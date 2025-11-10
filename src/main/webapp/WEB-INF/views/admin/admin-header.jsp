@@ -152,7 +152,7 @@
                 <li class="menu-item">
                     <a href="/admin/members" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-layout"></i>
-                        <div data-i18n="Layouts">고객 승인</div>
+                        <div data-i18n="Layouts">고객 관리</div>
                     </a>
                 </li>
 

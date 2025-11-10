@@ -24,21 +24,44 @@
     </select>
 
     <!-- 고객 목록 조회 (검색 조건 적용) -->
-    <select id="getMembersByCriteria" resultType="Member">
-        SELECT member_login_id, member_name, member_phone, member_email, created_at
+    <select id="getMembersByCriteria" parameterType="MemberCriteria" resultType="Member">
+        SELECT *
         FROM member
-        <where>
-            <if test="name != null and name != ''">
-                AND member_name LIKE CONCAT('%', #{memberName}, '%')
-            </if>
-            <if test="phone != null and phone != ''">
-                AND member_phone LIKE CONCAT('%', #{memberPhone}, '%')
-            </if>
-            <if test="email != null and email != ''">
-                AND member_email LIKE CONCAT('%', #{memberEmail}, '%')
-            </if>
-        </where>
+        WHERE 1=1
+        <if test="keyword != null and keyword != ''">
+            AND (login_id LIKE CONCAT('%', #{keyword}, '%')
+            OR name LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="startDate != null">
+            AND created_at &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND created_at &lt;= DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+        </if>
         ORDER BY created_at DESC
+        LIMIT #{skip}, #{amount}
+    </select>
+
+    <select id="getMemberTotalCount" parameterType="MemberCriteria" resultType="int">
+        SELECT COUNT(*)
+        FROM member
+        WHERE 1=1
+        <if test="keyword != null and keyword != ''">
+            AND (login_id LIKE CONCAT('%', #{keyword}, '%')
+            OR name LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="startDate != null">
+            AND created_at &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND created_at &lt;= DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+        </if>
     </select>
 
     <!-- 고객 상세 조회 -->
@@ -55,5 +78,27 @@
         WHERE staff_login_id = #{staffLoginId}
     </select>
 
+    <select id="getPage" resultType="MemberDTO">
+        select * from
+        member
+        where member_id > 0
+<!--        <include refid="search"/>-->
+        order by member_id desc
+        limit #{skip}, #{amount}
+    </select>
+
+    <select id="getTotal" resultType="int">
+        select count()
+        from
+        board
+        where bno > 0
+<!--        <include refid="search"/>-->
+    </select>
+
+    <update id="updateMemberStatus">
+        UPDATE member
+        SET status = #{status}
+        WHERE member_id = #{memberId}
+    </update>
 
 </mapper>
