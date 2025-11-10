@@ -49,12 +49,8 @@
                     </span>
                     <span class="app-brand-text demo menu-text fw-bolder ms-2">WMS</span>
                 </a>
-                <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
-                    <i class="bx bx-chevron-left bx-sm align-middle"></i>
-                </a>
             </div>
             <div class="menu-inner-shadow"></div>
-
             <ul class="menu-inner py-1">
                 <li class="menu-item">
                     <a href="${pageContext.request.contextPath}/dashboard" class="menu-link">
@@ -62,7 +58,6 @@
                         <div data-i18n="Analytics">대시보드</div>
                     </a>
                 </li>
-
                 <li class="menu-header small text-uppercase"><span class="menu-header-text">재무관리</span></li>
                 <li class="menu-item active">
                     <a href="${pageContext.request.contextPath}/sales/list" class="menu-link">
@@ -133,7 +128,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">검색어</label>
-                                    <input type="text" id="keyword" class="form-control" placeholder="고객사명, 카테고리 등"/>
+                                    <input type="text" id="keyword" class="form-control" placeholder="고객사, 창고명 등"/>
                                 </div>
                                 <div class="col-md-2 d-flex align-items-end">
                                     <button type="button" class="btn btn-outline-primary w-100" onclick="loadData(1)">
@@ -158,7 +153,6 @@
                                     <tbody id="tableBody"></tbody>
                                 </table>
                             </div>
-
                             <div class="d-flex justify-content-center mt-4">
                                 <nav>
                                     <ul class="pagination" id="pagination"></ul>
@@ -205,11 +199,11 @@
                 <div class="row g-2">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">고객사명 <span class="text-danger">*</span></label>
-                        <input type="text" id="modalClientName" class="form-control" placeholder="(주)고객사"/>
+                        <input type="text" id="modalClientName" class="form-control" placeholder="예: (주)SSG"/>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">창고명 <span class="text-danger">*</span></label>
-                        <input type="text" id="modalWarehouseName" class="form-control" placeholder="서울 제1창고"/>
+                        <input type="text" id="modalWarehouseName" class="form-control" placeholder="예: 김포 물류센터"/>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -217,7 +211,7 @@
                     <select id="modalCategory" class="form-select">
                         <option value="">선택하세요</option>
                         <option value="월 이용료">월 이용료</option>
-                        <option value="보관료">보관료</option>
+                        <option value="추가 보관료">추가 보관료</option>
                         <option value="작업비">작업비</option>
                         <option value="기타">기타</option>
                     </select>
@@ -249,7 +243,7 @@
 <script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
 <script>
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
-    const API_BASE_URL = CONTEXT_PATH + '/sales/api'; // (컨트롤러 분리 여부에 따라 수정 필요)
+    const API_BASE_URL = CONTEXT_PATH + '/sales/api';
 
     $(document).ready(function () {
         loadData(1);
@@ -268,7 +262,7 @@
             },
             dataType: 'json',
             success: function (res) {
-                renderTable(res.sales); // 필드명 확인 (res.sales)
+                renderTable(res.sales); // 필드명 확인
                 renderPagination(res);
             },
             error: function (e) {
@@ -286,7 +280,7 @@
         }
         list.forEach(item => {
             let amt = new Intl.NumberFormat('ko-KR').format(item.amount);
-            // ⚠️ 중요: \${} 이스케이프 처리됨
+            // [중요] 이스케이프 (\$) 처리됨
             tbody.append(`<tr style="cursor:pointer" onclick="openDetailModal(\${item.id})">
                 <td>\${item.id}</td>
                 <td>\${item.salesDate}</td>
@@ -326,7 +320,7 @@
             $('#btnUpdate, #btnDelete').show();
             salesModal.show();
         }).fail(function (e) {
-            console.error("Error fetching sales detail:", e);
+            console.error("Error fetching detail:", e);
             alert('매출 상세 정보를 불러오지 못했습니다.');
         });
     }
@@ -340,32 +334,29 @@
     }
 
     function deleteSales() {
-        if (confirm('이 매출 내역을 삭제하시겠습니까?')) sendRequest('DELETE', API_BASE_URL + '/' + $('#salesId').val(), '삭제되었습니다.');
+        if (confirm('삭제하시겠습니까?')) sendRequest('DELETE', API_BASE_URL + '/' + $('#salesId').val(), '삭제되었습니다.');
     }
 
     function sendRequest(method, url, msg) {
-        let salesData = {
-            salesDate: $('#modalSalesDate').val(),
-            clientName: $('#modalClientName').val(),
-            warehouseName: $('#modalWarehouseName').val(),
-            category: $('#modalCategory').val(),
-            amount: $('#modalAmount').val(),
-            description: $('#modalDescription').val()
-        };
-
         $.ajax({
             url: url,
             type: method,
             contentType: 'application/json',
-            data: method === 'DELETE' ? null : JSON.stringify(salesData),
+            data: method === 'DELETE' ? null : JSON.stringify({
+                salesDate: $('#modalSalesDate').val(),
+                clientName: $('#modalClientName').val(),
+                warehouseName: $('#modalWarehouseName').val(),
+                category: $('#modalCategory').val(),
+                amount: $('#modalAmount').val(),
+                description: $('#modalDescription').val()
+            }),
             success: function () {
                 alert(msg);
                 salesModal.hide();
                 loadData(1);
             },
             error: function (e) {
-                console.error("Error saving sales:", e);
-                alert('요청 처리 중 오류가 발생했습니다.');
+                alert('요청 실패: ' + e.status);
             }
         });
     }
