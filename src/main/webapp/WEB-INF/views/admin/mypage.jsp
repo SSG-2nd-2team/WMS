@@ -1,82 +1,106 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<%-- 같은 admin 폴더 내에 있으므로 경로 없이 바로 include --%>
 <%@ include file="admin-header.jsp" %>
 
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4">My Page</h4>
-    <div class="card mb-4">
-        <h5 class="card-header">회원 정보</h5>
-        <div class="card-body">
-            <div class="row gy-3">
-                <!-- Default Offcanvas -->
-                <div class="col-lg-3 col-md-6">
-                    <table class="table table-borderless">
-                        <tbody>
-                        <tr>
-                            <td style="white-space: nowrap;" class="align-middle"><small class="text-black fw-semibold mb-3">이름</small></td>
-                            <td class="py-3">
-                                <p class="mb-0">${staff.staffName}</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="white-space: nowrap;" class="align-middle"><small class="text-black fw-semibold mb-3">권한</small></td>
-                            <td class="py-3">
-                                <p class="mb-0">${staff.role}</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="white-space: nowrap;"><small class="text-black fw-semibold mb-3">ID</small></td>
-                            <td class="py-3">
-                                <p class="mb-0">${staff.staffLoginId}</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="white-space: nowrap;"><small class="text-black fw-semibold mb-3">전화번호</small></td>
-                            <td class="py-3">
-                                <!-- 읽기 모드 -->
-                                <p class="mb-0" id="phoneDisplay">${staff.staffPhone}</p>
-                                <!-- 수정 모드 -->
-                                <input type="text" class="form-control" id="phoneInput" value="${staff.staffPhone}" style="display: none;">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="white-space: nowrap;"><small class="text-black fw-semibold mb-3">Email</small></td>
-                            <td class="py-3">
-                                <!-- 읽기 모드 -->
-                                <p style="white-space: nowrap;" class="mb-0" id="emailDisplay">${staff.staffEmail}</p>
-                                <!-- 수정 모드 -->
-                                <input type="email" class="form-control" id="emailInput" value="${staff.staffEmail}" style="display: none;">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="white-space: nowrap;"><small class="text-black fw-semibold mb-3">가입일</small></td>
-                            <td class="py-3">
-                                <p style="white-space: nowrap;" class="mb-0">${staff.createdAt}</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="white-space: nowrap;"><small class="text-black fw-semibold mb-3">정보수정일</small></td>
-                            <td class="py-3">
-                                <p style="white-space: nowrap;" class="mb-0">${staff.updatedAt}</p>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-<%--                    <div>--%>
-<%--                        <button type="button" class="btn rounded-pill btn-info" id="editBtn" onclick="toggleEditMode()">수정하기</button>--%>
-<%--                    </div>--%>
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">설정 /</span> 내 정보
+    </h4>
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="card mb-4">
+                <h5 class="card-header">프로필 정보</h5>
+                <div class="card-body">
+                    <div class="d-flex align-items-start align-items-sm-center gap-4">
+                        <img src="${pageContext.request.contextPath}/assets/img/avatars/1.png"
+                             alt="user-avatar" class="d-block rounded" height="100" width="100" id="uploadedAvatar"/>
+                        <div class="button-wrapper">
+                            <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
+                                <span class="d-none d-sm-block">사진 변경</span>
+                                <i class="bx bx-upload d-block d-sm-none"></i>
+                                <input type="file" id="upload" class="account-file-input" hidden
+                                       accept="image/png, image/jpeg"/>
+                            </label>
+                            <button type="button" class="btn btn-outline-secondary account-image-reset mb-4">
+                                <i class="bx bx-reset d-block d-sm-none"></i>
+                                <span class="d-none d-sm-block">초기화</span>
+                            </button>
+                            <p class="text-muted mb-0">JPG, GIF or PNG. 최대 800K</p>
+                        </div>
+                    </div>
                 </div>
-
+                <hr class="my-0"/>
+                <div class="card-body">
+                    <form id="formAccountSettings" method="POST" onsubmit="return false">
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="staffName" class="form-label">이름</label>
+                                <input class="form-control" type="text" id="staffName" name="staffName"
+                                       value="${staff.staffName}" readonly/>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="staffLoginId" class="form-label">아이디</label>
+                                <input class="form-control" type="text" name="staffLoginId" id="staffLoginId"
+                                       value="${staff.staffLoginId}" readonly/>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="staffEmail" class="form-label">이메일</label>
+                                <input class="form-control" type="text" id="staffEmail" name="staffEmail"
+                                       value="${staff.staffEmail}" placeholder="example@racl.com"/>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label class="form-label" for="staffPhone">전화번호</label>
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text">KR (+82)</span>
+                                    <input type="text" id="staffPhone" name="staffPhone" class="form-control"
+                                           value="${staff.staffPhone}" placeholder="010-1234-5678"/>
+                                </div>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="role" class="form-label">권한</label>
+                                <input type="text" class="form-control" id="role" name="role" value="${staff.role}"
+                                       readonly/>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="createdAt" class="form-label">가입일</label>
+                                <input type="text" class="form-control" id="createdAt" name="createdAt"
+                                       value="${staff.createdAt}" readonly/>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <button type="submit" class="btn btn-primary me-2">변경사항 저장</button>
+                            <button type="reset" class="btn btn-outline-secondary">취소</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h5 class="card-header">Backdrop</h5>
-        <div class="card-body">
-
+            <div class="card">
+                <h5 class="card-header">계정 삭제</h5>
+                <div class="card-body">
+                    <div class="mb-3 col-12 mb-0">
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading fw-bold mb-1">정말로 계정을 삭제하시겠습니까?</h6>
+                            <p class="mb-0">계정이 삭제되면 되돌릴 수 없습니다. 신중하게 결정해주세요.</p>
+                        </div>
+                    </div>
+                    <form id="formAccountDeactivation" onsubmit="return false">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="accountActivation"
+                                   id="accountActivation"/>
+                            <label class="form-check-label" for="accountActivation">계정 삭제에 동의합니다.</label>
+                        </div>
+                        <button type="submit" class="btn btn-danger deactivate-account">계정 삭제</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- / Content -->
+<%-- 푸터 include (필수!) --%>
 <%@ include file="admin-footer.jsp" %>
