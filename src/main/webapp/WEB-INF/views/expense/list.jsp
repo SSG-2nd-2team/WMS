@@ -106,6 +106,7 @@
                     </ul>
                 </div>
             </nav>
+
             <div class="content-wrapper">
                 <div class="container-xxl flex-grow-1 container-p-y">
                     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">재무관리 /</span> 지출 관리</h4>
@@ -153,7 +154,6 @@
                                     <tbody id="tableBody"></tbody>
                                 </table>
                             </div>
-
                             <div class="d-flex justify-content-center mt-4">
                                 <nav>
                                     <ul class="pagination" id="pagination"></ul>
@@ -265,7 +265,7 @@
                 renderPagination(res);
             },
             error: function (e) {
-                console.error("Load failed", e);
+                console.error("Error loading expense data:", e);
                 $('#tableBody').html('<tr><td colspan="6" class="text-center py-3 text-danger">데이터 로드 실패</td></tr>');
             }
         });
@@ -278,8 +278,8 @@
             return;
         }
         list.forEach(item => {
+            // [중요] 500 에러 방지를 위한 이스케이프 (\$) 처리됨
             let amt = new Intl.NumberFormat('ko-KR').format(item.amount);
-            // ⚠️ 중요: \${} 로 이스케이프 처리했습니다.
             tbody.append(`<tr style="cursor:pointer" onclick="openDetailModal(\${item.id})">
                 <td>\${item.id}</td>
                 <td>\${item.expenseDate}</td>
@@ -297,6 +297,7 @@
         $('#expenseId').val('');
         $('#modalExpenseDate').val(new Date().toISOString().split('T')[0]);
         $('#modalWarehouseName, #modalCategory, #modalAmount, #modalDescription').val('');
+        $('#modalCategory').val('');
         $('#modalTitle').text('신규 지출 등록');
         $('#btnSave').show();
         $('#btnUpdate, #btnDelete').hide();
@@ -311,13 +312,13 @@
             $('#modalCategory').val(data.category);
             $('#modalAmount').val(data.amount);
             $('#modalDescription').val(data.description);
-
             $('#modalTitle').text('지출 상세 정보');
             $('#btnSave').hide();
             $('#btnUpdate, #btnDelete').show();
             expenseModal.show();
-        }).fail(function () {
-            alert('데이터를 불러오지 못했습니다.');
+        }).fail(function (e) {
+            console.error("Error fetching detail:", e);
+            alert('지출 상세 정보를 불러오지 못했습니다.');
         });
     }
 
@@ -362,11 +363,15 @@
         let startPage = Math.floor((res.page - 1) / 10) * 10 + 1;
         let endPage = Math.min(startPage + 9, totalPages);
 
-        if (res.page > 1) $ul.append(`<li class="page-item"><a class="page-link" href="javascript:loadData(\${res.page - 1})"><i class="bx bx-chevron-left"></i></a></li>`);
+        if (res.page > 1) {
+            $ul.append(`<li class="page-item"><a class="page-link" href="javascript:loadData(\${res.page - 1})"><i class="bx bx-chevron-left"></i></a></li>`);
+        }
         for (let i = startPage; i <= endPage; i++) {
             $ul.append(`<li class="page-item \${i === res.page ? 'active' : ''}"><a class="page-link" href="javascript:loadData(\${i})">\${i}</a></li>`);
         }
-        if (res.page < totalPages) $ul.append(`<li class="page-item"><a class="page-link" href="javascript:loadData(\${res.page + 1})"><i class="bx bx-chevron-right"></i></a></li>`);
+        if (res.page < totalPages) {
+            $ul.append(`<li class="page-item"><a class="page-link" href="javascript:loadData(\${res.page + 1})"><i class="bx bx-chevron-right"></i></a></li>`);
+        }
     }
 </script>
 </body>
