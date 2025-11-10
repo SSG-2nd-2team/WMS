@@ -6,4 +6,8 @@ import java.util.List;
 
 public interface DashboardService {
     List<DashboardSummaryDTO> getNetProfitSummary(int year);
+
+    int getMonthlyInboundCount(int year, int month);
+
+    int getMonthlyOutboundCount(int year, int month);
 }

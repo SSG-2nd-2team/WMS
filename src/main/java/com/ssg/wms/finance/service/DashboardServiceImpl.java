@@ -1,6 +1,7 @@
 package com.ssg.wms.finance.service;
 
 import com.ssg.wms.finance.dto.DashboardSummaryDTO;
+import com.ssg.wms.finance.mappers.DashboardMapper;
 import com.ssg.wms.finance.mappers.ExpenseMapper;
 import com.ssg.wms.finance.mappers.SalesMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final ExpenseMapper expenseMapper;
     private final SalesMapper salesMapper;
+    private final DashboardMapper dashboardMapper;
 
     @Override
     public List<DashboardSummaryDTO> getNetProfitSummary(int year) {
@@ -42,5 +44,15 @@ public class DashboardServiceImpl implements DashboardService {
             dto.setNetProfit(netProfit);
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public int getMonthlyInboundCount(int year, int month) {
+        return dashboardMapper.countMonthlyInbound(year, month);
+    }
+
+    @Override
+    public int getMonthlyOutboundCount(int year, int month) {
+        return dashboardMapper.countMonthlyOutbound(year, month);
     }
 }

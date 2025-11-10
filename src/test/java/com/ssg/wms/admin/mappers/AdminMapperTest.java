@@ -23,7 +23,7 @@ public class AdminMapperTest {
     void testGetStaffDetails() {
         long staffId = 1L; // 테스트용 데이터 존재해야 함
 
-        Staff staff = adminMapper.getStaffDetails(staffId);
+        StaffDTO staff = adminMapper.getStaffDetails(staffId);
 
         System.out.println("조회 결과: " + staff);
     }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.LocalDate;
 import java.time.Year;
 import java.util.HashMap;
 import java.util.List;
@@ -28,54 +29,63 @@ public class DashboardController {
     private final DashboardService dashboardService;
     private final ExpenseService expenseService;
 
-    // JSP 렌더링
+    // 대시보드 페이지 렌더링 (JSP)
     @GetMapping
-    public String dashboard(Model model, @RequestParam(required = false, defaultValue = "0") int year) {
-        // 초기 로딩 시에도 데이터를 계산해서 보내줄 수 있지만,
-        // 현재 구조에서는 JSP가 로딩 직후 AJAX를 호출하므로 껍데기만 리턴해도 충분.
+    public String dashboard(Model model) {
+        // 초기 데이터는 AJAX로 불러오므로 껍데기만 반환
         return "dashboard/index";
     }
 
-    // 대시보드 데이터 통합 조회 (AJAX용 API)
+    // 대시보드 데이터 통합 조회 (AJAX API)
     @GetMapping("/api")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getDashboardDataApi(
             @RequestParam(required = false, defaultValue = "0") int year) {
 
+        // 1. 연도 기본값 설정 (파라미터가 0이면 현재 연도)
         if (year == 0) {
             year = Year.now().getValue();
         }
 
-        // 1. 월별 데이터 & 카테고리별 지출 데이터 조회
+        // 2. 재무 데이터 조회 (월별 순수익, 카테고리별 지출)
         List<DashboardSummaryDTO> netProfitSummary = dashboardService.getNetProfitSummary(year);
         List<CategorySummaryDTO> expenseSummary = expenseService.getAnnualExpenseSummary(year);
 
-        // 2. [핵심 추가] 1년치 총합 계산
+        // 3. 재무 총합 계산 (1년치)
         long totalSales = netProfitSummary.stream()
                 .mapToLong(DashboardSummaryDTO::getTotalSales)
                 .sum();
-
         long totalExpense = netProfitSummary.stream()
                 .mapToLong(DashboardSummaryDTO::getTotalExpenses)
                 .sum();
-
         long netProfit = totalSales - totalExpense;
 
-        // 3. 수익률 계산 (매출이 0일 경우 0.0% 처리하여 에러 방지)
+        // 4. 수익률 계산 (매출 0원일 때 예외 처리)
         double profitMargin = (totalSales == 0) ? 0.0 : ((double) netProfit / totalSales) * 100;
 
-        // 4. 응답 데이터 구성 (Map에 모두 담아서 반환)
-        Map<String, Object> response = new HashMap<>();
-        response.put("netProfitSummary", netProfitSummary); // 차트용 월별 데이터
-        response.put("expenseSummary", expenseSummary);     // 차트용 카테고리 데이터
+        // 5. 물류 현황 데이터 조회 (선택된 연도의 현재 월 기준)
+        int currentMonth = LocalDate.now().getMonthValue();
+        int inboundCount = dashboardService.getMonthlyInboundCount(year, currentMonth);
+        int outboundCount = dashboardService.getMonthlyOutboundCount(year, currentMonth);
 
-        // 상단 요약 카드용 합계 데이터
+        // 6. 응답 데이터 구성
+        Map<String, Object> response = new HashMap<>();
+        // [차트용 데이터]
+        response.put("netProfitSummary", netProfitSummary);
+        response.put("expenseSummary", expenseSummary);
+
+        // [상단 요약 카드용 재무 데이터]
         response.put("totalSales", totalSales);
         response.put("totalExpense", totalExpense);
         response.put("netProfit", netProfit);
         response.put("profitMargin", profitMargin);
 
-        response.put("selectedYear", year); // 현재 선택된 연도
+        // [중단 요약 카드용 물류 데이터]
+        response.put("monthlyInboundCount", inboundCount);
+        response.put("monthlyOutboundCount", outboundCount);
+
+        // [기타 정보]
+        response.put("selectedYear", year);
 
         return ResponseEntity.ok(response);
     }

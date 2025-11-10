@@ -15,7 +15,6 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!--    <context:component-scan base-package="com.ssg.wms"/>-->
     <context:component-scan base-package="com.ssg.wms" use-default-filters="false">
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
         <context:include-filter type="annotation"
@@ -24,11 +23,6 @@
 
     <mvc:annotation-driven/>
 
-    <mvc:resources mapping="/resources/**" location="classpath:/static/"/>
-
-    <!--  부트스트랩 템플릿을 jsp 형식으로 열기 위해 assets 폴더 위치 지정  -->
-    <mvc:resources mapping="/resources/**" location="/resources/" />
-
-<!--    <mvc:resources mapping="/assets/**" location="/assets/"/>-->
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
 
 </beans>
