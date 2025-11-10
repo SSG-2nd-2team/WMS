@@ -30,6 +30,8 @@
 
     <script src="${pageContext.request.contextPath}/assets/vendor/js/helpers.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/config.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.41.0/dist/apexcharts.min.js"></script>
 </head>
 
 <body>
@@ -55,9 +57,6 @@
                         </svg>
                     </span>
                     <span class="app-brand-text demo menu-text fw-bolder ms-2">WMS</span>
-                </a>
-                <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
-                    <i class="bx bx-chevron-left bx-sm align-middle"></i>
                 </a>
             </div>
             <div class="menu-inner-shadow"></div>
@@ -134,10 +133,9 @@
                                                 <span class="badge bg-label-success rounded-pill">Yearly</span>
                                             </div>
                                             <div class="mt-sm-auto">
-                                                <h3 class="mb-0" id="totalSales">Loading...</h3>
+                                                <h3 class="mb-0" id="totalSales">0원</h3>
                                             </div>
                                         </div>
-                                        <div id="profileReportChart"></div>
                                     </div>
                                 </div>
                             </div>
@@ -152,7 +150,7 @@
                                                 <span class="badge bg-label-danger rounded-pill">Yearly</span>
                                             </div>
                                             <div class="mt-sm-auto">
-                                                <h3 class="mb-0" id="totalExpense">Loading...</h3>
+                                                <h3 class="mb-0" id="totalExpense">0원</h3>
                                             </div>
                                         </div>
                                     </div>
@@ -169,7 +167,7 @@
                                                 <span class="badge bg-label-primary rounded-pill">Yearly</span>
                                             </div>
                                             <div class="mt-sm-auto">
-                                                <h3 class="mb-0 text-primary" id="netProfit">Loading...</h3>
+                                                <h3 class="mb-0 text-primary" id="netProfit">0원</h3>
                                             </div>
                                         </div>
                                     </div>
@@ -194,7 +192,6 @@
                                                 <h4 class="my-1" id="monthlyInbound">0 건</h4>
                                             </div>
                                         </div>
-                                        <div id="inboundChart"></div>
                                     </div>
                                 </div>
                             </div>
@@ -213,7 +210,6 @@
                                                 <h4 class="my-1" id="monthlyOutbound">0 건</h4>
                                             </div>
                                         </div>
-                                        <div id="outboundChart"></div>
                                     </div>
                                 </div>
                             </div>
@@ -253,8 +249,7 @@
                 </div>
                 <footer class="content-footer footer bg-footer-theme">
                     <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
-                        <div class="mb-2 mb-md-0">
-                            ©
+                        <div class="mb-2 mb-md-0">©
                             <script>document.write(new Date().getFullYear());</script>
                             , made with ❤️ by WMS Team
                         </div>
@@ -272,79 +267,59 @@
 <script src="${pageContext.request.contextPath}/assets/vendor/js/bootstrap.js"></script>
 <script src="${pageContext.request.contextPath}/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
 <script src="${pageContext.request.contextPath}/assets/vendor/js/menu.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.41.0/dist/apexcharts.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
 
 <script>
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
-    const API_URL = CONTEXT_PATH + '/dashboard/api'; // API 컨트롤러 경로 확인 필요
+    const API_URL = CONTEXT_PATH + '/dashboard/api';
+
+    // 전역 변수로 차트 객체 선언 (initEmptyCharts에서 할당될 것임)
+    let mainChart;
+    let growthChart;
 
     $(document).ready(function () {
-        // 연도 필터 초기화 (현재 연도 ~ 5년 전)
+        // 1. 페이지 로드 되자마자 빈 차트 먼저 그리기 (껍데기 생성)
+        // 이 함수 내에서 mainChart와 growthChart 변수에 ApexCharts 인스턴스가 할당됩니다.
+        initEmptyCharts();
+
+        // 2. 연도 필터 초기화 및 데이터 로드
         const currentYear = new Date().getFullYear();
         let yearFilter = $('#yearFilter');
         for (let i = 0; i < 5; i++) {
             yearFilter.append(`<option value="\${currentYear - i}">\${currentYear - i}년</option>`);
         }
-        yearFilter.val(currentYear);
+        yearFilter.val(currentYear); // 현재 연도 선택
 
-        loadDashboardData(currentYear);
+        loadDashboardData(currentYear); // 현재 연도 데이터 로드
 
         $('#yearFilter').change(function () {
             loadDashboardData($(this).val());
         });
     });
 
-    function loadDashboardData(year) {
-        $.ajax({
-            url: API_URL,
-            type: 'GET',
-            data: {year: year},
-            dataType: 'json',
-            success: function (data) {
-                updateSummaryCards(data);
-                renderMainChart(data.monthlySalesData, data.monthlyExpenseData);
-                renderGrowthChart(data.profitMargin);
-            },
-            error: function (e) {
-                console.error("Dashboard load failed", e);
-                // 에러 처리 UI (옵션)
-            }
-        });
-    }
-
-    function updateSummaryCards(data) {
-        $('#totalSales').text(formatCurrency(data.totalSales));
-        $('#totalExpense').text(formatCurrency(data.totalExpense));
-        $('#netProfit').text(formatCurrency(data.netProfit));
-
-        // 물류 현황 (백엔드 제공 시 연결)
-        $('#monthlyInbound').text((data.monthlyInboundCount || 0) + ' 건');
-        $('#monthlyOutbound').text((data.monthlyOutboundCount || 0) + ' 건');
-        $('#profitMarginText').text(data.profitMargin.toFixed(1) + '% 수익률');
-    }
-
-    function renderMainChart(salesData, expenseData) {
-        const options = {
-            series: [{name: '매출', data: salesData}, {name: '지출', data: expenseData}],
+    // --- [신규 추가] 빈 차트 초기화 함수 ---
+    function initEmptyCharts() {
+        // 메인 차트 초기화
+        const mainChartOptions = {
+            series: [{name: '매출', data: Array(12).fill(0)}, {name: '지출', data: Array(12).fill(0)}], // 초기값
             chart: {height: 300, type: 'bar', toolbar: {show: false}, fontFamily: 'Public Sans'},
             plotOptions: {bar: {horizontal: false, columnWidth: '40%', borderRadius: 4}},
             dataLabels: {enabled: false},
             stroke: {show: true, width: 2, colors: ['transparent']},
-            colors: ['#696cff', '#ff3e1d'], // Sneat Primary & Danger
+            colors: ['#696cff', '#ff3e1d'],
             xaxis: {categories: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']},
             fill: {opacity: 1},
             grid: {borderColor: '#f1f1f1', padding: {bottom: 10}},
-            legend: {position: 'top', horizontalAlign: 'left', markers: {radius: 12}}
+            legend: {position: 'top', horizontalAlign: 'left', markers: {radius: 12}},
+            noData: {text: 'Loading Data...'} // 데이터 없을 때 표시 문구
         };
-        if (window.mainChart) window.mainChart.destroy();
-        window.mainChart = new ApexCharts(document.querySelector("#mainChart"), options);
-        window.mainChart.render();
-    }
+        // 전역 변수 mainChart에 인스턴스 할당
+        mainChart = new ApexCharts(document.querySelector("#mainChart"), mainChartOptions);
+        mainChart.render();
 
-    function renderGrowthChart(profitMargin) {
-        const options = {
-            series: [profitMargin],
+        // 성장률 차트 초기화
+        const growthChartOptions = {
+            series: [0], // 초기값
             chart: {height: 200, type: 'radialBar', sparkline: {enabled: true}},
             plotOptions: {
                 radialBar: {
@@ -363,16 +338,61 @@
             },
             colors: ['#696cff']
         };
-        if (window.growthChart) window.growthChart.destroy();
-        window.growthChart = new ApexCharts(document.querySelector("#growthChart"), options);
-        window.growthChart.render();
+        // 전역 변수 growthChart에 인스턴스 할당
+        growthChart = new ApexCharts(document.querySelector("#growthChart"), growthChartOptions);
+        growthChart.render();
     }
 
-    // [수정 후] (값이 없으면 0으로 처리)
+    function loadDashboardData(year) {
+        $.ajax({
+            url: API_URL,
+            type: 'GET',
+            data: {year: year},
+            dataType: 'json',
+            success: function (data) {
+                updateSummaryCards(data);
+
+                // 데이터 변환
+                const monthlySales = Array(12).fill(0);
+                const monthlyExpenses = Array(12).fill(0);
+                if (data.netProfitSummary) {
+                    data.netProfitSummary.forEach(item => {
+                        if (item.month >= 1 && item.month <= 12) {
+                            monthlySales[item.month - 1] = item.totalSales;
+                            monthlyExpenses[item.month - 1] = item.totalExpenses;
+                        }
+                    });
+                }
+
+                // [핵심] 기존 차트에 데이터만 업데이트 (updateSeries)
+                // initEmptyCharts에서 이미 mainChart 인스턴스가 생성되었으므로,
+                // 여기서는 destroy() 없이 데이터만 갈아끼우는 updateSeries를 사용합니다.
+                mainChart.updateSeries([
+                    {name: '매출', data: monthlySales},
+                    {name: '지출', data: monthlyExpenses}
+                ]);
+
+                // growthChart도 마찬가지로 데이터만 업데이트
+                growthChart.updateSeries([data.profitMargin || 0]); // profitMargin이 null일 경우 0으로 처리
+            },
+            error: function (e) {
+                console.error("Dashboard load failed", e);
+            }
+        });
+    }
+
+    function updateSummaryCards(data) {
+        $('#totalSales').text(formatCurrency(data.totalSales));
+        $('#totalExpense').text(formatCurrency(data.totalExpense));
+        $('#netProfit').text(formatCurrency(data.netProfit));
+        $('#monthlyInbound').text((data.monthlyInboundCount || 0) + ' 건');
+        $('#monthlyOutbound').text((data.monthlyOutboundCount || 0) + ' 건');
+        $('#profitMarginText').text((data.profitMargin || 0).toFixed(1) + '% 수익률');
+    }
+
     function formatCurrency(amount) {
-        // amount가 null이나 undefined면 0으로 대체
         let safeAmount = amount || 0;
-        return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(safeAmount);
+        return new Intl.NumberFormat('ko-KR', {style: 'currency', currency: 'KRW'}).format(safeAmount);
     }
 </script>
 </body>
