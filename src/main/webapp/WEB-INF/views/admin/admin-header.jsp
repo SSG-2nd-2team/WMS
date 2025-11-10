@@ -117,7 +117,7 @@
                   </g>
                 </svg>
               </span>
-                    <span class="app-brand-text demo menu-text fw-bolder ms-2">RACL WMS</span>
+                    <span class="app-brand-text demo menu-text fw-bolder ms-2">RACL</span>
                 </a>
 
                 <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -348,8 +348,8 @@
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <span class="fw-semibold d-block">사용자 이름 입력</span>
-                                                <small class="text-muted">권한 입력</small>
+                                                <span class="fw-semibold d-block">${loginId}</span>
+                                                <small class="text-muted">Admin</small>
                                             </div>
                                         </div>
                                     </a>
@@ -367,7 +367,7 @@
                                     <div class="dropdown-divider"></div>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="html/auth-login-basic.html">
+                                    <a class="dropdown-item" href="/admin/logout">
                                         <i class="bx bx-power-off me-2"></i>
                                         <span class="align-middle">Log Out</span>
                                     </a>

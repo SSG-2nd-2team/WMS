@@ -125,14 +125,14 @@
                     <h4 class="mb-2">환영해요! 👋</h4>
                     <p class="mb-4">신속하고 정확한 창고 관리 서비스 RACL WMS와 함께 편리한 비즈니스를 시작해보세요.</p>
 
-                    <form id="formAuthentication" class="mb-3" action="index.html" method="POST">
+                    <form id="formAuthentication" class="mb-3" action="/admin" method="POST">
                         <div class="mb-3">
-                            <label for="username" class="form-label">ID</label>
+                            <label for="loginId" class="form-label">ID</label>
                             <input
                                     type="text"
                                     class="form-control"
-                                    id="username"
-                                    name="username"
+                                    id="loginId"
+                                    name="loginId"
                                     placeholder="ID를 입력해주세요"
                                     autofocus
                             />

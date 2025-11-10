@@ -1,5 +1,16 @@
 package com.ssg.wms.admin.service;
 
-public interface AdminService {
+import com.ssg.wms.admin.domain.Member;
+import com.ssg.wms.admin.domain.Staff;
+import com.ssg.wms.admin.dto.MemberSearchCriteriaDTO;
+import com.ssg.wms.admin.dto.StaffDTO;
 
+import java.util.List;
+
+public interface AdminService {
+    void updateStaff(StaffDTO staffDTO);
+    Staff getStaffDetails(long staffId);
+    List<Member> getMembersByCriteria(MemberSearchCriteriaDTO criteria);
+    Member getMemberDetails(long memberId);
+    long findStaffIdByStaffLoginId(String staffLoginId);
 }

@@ -20,8 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
         // 관리자만 허용 (ADMIN)
         registry.addInterceptor(new RoleCheckInterceptor("ADMIN"))
                 .addPathPatterns(
-                        "/staff/**",
-                        "/system/**"
+                        "/admin/**",
+                        "*/admin/**"
                 );
     }
 }
