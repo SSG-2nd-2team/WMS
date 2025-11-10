@@ -5,10 +5,8 @@ import com.ssg.wms.product_ehs.dto.CategoryDTO;
 import com.ssg.wms.product_ehs.dto.ProductDTO;
 import com.ssg.wms.inbound.service.InboundMemberService;
 import com.ssg.wms.product_ehs.service.ProductServiceImpl;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +24,7 @@ public class InboundMemberController {
 
     private final InboundMemberService inboundService;
     private final ProductServiceImpl productService;
-    
+
     // 관리자가 승인시에 창고 위치 지정할때 창고 리스트 보려고 사용
 //    private final WarehouseService warehouseService
 
@@ -34,10 +32,10 @@ public class InboundMemberController {
     @GetMapping("/request")
     public String getInboundRequestForm(
 //            HttpSession session,
-                                        Model model) {
+            Model model) {
         // 로그인한 사용자의 user_id를 자동으로 가져오도록
-        Integer memberId = 1;
-//        Integer memberId = (Integer) session.getAttribute("loginMemberId");
+        Long memberId = 1L;  // Integer → Long으로 변경!
+//        Long memberId = (Long) session.getAttribute("loginMemberId");
 //        String memberName = (String) session.getAttribute("loginMemberName");
         String memberName = "엄홍길";
         model.addAttribute("memberId", memberId);
@@ -60,7 +58,6 @@ public class InboundMemberController {
         List<ProductDTO> products = new ArrayList<>();
         model.addAttribute("products", products);
 
-
         return "inbound/member/request";
     }
 
@@ -77,17 +74,19 @@ public class InboundMemberController {
         return productService.getProductsByPartnerAndCategory(partnerId, categoryCd);
     }
 
-
-
     // 입고 요청
     @PostMapping("/request")
     public String inboundRequest(HttpSession session,
                                  @Valid @ModelAttribute InboundRequestDTO inboundRequestDTO) {
 
         // 로그인한 사용자의 memberId 가져오기
-        Integer memberId = 1;
-//        Integer memberId = (Integer) session.getAttribute("loginMemberId");
+        Long memberId = 1L;  // Integer → Long으로 변경!
+//        Long memberId = (Long) session.getAttribute("loginMemberId");
         inboundRequestDTO.setMemberId(memberId);
+
+        log.info("=== 입고 요청 디버깅 ===");
+        log.info("memberId: {}", memberId);
+        log.info("DTO: {}", inboundRequestDTO);
 
         // 서비스 호출하여 DB 저장
         inboundService.createInbound(inboundRequestDTO);
@@ -96,7 +95,6 @@ public class InboundMemberController {
         return "redirect:/inbound/member/list";
     }
 
-
     // 입고 요청 목록 조회 (관리자용 - 브랜드, 상태 파라미터로 받아서 검색)
 
     // 입고 요청 단건 조회
@@ -104,6 +102,5 @@ public class InboundMemberController {
     // 입고 요청 수정
 
     // 입고 요청 취소
-
 
 }

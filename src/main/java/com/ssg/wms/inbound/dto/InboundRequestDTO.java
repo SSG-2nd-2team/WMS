@@ -11,7 +11,7 @@ public class InboundRequestDTO {
 
     private int warehouseId;
     private int staffId;
-    private int memberId;             // 필수
+    private Long memberId;             // 필수
     private String inboundStatus;      // 선택, 기본값: "request"
     private String inboundRejectReason; // 선택, 초기에는 null
     private LocalDateTime inboundRequestedAt;

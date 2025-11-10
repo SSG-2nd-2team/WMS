@@ -13,7 +13,7 @@ public class InboundVO {
     private int inboundId;
     private int warehouseId;
     private int staffId;
-    private int memberId;
+    private Long memberId;
     private String inboundStatus;         // request, cancelled, approved, rejected
     private String inboundRejectReason;
     private LocalDateTime inboundRequestedAt;
