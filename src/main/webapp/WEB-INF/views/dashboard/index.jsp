@@ -2,9 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<%-- [핵심] 이 페이지가 'dashboard'임을 헤더에게 알림 --%>
-<c:set var="pageActive" value="dashboard" scope="request"/>
-
 <%@ include file="../admin/admin-header.jsp" %>
 
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -71,41 +68,43 @@
 
     <h5 class="pb-1 mb-4 text-muted">물류 현황 (이번 달)</h5>
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center">
-                            <div class="avatar avatar-md me-2">
-                                <span class="avatar-initial rounded bg-label-info"><i
-                                        class="bx bx-down-arrow-alt fs-4"></i></span>
-                            </div>
-                            <div>
-                                <p class="mb-0 fw-semibold">금월 입고량</p>
-                                <h4 class="my-1" id="monthlyInbound">0 건</h4>
-                            </div>
-                        </div>
-                        <div id="inboundChart"></div>
+        <div class="col-lg-6 col-md-12 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center justify-content-between pb-0">
+                    <div class="card-title mb-0">
+                        <h5 class="m-0 me-2">금월 입고량</h5>
                     </div>
+                    <div class="avatar">
+                        <span class="avatar-initial rounded bg-label-info"><i
+                                class="bx bx-down-arrow-alt fs-4"></i></span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-2" id="monthlyInbound">0 건</h2>
+                    </div>
+                    <ul class="p-0 m-0" id="recentInboundList">
+                    </ul>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-md-6 col-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center">
-                            <div class="avatar avatar-md me-2">
-                                <span class="avatar-initial rounded bg-label-warning"><i
-                                        class="bx bx-up-arrow-alt fs-4"></i></span>
-                            </div>
-                            <div>
-                                <p class="mb-0 fw-semibold">금월 출고량</p>
-                                <h4 class="my-1" id="monthlyOutbound">0 건</h4>
-                            </div>
-                        </div>
-                        <div id="outboundChart"></div>
+        <div class="col-lg-6 col-md-12 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center justify-content-between pb-0">
+                    <div class="card-title mb-0">
+                        <h5 class="m-0 me-2">금월 출고량</h5>
                     </div>
+                    <div class="avatar">
+                        <span class="avatar-initial rounded bg-label-warning"><i
+                                class="bx bx-up-arrow-alt fs-4"></i></span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-2" id="monthlyOutbound">0 건</h2>
+                    </div>
+                    <ul class="p-0 m-0" id="recentOutboundList">
+                    </ul>
                 </div>
             </div>
         </div>
@@ -114,8 +113,9 @@
     <div class="row">
         <div class="col-md-8 col-lg-8 order-1 mb-4">
             <div class="card h-100">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between">
                     <h5 class="card-title m-0 me-2">월별 재무 현황</h5>
+                    <small class="text-muted">(단위: 만원)</small>
                 </div>
                 <div class="card-body px-0">
                     <div class="tab-content p-0">
@@ -167,6 +167,7 @@
     });
 
     function initEmptyCharts() {
+        // 메인 차트 (막대)
         const mainChartEl = document.querySelector("#mainChart");
         if (mainChartEl) {
             const mainChartOptions = {
@@ -177,15 +178,32 @@
                 stroke: {show: true, width: 2, colors: ['transparent']},
                 colors: ['#696cff', '#ff3e1d'],
                 xaxis: {categories: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']},
+                yaxis: {
+                    labels: {
+                        // [수정] Y축 눈금: 만 단위로 나누고 콤마 포맷팅
+                        formatter: function (val) {
+                            return new Intl.NumberFormat('ko-KR').format(Math.round(val / 10000));
+                        }
+                    }
+                },
                 fill: {opacity: 1},
                 grid: {borderColor: '#f1f1f1', padding: {bottom: 10}},
                 legend: {position: 'top', horizontalAlign: 'left', markers: {radius: 12}},
+                tooltip: {
+                    y: {
+                        // [수정] 툴팁: 전체 금액(원 단위) 표시
+                        formatter: function (val) {
+                            return new Intl.NumberFormat('ko-KR').format(val) + " 원";
+                        }
+                    }
+                },
                 noData: {text: '데이터 로딩 중...'}
             };
             mainChart = new ApexCharts(mainChartEl, mainChartOptions);
             mainChart.render();
         }
 
+        // 수익률 차트 (원형)
         const growthChartEl = document.querySelector("#growthChart");
         if (growthChartEl) {
             const growthChartOptions = {
@@ -251,6 +269,7 @@
     }
 
     function formatCurrency(amount) {
-        return new Intl.NumberFormat('ko-KR', {style: 'currency', currency: 'KRW'}).format(amount || 0);
+        let safeAmount = amount || 0;
+        return new Intl.NumberFormat('ko-KR', {style: 'currency', currency: 'KRW'}).format(safeAmount);
     }
 </script>

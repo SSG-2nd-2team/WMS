@@ -25,7 +25,13 @@
                 AND sales_date &lt;= #{dateTo}
             </if>
             <if test="keyword != null and keyword != ''">
-                AND (description LIKE CONCAT('%', #{keyword}, '%') OR client_name LIKE CONCAT('%', #{keyword}, '%'))
+                AND (
+                sales_id LIKE CONCAT('%', #{keyword}, '%')
+                OR warehouse_name LIKE CONCAT('%', #{keyword}, '%')
+                OR client_name LIKE CONCAT('%', #{keyword}, '%')
+                OR category LIKE CONCAT('%', #{keyword}, '%')
+                OR description LIKE CONCAT('%', #{keyword}, '%')
+                )
             </if>
         </where>
         ORDER BY sales_date DESC

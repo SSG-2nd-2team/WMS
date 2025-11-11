@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -13,7 +14,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class ExpenseRequestDTO { // 지출 검색용
     private String keyword;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateFrom;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateTo;
 
     @Builder.Default
