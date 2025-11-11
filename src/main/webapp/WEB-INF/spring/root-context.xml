@@ -13,21 +13,16 @@
        http://www.springframework.org/schema/tx
        http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <!-- 1. Component Scan 설정: Controller가 아닌 Service/Repository를 스캔 -->
     <context:component-scan base-package="com.ssg.wms">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
         <context:exclude-filter type="annotation"
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
     </context:component-scan>
 
-    <!-- 2. MyBatis Mapper Scan 설정 -->
-    <!-- com.ssg.wms 하위의 모든 Mapper 인터페이스를 찾습니다. -->
     <mybatis-spring:scan base-package="com.ssg.wms.**.mapper, com.ssg.wms.**.mappers"/>
 
-    <!-- 3. HikariCP Configuration (최초 상태 유지) -->
     <bean name="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
         <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
-        <!-- DB 연결 정보는 사용자님의 환경에 맞춥니다. -->
         <property name="jdbcUrl"
                   value="jdbc:mysql://localhost:3306/ssg2?serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8"/>
         <property name="username" value="root"/>
@@ -37,23 +32,18 @@
         <property name="maximumPoolSize" value="10"/>
     </bean>
 
-    <!-- 4. DataSource Bean -->
     <bean name="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
-        <!-- 생성자 인자로 HikariConfig를 주입 -->
         <constructor-arg ref="hikariConfig"/>
     </bean>
 
-    <!-- 5. Transaction Manager Setup -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
     <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 
-    <!-- 6. SqlSessionFactoryBean Setup -->
     <bean class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
 
-        <!-- DTO Alias Scan: WMS 하위의 모든 DTO 패키지를 스캔하도록 안정화 -->
         <property name="typeAliasesPackage"
                   value="com.ssg.wms.warehouse.dto, com.ssg.wms.finance.dto, com.ssg.wms.inbound.dto, com.ssg.wms.product.dto"/>
 
@@ -65,4 +55,5 @@
             </bean>
         </property>
     </bean>
+
 </beans>
