@@ -15,15 +15,18 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!--    <context:component-scan base-package="com.ssg.wms"/>-->
     <context:component-scan base-package="com.ssg.wms" use-default-filters="false">
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
         <context:include-filter type="annotation"
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
     </context:component-scan>
 
+    <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper" />
+
     <mvc:annotation-driven/>
 
-    <mvc:resources mapping="/resources/**" location="classpath:/static/"/>
+    <mvc:resources mapping="/static/**" location="classpath:/static/"/>
+
+    <mvc:resources mapping="/assets/**" location="/assets/"/>
 
 </beans>
