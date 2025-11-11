@@ -41,7 +41,8 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>관리번호</th>
+                        <%-- [수정] "ID" -> "관리번호" --%>
                         <th>지출일자</th>
                         <th>창고명</th>
                         <th>카테고리</th>
@@ -156,10 +157,16 @@
         }
         list.forEach(item => {
             let amt = new Intl.NumberFormat('ko-KR').format(item.amount);
+
+            // [수정] <td>\${item.id}</td> -> <td>\${item.expenseCode}</td>
             tbody.append(`<tr style="cursor:pointer" onclick="openDetailModal(\${item.id})">
-                <td>\${item.id}</td><td>\${item.expenseDate}</td><td><strong>\${item.warehouseName}</strong></td>
+                <td>\${item.expenseCode}</td>
+                <td>\${item.expenseDate}</td>
+                <td><strong>\${item.warehouseName}</strong></td>
                 <td><span class="badge bg-label-danger">\${item.category}</span></td>
-                <td class="text-end fw-bold text-danger">\${amt}원</td><td>\${item.description || '-'}</td></tr>`);
+                <td class="text-end fw-bold text-danger">\${amt}원</td>
+                <td>\${item.description || '-'}</td>
+            </tr>`);
         });
     }
 

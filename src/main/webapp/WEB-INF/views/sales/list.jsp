@@ -41,7 +41,7 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>관리번호</th>
                         <th>매출일자</th>
                         <th>고객사명</th>
                         <th>창고명</th>
@@ -159,10 +159,19 @@
         }
         list.forEach(item => {
             let amt = new Intl.NumberFormat('ko-KR').format(item.amount);
+
+            // [수정]
+            // 1. <td>\${item.id}</td> -> <td>\${item.salesCode}</td> 로 변경
+            // 2. onclick="openDetailModal(\${item.id})" 는 그대로 ID를 사용 (모달은 PK로 조회해야 하므로)
             tbody.append(`<tr style="cursor:pointer" onclick="openDetailModal(\${item.id})">
-                <td>\${item.id}</td><td>\${item.salesDate}</td><td><strong>\${item.clientName}</strong></td><td>\${item.warehouseName}</td>
+                <td>\${item.salesCode}</td>
+                <td>\${item.salesDate}</td>
+                <td><strong>\${item.clientName}</strong></td>
+                <td>\${item.warehouseName}</td>
                 <td><span class="badge bg-label-success">\${item.category}</span></td>
-                <td class="text-end fw-bold text-success">\${amt}원</td><td>\${item.description || '-'}</td></tr>`);
+                <td class="text-end fw-bold text-success">\${amt}원</td>
+                <td>\${item.description || '-'}</td>
+            </tr>`);
         });
     }
 

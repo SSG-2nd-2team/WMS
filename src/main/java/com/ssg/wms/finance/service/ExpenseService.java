@@ -15,6 +15,4 @@ public interface ExpenseService {
     void updateExpense(Long id, ExpenseSaveDTO dto);
     void deleteExpense(Long id);
 
-    List<CategorySummaryDTO> getAnnualExpenseSummary(int year);
-    List<CategorySummaryDTO> getMonthlyExpenseSummary(int year, int month);
 }

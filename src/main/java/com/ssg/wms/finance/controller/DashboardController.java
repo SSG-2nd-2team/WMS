@@ -1,9 +1,9 @@
 package com.ssg.wms.finance.controller;
 
-import com.ssg.wms.finance.dto.CategorySummaryDTO;
+// import com.ssg.wms.finance.dto.CategorySummaryDTO; // (제거)
 import com.ssg.wms.finance.dto.DashboardSummaryDTO;
 import com.ssg.wms.finance.service.DashboardService;
-import com.ssg.wms.finance.service.ExpenseService;
+// import com.ssg.wms.finance.service.ExpenseService; // (제거)
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ import java.util.Map;
 public class DashboardController {
 
     private final DashboardService dashboardService;
-    private final ExpenseService expenseService;
+    // private final ExpenseService expenseService; // (제거)
 
     @GetMapping
     public String dashboard(Model model) {
@@ -45,18 +45,20 @@ public class DashboardController {
 
         // 1. 데이터 조회
         List<DashboardSummaryDTO> netProfitSummary = dashboardService.getNetProfitSummary(year);
-        // [수정] 월별 카테고리
-        List<CategorySummaryDTO> monthlyExpenseSummary = expenseService.getMonthlyExpenseSummary(year, queryMonth);
+
+        // 2. [삭제] 월별 카테고리 지출 조회 로직 삭제
+
+        // 3. 월간 물류
         int inboundCount = dashboardService.getMonthlyInboundCount(year, queryMonth);
         int outboundCount = dashboardService.getMonthlyOutboundCount(year, queryMonth);
 
-        // 2. 연간 총합 계산
+        // 4. 연간 총합 계산
         long totalSales = netProfitSummary.stream().mapToLong(DashboardSummaryDTO::getTotalSales).sum();
         long totalExpense = netProfitSummary.stream().mapToLong(DashboardSummaryDTO::getTotalExpenses).sum();
         long netProfit = totalSales - totalExpense;
         double profitMargin = (totalSales == 0) ? 0.0 : ((double) netProfit / totalSales) * 100;
 
-        // 3. 전월/전년 대비 계산
+        // 5. 전월/전년 대비 계산
         List<DashboardSummaryDTO> prevYearSummary = dashboardService.getNetProfitSummary(year - 1);
         long prevYearSameMonthProfit = prevYearSummary.get(queryMonth - 1).getNetProfit();
         long prevMonthProfit = (queryMonth == 1) ? prevYearSummary.get(11).getNetProfit() : netProfitSummary.get(queryMonth - 2).getNetProfit();
@@ -64,12 +66,11 @@ public class DashboardController {
         double profitGrowthMoM = calculateGrowthRate(currentMonthProfit, prevMonthProfit);
         double profitGrowthYoY = calculateGrowthRate(currentMonthProfit, prevYearSameMonthProfit);
 
-        // 4. 응답 데이터 구성
+        // 6. 응답 데이터 구성
         Map<String, Object> response = new HashMap<>();
         response.put("netProfitSummary", netProfitSummary);
 
-        // ✅ [핵심 수정] JSP가 찾는 이름인 "expenseSummary"로 보냅니다.
-        response.put("expenseSummary", monthlyExpenseSummary);
+        // response.put("monthlyExpenseSummary", monthlyExpenseSummary); // [삭제]
 
         response.put("totalSales", totalSales);
         response.put("totalExpense", totalExpense);

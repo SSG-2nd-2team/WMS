@@ -18,8 +18,8 @@ public interface ExpenseMapper {
     void save(ExpenseVO expenseVO);
     void update(ExpenseVO expenseVO);
     void delete(Long id);
-
-    List<CategorySummaryDTO> findSummaryByCategory(int year);
     List<DashboardSummaryDTO> findMonthlySummary(int year);
-    List<CategorySummaryDTO> findSummaryByCategoryForMonth(@Param("year") int year, @Param("month") int month);
+
+    // 생성된 관리번호(expense_code)를 업데이트하기 위한 메서드
+    void updateCode(@Param("id") Long id, @Param("expenseCode") String expenseCode);
 }

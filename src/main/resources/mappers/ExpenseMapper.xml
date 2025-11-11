@@ -95,4 +95,10 @@
         GROUP BY category
     </select>
 
+    <update id="updateCode">
+        UPDATE expense
+        SET expense_code = #{expenseCode}
+        WHERE expense_id = #{id}
+    </update>
+
 </mapper>

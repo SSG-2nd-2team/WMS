@@ -2,8 +2,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<%-- 1. 헤더 include (경로 주의!) --%>
 <c:set var="pageActive" value="dashboard" scope="request"/>
+
+<%-- 이 코드를 추가해서 '공통 스크립트 로드 금지' 플래그를 세웁니다. --%>
+<c:set var="disablePageSpecificScript" value="true" scope="request"/>
+
 <%@ include file="../admin/admin-header.jsp" %>
 
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -151,18 +154,6 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12 col-lg-12 order-1 mb-4">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between">
-                    <h5 class="card-title m-0 me-2" id="pieChartTitle">월별 지출 현황 (카테고리별)</h5>
-                </div>
-                <div class="card-body px-0">
-                    <div id="categoryPieChart"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 <%@ include file="../admin/admin-footer.jsp" %>
 
@@ -170,13 +161,13 @@
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
     const API_URL = CONTEXT_PATH + '/dashboard/api';
 
-    let mainChart, growthChart, categoryPieChart;
+    let mainChart, growthChart;
 
     $(document).ready(function () {
         initEmptyCharts();
 
         const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth() + 1; // 1~12월
+        const currentMonth = new Date().getMonth() + 1;
 
         let yearFilter = $('#yearFilter');
         for (let i = 0; i < 5; i++) {
@@ -197,29 +188,77 @@
         const mainChartEl = document.querySelector("#mainChart");
         if (mainChartEl) {
             const mainChartOptions = {
-                series: [],
-                chart: {height: 300, type: 'bar', toolbar: {show: false}, fontFamily: 'Public Sans'},
+                // --- ▼ [수정 1] 빈 배열 대신 0으로 채워진 데이터로 초기화 ---
+                series: [
+                    {name: '매출', data: Array(12).fill(0)},
+                    {name: '지출', data: Array(12).fill(0)}
+                ],
+                // --- ▲ 수정 완료 ---
+                chart: {
+                    height: 300,
+                    type: 'bar',
+                    toolbar: {show: false},
+                    fontFamily: 'Public Sans',
+                    animations: { // 애니메이션 설정
+                        enabled: true,
+                        speed: 800,
+                        animateGradually: {
+                            enabled: true,
+                            delay: 150
+                        },
+                        dynamicAnimation: {
+                            enabled: true,
+                            speed: 350
+                        }
+                    }
+                },
                 plotOptions: {bar: {horizontal: false, columnWidth: '40%', borderRadius: 4}},
                 dataLabels: {enabled: false},
                 stroke: {show: true, width: 2, colors: ['transparent']},
                 colors: ['#696cff', '#ff3e1d'],
                 xaxis: {categories: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']},
-                yaxis: {labels: {formatter: (val) => formatKoreanNumber(val)}},
+                // --- (Y축 설정은 그대로) ---
+                yaxis: {
+                    min: 0,
+                    tickAmount: 5, // Y축 눈금 개수 5개로 제한
+                    labels: {
+                        formatter: (val) => formatKoreanNumber(val),
+                        hideOverlappingLabels: true, // 겹치는 라벨 자동 숨김
+                        style: {
+                            fontSize: '11px' // 폰트 크기 살짝 줄임
+                        }
+                    }
+                },
                 fill: {opacity: 1},
                 grid: {borderColor: '#f1f1f1'},
                 legend: {position: 'top', horizontalAlign: 'left', markers: {radius: 12}},
                 tooltip: {y: {formatter: (val) => formatCurrency(val) + " 원"}},
-                noData: {text: '데이터 로딩 중...'}
+                // --- ▼ [수정 2] noData 옵션 제거 ---
+                // noData: {text: '데이터 로딩 중...'}
+                // --- ▲ 수정 완료 ---
             };
             mainChart = new ApexCharts(mainChartEl, mainChartOptions);
             mainChart.render();
         }
+
         // (수익률 차트 초기화)
         const growthChartEl = document.querySelector("#growthChart");
         if (growthChartEl) {
             const growthChartOptions = {
                 series: [0],
-                chart: {height: 240, type: 'radialBar', sparkline: {enabled: true}},
+                chart: {
+                    height: 240,
+                    type: 'radialBar',
+                    /*sparkline: {enabled: true}*/ // sparkline 주석 처리 (유지)
+                },
+                animations: { // 애니메이션 설정 (유지)
+                    enabled: true,
+                    speed: 800,
+                    dynamicAnimation: {
+                        enabled: true,
+                        speed: 350
+                    }
+                },
                 plotOptions: {
                     radialBar: {
                         hollow: {size: '70%'},
@@ -241,19 +280,6 @@
             growthChart.render();
         }
 
-        // (파이 차트 초기화)
-        const pieChartEl = document.querySelector("#categoryPieChart");
-        if (pieChartEl) {
-            const pieChartOptions = {
-                series: [],
-                chart: {height: 350, type: 'pie'},
-                labels: [],
-                noData: {text: '해당 월의 지출 내역이 없습니다.'},
-                responsive: [{breakpoint: 480, options: {chart: {width: 200}, legend: {position: 'bottom'}}}]
-            };
-            categoryPieChart = new ApexCharts(pieChartEl, pieChartOptions);
-            categoryPieChart.render();
-        }
     }
 
     function loadDashboardData(year, month) {
@@ -289,15 +315,6 @@
                         plotOptions: {radialBar: {dataLabels: {value: {color: color}}}}
                     });
                 }
-
-                // ✅ [핵심 수정] JSP가 컨트롤러의 응답 이름인 "monthlyExpenseSummary"를 찾도록 수정
-                if (categoryPieChart && data.monthlyExpenseSummary) {
-                    const pieSeries = data.monthlyExpenseSummary.map(item => item.totalAmount);
-                    const pieLabels = data.monthlyExpenseSummary.map(item => item.category);
-
-                    categoryPieChart.updateSeries(pieSeries.length > 0 ? pieSeries : []);
-                    categoryPieChart.updateOptions({labels: pieLabels.length > 0 ? pieLabels : []});
-                }
             },
             error: function (e) {
                 console.error("Dashboard load failed", e);
@@ -307,37 +324,56 @@
 
     function updateTitles(year, month, isYearly) {
         let titleMonth = isYearly ? new Date().getMonth() + 1 : month;
-        $('#logisticsTitle').text(`물류 현황 (${year}년 ${titleMonth}월)`);
-        $('#pieChartTitle').text(`${year}년 ${titleMonth}월 지출 현황 (카테고리별)`);
+        $('#logisticsTitle').text(`물류 현황 (\${year}년 \${titleMonth}월)`);
+
         $('#growthChartTitle').text('연간 순수익률');
         $('#summaryScopeLabel1, #summaryScopeLabel2, #summaryScopeLabel3').text('Yearly');
     }
 
+
+    // [추가] 숫자 카운트업 애니메이션 함수
+    function animateCountUp(elementId, endValue) {
+        const el = document.getElementById(elementId);
+        const duration = 1000; // 애니메이션 지속 시간 (1.0초)
+        const end = parseInt(endValue) || 0;
+
+        if (el.animator) {
+            cancelAnimationFrame(el.animator);
+        }
+        let startTime = null;
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            const currentNumber = Math.floor(progress * end);
+
+            el.innerHTML = formatCurrency(currentNumber);
+
+            if (progress < 1) {
+                el.animator = requestAnimationFrame(animation);
+            } else {
+                el.innerHTML = formatCurrency(end);
+            }
+        }
+
+        el.animator = requestAnimationFrame(animation);
+    }
+
+    // 모든 요약 카드 애니메이션을 호출하는 함수 (최종 수정본)
     function updateSummaryCards(data) {
-        $('#totalSales').text(formatCurrency(data.totalSales));
-        $('#totalExpense').text(formatCurrency(data.totalExpense));
-        $('#netProfit').text(formatCurrency(data.netProfit));
-        $('#profitMarginText').text((data.profitMargin || 0).toFixed(1) + '% 수익률');
+        animateCountUp('totalSales', data.totalSales);
+        animateCountUp('totalExpense', data.totalExpense);
+        animateCountUp('netProfit', data.netProfit);
+
+        // 수익률 퍼센트 애니메이션
+        animatePercentageUp('profitMarginText', data.profitMargin);
 
         $('#monthlyInbound').text((data.monthlyInboundCount || 0) + ' 건');
         $('#monthlyOutbound').text((data.monthlyOutboundCount || 0) + ' 건');
 
-        updateGrowthText('#profitGrowthMoM', data.profitGrowthMoM);
-        updateGrowthText('#profitGrowthYoY', data.profitGrowthYoY);
-    }
-
-    function updateGrowthText(elementId, value) {
-        const el = $(elementId);
-        if (value > 0) {
-            el.text(`▲ \${value.toFixed(1)}%`);
-            el.removeClass('text-danger').addClass('text-success');
-        } else if (value < 0) {
-            el.text(`▼ \${value.toFixed(1)}%`);
-            el.removeClass('text-success').addClass('text-danger');
-        } else {
-            el.text(`- 0.0%`);
-            el.removeClass('text-success text-danger').addClass('text-muted');
-        }
+        // 전월/전년 대비 애니메이션 함수 호출 (ID에서 # 제거)
+        animateGrowthPercentage('profitGrowthMoM', data.profitGrowthMoM);
+        animateGrowthPercentage('profitGrowthYoY', data.profitGrowthYoY);
     }
 
     function formatKoreanNumber(num) {
@@ -350,5 +386,76 @@
     function formatCurrency(amount) {
         let safeAmount = amount || 0;
         return new Intl.NumberFormat('ko-KR', {style: 'currency', currency: 'KRW'}).format(safeAmount);
+    }
+
+    // 퍼센트(%) 숫자 전용 애니메이션 함수
+    function animatePercentageUp(elementId, endValue) {
+        const el = document.getElementById(elementId);
+        const duration = 1000;
+        const end = parseFloat(endValue) || 0;
+
+        if (el.animator) cancelAnimationFrame(el.animator);
+        let startTime = null;
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            const currentNumber = progress * end;
+            el.innerHTML = currentNumber.toFixed(1) + '% 수익률';
+            if (progress < 1) {
+                el.animator = requestAnimationFrame(animation);
+            } else {
+                el.innerHTML = end.toFixed(1) + '% 수익률';
+            }
+        }
+
+        el.animator = requestAnimationFrame(animation);
+    }
+
+    // [추가] 전월/전년 대비(%) 증감 애니메이션 함수
+    function animateGrowthPercentage(elementId, endValue) {
+        const el = document.getElementById(elementId);
+        const duration = 1000; // 1초
+        const end = parseFloat(endValue) || 0;
+
+        if (!el) return;
+        if (el.animator) cancelAnimationFrame(el.animator);
+        let startTime = null;
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            const currentNumber = progress * end;
+
+            el.classList.remove('text-success', 'text-danger', 'text-muted');
+            if (currentNumber > 0.05) {
+                el.innerHTML = `▲ \${currentNumber.toFixed(1)}%`;
+                el.classList.add('text-success');
+            } else if (currentNumber < -0.05) {
+                el.innerHTML = `▼ \${Math.abs(currentNumber).toFixed(1)}%`;
+                el.classList.add('text-danger');
+            } else {
+                el.innerHTML = `- 0.0%`;
+                el.classList.add('text-muted');
+            }
+
+            if (progress < 1) {
+                el.animator = requestAnimationFrame(animation);
+            } else {
+                el.classList.remove('text-success', 'text-danger', 'text-muted');
+                if (end > 0) {
+                    el.innerHTML = `▲ \${end.toFixed(1)}%`;
+                    el.classList.add('text-success');
+                } else if (end < 0) {
+                    el.innerHTML = `▼ \${Math.abs(end).toFixed(1)}%`;
+                    el.classList.add('text-danger');
+                } else {
+                    el.innerHTML = `- 0.0%`;
+                    el.classList.add('text-muted');
+                }
+            }
+        }
+
+        el.animator = requestAnimationFrame(animation);
     }
 </script>

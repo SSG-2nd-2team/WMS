@@ -44,9 +44,27 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Long saveExpense(ExpenseSaveDTO dto) {
+        // 1. DTO를 VO로 변환
         ExpenseVO expenseVO = modelMapper.map(dto, ExpenseVO.class);
+
+        // 2. 먼저 DB에 저장 (ID를 받아오기 위해)
         expenseMapper.save(expenseVO);
-        return expenseVO.getId();
+
+        // 3. MyBatis가 <insert>의 useGeneratedKeys 덕분에 VO에 채워준 ID를 가져옴
+        Long newId = expenseVO.getId();
+
+        // 4. 고유 식별 번호 생성 (예: EXP-251111-00027)
+        // 날짜 포맷 (2025-11-11 -> 251111)
+        String datePart = dto.getExpenseDate().toString().replace("-", "").substring(2);
+        // ID 포맷 (27 -> 00027)
+        String idPart = String.format("%05d", newId); // ID를 5자리로 패딩
+
+        String expenseCode = "EXP-" + datePart + "-" + idPart;
+
+        // 5. 생성된 관리번호(expenseCode)를 DB에 다시 UPDATE
+        expenseMapper.updateCode(newId, expenseCode);
+
+        return newId; // 컨트롤러에는 기존처럼 ID만 반환
     }
 
     @Override
@@ -61,17 +79,5 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public void deleteExpense(Long id) {
         expenseMapper.delete(id);
-    }
-
-    // [수정] getAnnualExpenseSummary가 Service 인터페이스와 맞도록 @Override 추가
-    @Override
-    public List<CategorySummaryDTO> getAnnualExpenseSummary(int year) {
-        return expenseMapper.findSummaryByCategory(year);
-    }
-
-    // [수정] 월별 카테고리 요약 메서드 구현 추가
-    @Override
-    public List<CategorySummaryDTO> getMonthlyExpenseSummary(int year, int month) {
-        return expenseMapper.findSummaryByCategoryForMonth(year, month);
     }
 }

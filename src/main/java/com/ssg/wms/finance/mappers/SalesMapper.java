@@ -4,6 +4,7 @@ import com.ssg.wms.finance.domain.SalesVO;
 import com.ssg.wms.finance.dto.DashboardSummaryDTO;
 import com.ssg.wms.finance.dto.SalesRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +24,6 @@ public interface SalesMapper {
     void delete(Long id);
 
     List<DashboardSummaryDTO> findMonthlySummary(int year);
+
+    void updateCode(@Param("id") Long id, @Param("salesCode") String salesCode);
 }

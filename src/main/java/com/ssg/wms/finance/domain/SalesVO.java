@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class SalesVO {
     private Long id;            // 매출 ID (PK)
+    private String salesCode; // 관리용 넘버링
     private String warehouseName;    // 창고명
     private LocalDate salesDate;     // 매출일자
     private String category;         // 매출 분류

@@ -42,10 +42,21 @@ public class SalesServiceImpl implements SalesService {
     }
 
     @Override
+    @Transactional
     public Long saveSales(SalesSaveDTO dto) {
         SalesVO salesVO = modelMapper.map(dto, SalesVO.class);
+
         salesMapper.save(salesVO);
-        return salesVO.getId();
+
+        Long newId = salesVO.getId();
+
+        String datePart = dto.getSalesDate().toString().replace("-", "").substring(2);
+        String idPart = String.format("%05d", newId); // 5자리 ID
+        String salesCode = "SAL-" + datePart + "-" + idPart;
+
+        salesMapper.updateCode(newId, salesCode);
+
+        return newId;
     }
 
     @Override
