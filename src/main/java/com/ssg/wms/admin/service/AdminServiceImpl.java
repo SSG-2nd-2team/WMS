@@ -2,9 +2,11 @@ package com.ssg.wms.admin.service;
 
 import com.ssg.wms.admin.domain.Member;
 import com.ssg.wms.admin.domain.Staff;
+import com.ssg.wms.admin.dto.MemberCriteria;
 import com.ssg.wms.admin.dto.MemberSearchCriteriaDTO;
 import com.ssg.wms.admin.dto.StaffDTO;
 import com.ssg.wms.admin.mappers.AdminMapper;
+import com.ssg.wms.common.AccountStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<Member> getMembersByCriteria(MemberSearchCriteriaDTO criteria) {
+    public List<Member> getMembersByCriteria(MemberCriteria criteria) {
         return adminMapper.getMembersByCriteria(criteria);
     }
 
@@ -35,4 +37,16 @@ public class AdminServiceImpl implements AdminService {
     public long findStaffIdByStaffLoginId(String staffLoginId) {
         return adminMapper.findStaffIdByStaffLoginId(staffLoginId);
     }
+
+    @Override
+    public int getMemberTotalCount(MemberCriteria cri) {
+        return adminMapper.getMemberTotalCount(cri);
+    }
+
+    @Override
+    public void changeMemberStatus(long memberId, AccountStatus status) {
+        adminMapper.updateMemberStatus(memberId, status.name());
+    }
+
+
 }

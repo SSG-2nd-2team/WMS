@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,9 +17,10 @@ public class StaffDTO {
     private long staffId;
     private String staffLoginId;
     private String staffName;
-    private String staffPw;
     private String staffPhone;
     private String staffEmail;
     private Role role;
     private AccountStatus status;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -1,7 +1,7 @@
 package com.ssg.wms.admin.mappers;
 
 import com.ssg.wms.admin.domain.Member;
-import com.ssg.wms.admin.domain.Staff;
+import com.ssg.wms.admin.dto.MemberCriteria;
 import com.ssg.wms.admin.dto.MemberSearchCriteriaDTO;
 import com.ssg.wms.admin.dto.StaffDTO;
 import org.junit.jupiter.api.Test;
@@ -23,14 +23,14 @@ public class AdminMapperTest {
     void testGetStaffDetails() {
         long staffId = 1L; // 테스트용 데이터 존재해야 함
 
-        StaffDTO staff = adminMapper.getStaffDetails(staffId);
+        StaffDTO staffDTO = adminMapper.getStaffDetails(staffId);
 
-        System.out.println("조회 결과: " + staff);
+        System.out.println("조회 결과: " + staffDTO);
     }
 
     @Test
     void testGetMembersByCriteria() {
-        MemberSearchCriteriaDTO criteria = new MemberSearchCriteriaDTO();
+        MemberCriteria criteria = new MemberCriteria();
         criteria.setKeyword("홍"); // LIKE 검색용
 
         List<Member> list = adminMapper.getMembersByCriteria(criteria);

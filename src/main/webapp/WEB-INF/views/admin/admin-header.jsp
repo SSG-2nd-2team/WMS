@@ -266,7 +266,7 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/announcements" class="menu-link">
                                 <div data-i18n="Notice">공지사항</div>
                             </a>
                         </li>
