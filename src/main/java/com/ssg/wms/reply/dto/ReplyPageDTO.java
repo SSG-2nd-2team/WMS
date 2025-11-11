@@ -1,22 +1,22 @@
-package com.ssg.wms.announcement.dto;
+package com.ssg.wms.reply.dto;
 
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @ToString
-public class AnnouncementPageDTO {
+public class ReplyPageDTO {
 
   private int startPage; //시작
   private int endPage; //화면에서 마지막 번호
   private boolean prev, next;
 
   private int total;
+
   private int pageNum;
   private int amount;
-  private int totalPages;
 
-  public AnnouncementPageDTO(int pageNum, int amount, int total) {
+  public ReplyPageDTO(int pageNum, int amount, int total) {
 
     this.pageNum = pageNum;
     this.amount = amount;
@@ -26,7 +26,6 @@ public class AnnouncementPageDTO {
     this.startPage = this.endPage - 9;
 
     int realEnd = (int) Math.ceil((total * 1.0) / amount);
-    totalPages = realEnd;
 
     if(realEnd < endPage) {
       endPage = realEnd;
@@ -34,7 +33,6 @@ public class AnnouncementPageDTO {
 
     this.prev = startPage > 1;
     this.next = endPage < realEnd;
-
   }
   
 }

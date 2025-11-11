@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Announcement {
-    private long announcementId;
+    private Long announcementId;
     private String title;
     private String content;
     private String writer;

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StaffDTO {
-    private long staffId;
+    private Long staffId;
     private String staffLoginId;
     private String staffName;
     private String staffPhone;

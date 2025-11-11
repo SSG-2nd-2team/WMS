@@ -49,7 +49,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public Long saveInquiry(InquiryDTO dto) {
         inquiryMapper.insertInquiry(dto);
-        return dto.getAnnouncementId();
+        return dto.getInquiryId();
     }
 
     @Override

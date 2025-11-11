@@ -31,7 +31,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
         model.addAttribute("announcements", list);
         model.addAttribute("currentPage", pageDTO.getPageNum());
-        model.addAttribute("totalPages", pageDTO.getTotal());
+        model.addAttribute("totalPages", pageDTO.getTotalPages());
         model.addAttribute("startPage", pageDTO.getStartPage());
         model.addAttribute("endPage", pageDTO.getEndPage());
         model.addAttribute("totalCount", totalCount);
@@ -50,6 +50,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
     public void updateAnnouncement(AnnouncementDTO dto) {
         announcementMapper.updateAnnouncement(dto);
+        log.info("Service - updateAnnouncement 실행 완료");
     }
 
     public void deleteAnnouncement(Long id) {

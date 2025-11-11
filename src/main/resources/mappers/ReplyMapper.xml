@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssg.wms.reply.mappers.ReplyMapper">
+
+    <select id="countReplies" resultType="int">
+        SELECT COUNT(*)
+        FROM reply
+        WHERE status = 'AVAILABLE'
+    </select>
+
+    <select id="findRepliesByInquiryId" parameterType="long" resultType="com.ssg.wms.reply.dto.ReplyDTO">
+        SELECT reply_id, inquiry_id, writer, content, created_at, updated_at
+        FROM reply
+        WHERE inquiry_id = #{inquiryId}
+        AND status = 'AVAILABLE'
+        ORDER BY created_at DESC
+    </select>
+
+    <insert id="insertReply" parameterType="com.ssg.wms.reply.dto.ReplyDTO" useGeneratedKeys="true" keyProperty="replyId">
+        INSERT INTO reply (inquiry_id, title, writer, content)
+        VALUES (#{inquiryId}, #{title}, #{writer}, #{content});
+    </insert>
+
+    <select id="findByIdAndInquiryId" resultType="com.ssg.wms.reply.dto.ReplyDTO">
+        SELECT reply_id, inquiry_id, writer, content, created_at, updated_at
+        FROM reply
+        WHERE reply_id = #{replyId}
+          AND inquiry_id = #{inquiryId}
+        LIMIT 1
+    </select>
+
+    <update id="updateReply" parameterType="com.ssg.wms.reply.dto.ReplyDTO">
+        UPDATE reply
+        SET title = #{title},
+            content = #{content},
+            updated_at = NOW()
+        WHERE reply_id = #{replyId}
+          AND inquiry_id = #{inquiryId}
+    </update>
+
+    <update id="deleteReply">
+        UPDATE reply
+        SET status = 'DELETED'
+        WHERE reply_id = #{replyId}
+    </update>
+
+</mapper>

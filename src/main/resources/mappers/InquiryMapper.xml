@@ -23,7 +23,7 @@
         </if>
     </select>
 
-    <select id="selectInquiriesById" resultType="com.ssg.wms.inquiry.dto.InquiryDTO">
+    <select id="selectInquiryById" resultType="com.ssg.wms.inquiry.dto.InquiryDTO">
         SELECT *
         FROM inquiry
         WHERE inquiry_id = #{id}

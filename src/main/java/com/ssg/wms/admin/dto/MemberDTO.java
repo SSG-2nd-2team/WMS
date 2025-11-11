@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberDTO {
-    private long memberId;
+    private Long memberId;
     private String memberLoginId;
     private String memberName;
     private String memberPhone;

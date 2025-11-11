@@ -1,4 +1,4 @@
-package com.ssg.wms.inquiry.dto;
+package com.ssg.wms.reply.dto;
 
 import com.ssg.wms.common.BoardStatus;
 import lombok.AllArgsConstructor;
@@ -12,12 +12,11 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InquiryDTO {
+public class ReplyDTO {
+    private Long replyId;
     private Long inquiryId;
-    private String title;
     private String content;
     private String writer;
-    private boolean isImportant;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private BoardStatus status;

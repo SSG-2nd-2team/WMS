@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Controller
@@ -23,18 +24,22 @@ public class InquiryController {
 
     private final InquiryService inquiryService;
 
-    // 공지 목록 조회
+    // 문의 목록 조회
     @GetMapping
     public String getInquiries(@ModelAttribute InquirySearch inquirySearch,
+                                   HttpSession session,
                                    Model model) {
-        log.info("=== 공지사항 목록 조회 요청 ===");
+        log.info("=== 문의사항 목록 조회 요청 ===");
         log.info("검색 조건: {}", inquirySearch);
         inquiryService.getInquiries(inquirySearch, model);
         log.info("Model attributes: {}", model.asMap().keySet());
+
+        model.addAttribute("role", session.getAttribute("role"));
+
         return "inquiries/list"; // JSP 경로
     }
 
-    // 공지 상세조회
+    // 문의 상세조회
     @GetMapping("/{id}")
     public String getInquiry(@PathVariable("id") Long id,
                                   Model model) {
@@ -43,14 +48,14 @@ public class InquiryController {
         return "inquiries/detail";
     }
 
-    // 공지 작성 폼
+    // 문의 작성 폼
     @GetMapping("/save")
     public String getSaveForm(Model model) {
         model.addAttribute("inquiry", new InquiryDTO());
         return "inquiries/save";
     }
 
-    // 공지 작성 처리
+    // 문의 작성 처리
     @PostMapping("/save")
     public String postSaveForm(@Valid @ModelAttribute("inquiry") InquiryDTO inquiryDTO,
                                BindingResult bindingResult) {
@@ -62,7 +67,7 @@ public class InquiryController {
         return "redirect:/inquiries/" + savedId;
     }
 
-    // 공지 수정 폼
+    // 문의 수정 폼
     @GetMapping("/{id}/edit")
     public String getUpdateForm(@PathVariable("id") Long id,
                                 Model model) {
@@ -71,7 +76,7 @@ public class InquiryController {
         return "inquiries/edit";
     }
 
-    // 공지 수정 처리
+    // 문의 수정 처리
     @PostMapping("/{id}/edit")
     public String postUpdateForm(@Valid @ModelAttribute("inquiry") InquiryDTO inquiryDTO,
                                  BindingResult bindingResult,
@@ -84,7 +89,7 @@ public class InquiryController {
         return "redirect:/inquiries/" + id;
     }
 
-    // 공지 삭제
+    // 문의 삭제
     @PostMapping("/{id}/delete")
     public String postDelete(@PathVariable("id") Long id) {
         inquiryService.deleteInquiry(id);
