@@ -34,4 +34,5 @@ public interface InboundMemberMapper {
 
     // 입고 요청 취소
 
+
 }
