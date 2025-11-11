@@ -13,12 +13,12 @@ import java.util.List;
 @Log4j2
 @Service
 @Transactional
-
 public class WarehouseAdminServiceImpl implements WarehouseAdminService {
 
     private final WarehouseAdminMapper warehouseAdminMapper;
     private final KakaoApiUtil kakaoApiUtil;
 
+    // 생성자 주입
     @Autowired
     public WarehouseAdminServiceImpl(
             WarehouseAdminMapper warehouseAdminMapper,
@@ -45,15 +45,16 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
             throw new IllegalArgumentException("이미 존재하는 창고 이름입니다.");
         }
 
-        // 2. Geocoding (카카오 API 호출)
+        // 2. Geocoding (카카오 API 호출) - 예외 처리 로직 개선
         Double[] coords;
         try {
             log.info("Geocoding 시작 (Admin). 주소: {}", saveDTO.getAddress());
             coords = kakaoApiUtil.getCoordinates(saveDTO.getAddress());
             log.info("Geocoding 성공 (Admin). 위도: {}, 경도: {}", coords[1], coords[0]);
         } catch (Exception e) {
-            log.error("Geocoding API 호출 오류 발생 (Admin): {}", e.getMessage());
-            throw new Exception("주소 변환(Geocoding)에 실패했습니다. 주소를 확인해 주세요.");
+            // Geocoding 실패 시 상세 로그를 남기고, 사용자에게는 명확한 메시지를 던짐
+            log.error("Geocoding API 호출 중 오류 발생 (Admin). 주소: {}. 상세 오류:", saveDTO.getAddress(), e);
+            throw new Exception("주소 변환(Geocoding)에 실패했습니다. (원인: 주소 변환(Geocoding)에 실패했습니다. 주소를 확인해 주세요.)", e);
         }
 
         // 3. DTO에 위도(Latitude)와 경도(Longitude) 설정 (카카오 API 응답 순서: [경도, 위도])
@@ -74,9 +75,10 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
 
             for (SectionDTO section : saveDTO.getSections()) {
 
-               
+                // 5-1. 층수 유효성 검사 (최대 2층)
                 if (section.getLocations() != null) {
                     for (LocationDTO location : section.getLocations()) {
+                        // 참고: 층수 3 초과 시 WARN 로그 및 예외 발생
                         if (location.getFloorNum() > 3) {
                             log.warn("등록 실패 (Admin): 층수({})가 최대 2층을 초과합니다.", location.getFloorNum());
                             throw new IllegalArgumentException("위치 정보의 층수는 최대 2층까지 등록 가능합니다.");

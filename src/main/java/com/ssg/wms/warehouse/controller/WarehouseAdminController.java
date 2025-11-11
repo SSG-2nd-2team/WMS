@@ -14,7 +14,9 @@ import org.springframework.ui.Model;
 import javax.validation.Valid;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.log4j.Log4j2; // 로그 추가
 
+@Log4j2 // 로그 사용을 위해 추가
 @Controller
 @RequestMapping("/admin/warehouses")
 public class WarehouseAdminController {
@@ -71,17 +73,22 @@ public class WarehouseAdminController {
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
 
+        log.info("창고 등록 요청 시작. 주소: {}", saveDTO.getAddress());
+
         // 1. DTO 유효성 검사 (바인딩 오류 및 @Valid 검사)
         if (bindingResult.hasErrors()) {
-            // BindingResult와 입력 데이터를 Flash Attribute로 전달하여, GET /register 뷰에서 오류 및 데이터를 복원하도록 처리
+            // BindingResult와 입력 데이터를 Flash Attribute로 전달
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.saveDTO", bindingResult);
             redirectAttributes.addFlashAttribute("saveDTO", saveDTO);
+            log.warn("창고 등록 유효성 검사 실패: {}", bindingResult.getFieldError().getDefaultMessage());
             return "redirect:/admin/warehouses/register";
         }
 
         try {
+            // Service 계층으로 전달 전 Admin ID 설정
             saveDTO.setAdminId(MOCK_ADMIN_ID);
             Long newWarehouseId = warehouseAdminService.saveWarehouse(saveDTO);
+            log.info("창고 등록 성공. ID: {}", newWarehouseId);
 
             // 2. 성공: 창고 리스트 페이지로 리다이렉트
             redirectAttributes.addFlashAttribute("message", "✅ " + newWarehouseId + "번 창고 등록이 완료되었습니다.");
@@ -89,23 +96,25 @@ public class WarehouseAdminController {
 
         } catch (IllegalArgumentException e) {
             // 3. 비즈니스 오류 (예: 이름 중복, 층수 초과 등)
-            // BindingResult에 필드 오류를 추가하고, 데이터와 함께 리다이렉트
-            bindingResult.rejectValue("name", "name.duplicate", e.getMessage()); // 이름 중복은 name 필드에 연결
+            // 오류를 BindingResult에 추가하고, 데이터와 함께 리다이렉트하여 폼을 다시 보여줌
+            log.error("창고 등록 비즈니스 오류 발생: {}", e.getMessage());
+            bindingResult.rejectValue("name", "name.duplicate", e.getMessage()); // 오류를 특정 필드(name)에 연결
+
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.saveDTO", bindingResult);
             redirectAttributes.addFlashAttribute("saveDTO", saveDTO);
-            redirectAttributes.addFlashAttribute("error", "비즈니스 오류: " + e.getMessage()); // 일반 오류 메시지 전달
+            redirectAttributes.addFlashAttribute("error", "등록 오류: " + e.getMessage());
             return "redirect:/admin/warehouses/register";
 
         } catch (Exception e) {
             // 4. 시스템/API 오류 (예: Geocoding 실패, DB 연결 오류 등)
             // Global 오류 메시지를 BindingResult에 추가하고, 데이터와 함께 리다이렉트
-            bindingResult.reject("globalError", "시스템 오류로 등록 실패: " + e.getMessage());
+            log.error("창고 등록 중 시스템 오류 발생: {}", e.getMessage(), e);
+            bindingResult.reject("globalError", e.getMessage()); // 서비스에서 던진 상세 메시지를 Global Error로 사용
+
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.saveDTO", bindingResult);
             redirectAttributes.addFlashAttribute("saveDTO", saveDTO);
-            redirectAttributes.addFlashAttribute("error", "시스템 오류: 등록 중 예상치 못한 오류 발생."); // 일반 오류 메시지 전달
+            redirectAttributes.addFlashAttribute("error", "시스템 오류: 등록 중 예상치 못한 오류 발생. (원인: " + e.getMessage() + ")");
 
-            // 디버깅을 위해 콘솔에 예외 출력
-            e.printStackTrace();
             return "redirect:/admin/warehouses/register";
         }
     }
@@ -159,6 +168,8 @@ public class WarehouseAdminController {
             redirectAttributes.addFlashAttribute("message", warehouseId + "번 창고 수정이 완료되었습니다.");
             return "redirect:/admin/warehouses/" + warehouseId;
         } catch (Exception e) {
+            // 수정 로직에서 발생하는 오류도 명확히 처리
+            log.error("창고 수정 중 오류 발생 (ID: {}): {}", warehouseId, e.getMessage());
             redirectAttributes.addFlashAttribute("error", "수정 실패: " + e.getMessage());
             return "redirect:/admin/warehouses/" + warehouseId;
         }
@@ -171,6 +182,8 @@ public class WarehouseAdminController {
             redirectAttributes.addFlashAttribute("message", "창고(" + warehouseId + ")가 삭제되었습니다.");
             return "redirect:/admin/warehouses";
         } catch (Exception e) {
+            // 삭제 로직에서 발생하는 오류도 명확히 처리
+            log.error("창고 삭제 중 오류 발생 (ID: {}): {}", warehouseId, e.getMessage());
             redirectAttributes.addFlashAttribute("error", "삭제 실패: " + e.getMessage());
             return "redirect:/admin/warehouses/" + warehouseId;
         }
