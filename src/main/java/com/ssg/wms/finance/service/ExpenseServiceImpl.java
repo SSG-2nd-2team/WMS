@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-@RequiredArgsConstructor // final로 선언된 Mapper를 자동 주입 (Autowired)
-@Transactional // (선택 사항: CUD 작업 시 트랜잭션 보장)
+@RequiredArgsConstructor
+@Transactional
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final ExpenseMapper expenseMapper;
-    private final ModelMapper modelMapper; // DTO <-> VO 변환용
+    private final ModelMapper modelMapper;
 
     @Override
     public ExpenseResponseDTO getExpenses(ExpenseRequestDTO dto) {
@@ -37,7 +37,6 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public ExpenseVO getExpense(Long id) {
-        // Java 8/9 호환 방식: () -> new ... 를 인자로 전달합니다.
         return expenseMapper.findById(id).orElseThrow(() ->
                 new NoSuchElementException("ID " + id + "에 해당하는 Expense 를 찾을 수 없습니다.")
         );
@@ -45,18 +44,16 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Long saveExpense(ExpenseSaveDTO dto) {
-        // DTO 를 VO(Entity)로 변환
         ExpenseVO expenseVO = modelMapper.map(dto, ExpenseVO.class);
         expenseMapper.save(expenseVO);
-        return expenseVO.getId(); // 저장 후 생성된 PK 반환
+        return expenseVO.getId();
     }
 
     @Override
     public void updateExpense(Long id, ExpenseSaveDTO dto) {
-        // DTO를 VO로 변환
         ExpenseVO expenseVO = modelMapper.map(dto, ExpenseVO.class);
         ExpenseVO finalVO = expenseVO.toBuilder()
-                .id(id) // URL 에서 받은 id로 설정
+                .id(id)
                 .build();
         expenseMapper.update(finalVO);
     }
@@ -66,8 +63,15 @@ public class ExpenseServiceImpl implements ExpenseService {
         expenseMapper.delete(id);
     }
 
+    // [수정] getAnnualExpenseSummary가 Service 인터페이스와 맞도록 @Override 추가
     @Override
     public List<CategorySummaryDTO> getAnnualExpenseSummary(int year) {
         return expenseMapper.findSummaryByCategory(year);
+    }
+
+    // [수정] 월별 카테고리 요약 메서드 구현 추가
+    @Override
+    public List<CategorySummaryDTO> getMonthlyExpenseSummary(int year, int month) {
+        return expenseMapper.findSummaryByCategoryForMonth(year, month);
     }
 }

@@ -5,6 +5,7 @@ import com.ssg.wms.finance.dto.CategorySummaryDTO;
 import com.ssg.wms.finance.dto.DashboardSummaryDTO;
 import com.ssg.wms.finance.dto.ExpenseRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,18 +13,13 @@ import java.util.Optional;
 @Mapper
 public interface ExpenseMapper {
     List<ExpenseVO> findAll(ExpenseRequestDTO dto);
-
     int count(ExpenseRequestDTO dto);
-
     Optional<ExpenseVO> findById(Long id);
-
     void save(ExpenseVO expenseVO);
-
     void update(ExpenseVO expenseVO);
-
     void delete(Long id);
 
     List<CategorySummaryDTO> findSummaryByCategory(int year);
-
     List<DashboardSummaryDTO> findMonthlySummary(int year);
+    List<CategorySummaryDTO> findSummaryByCategoryForMonth(@Param("year") int year, @Param("month") int month);
 }

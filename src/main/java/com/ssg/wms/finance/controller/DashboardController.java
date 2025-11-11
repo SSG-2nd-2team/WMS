@@ -29,64 +29,64 @@ public class DashboardController {
     private final DashboardService dashboardService;
     private final ExpenseService expenseService;
 
-    // 대시보드 페이지 렌더링 (JSP)
     @GetMapping
     public String dashboard(Model model) {
-        // 초기 데이터는 AJAX로 불러오므로 껍데기만 반환
         return "dashboard/index";
     }
 
-    // 대시보드 데이터 통합 조회 (AJAX API)
     @GetMapping("/api")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getDashboardDataApi(
-            @RequestParam(required = false, defaultValue = "0") int year) {
+            @RequestParam(required = false, defaultValue = "0") int year,
+            @RequestParam(required = false, defaultValue = "0") int month) {
 
-        // 1. 연도 기본값 설정 (파라미터가 0이면 현재 연도)
-        if (year == 0) {
-            year = Year.now().getValue();
-        }
+        if (year == 0) year = Year.now().getValue();
+        int queryMonth = (month == 0) ? LocalDate.now().getMonthValue() : month;
 
-        // 2. 재무 데이터 조회 (월별 순수익, 카테고리별 지출)
+        // 1. 데이터 조회
         List<DashboardSummaryDTO> netProfitSummary = dashboardService.getNetProfitSummary(year);
-        List<CategorySummaryDTO> expenseSummary = expenseService.getAnnualExpenseSummary(year);
+        // [수정] 월별 카테고리
+        List<CategorySummaryDTO> monthlyExpenseSummary = expenseService.getMonthlyExpenseSummary(year, queryMonth);
+        int inboundCount = dashboardService.getMonthlyInboundCount(year, queryMonth);
+        int outboundCount = dashboardService.getMonthlyOutboundCount(year, queryMonth);
 
-        // 3. 재무 총합 계산 (1년치)
-        long totalSales = netProfitSummary.stream()
-                .mapToLong(DashboardSummaryDTO::getTotalSales)
-                .sum();
-        long totalExpense = netProfitSummary.stream()
-                .mapToLong(DashboardSummaryDTO::getTotalExpenses)
-                .sum();
+        // 2. 연간 총합 계산
+        long totalSales = netProfitSummary.stream().mapToLong(DashboardSummaryDTO::getTotalSales).sum();
+        long totalExpense = netProfitSummary.stream().mapToLong(DashboardSummaryDTO::getTotalExpenses).sum();
         long netProfit = totalSales - totalExpense;
-
-        // 4. 수익률 계산 (매출 0원일 때 예외 처리)
         double profitMargin = (totalSales == 0) ? 0.0 : ((double) netProfit / totalSales) * 100;
 
-        // 5. 물류 현황 데이터 조회 (선택된 연도의 현재 월 기준)
-        int currentMonth = LocalDate.now().getMonthValue();
-        int inboundCount = dashboardService.getMonthlyInboundCount(year, currentMonth);
-        int outboundCount = dashboardService.getMonthlyOutboundCount(year, currentMonth);
+        // 3. 전월/전년 대비 계산
+        List<DashboardSummaryDTO> prevYearSummary = dashboardService.getNetProfitSummary(year - 1);
+        long prevYearSameMonthProfit = prevYearSummary.get(queryMonth - 1).getNetProfit();
+        long prevMonthProfit = (queryMonth == 1) ? prevYearSummary.get(11).getNetProfit() : netProfitSummary.get(queryMonth - 2).getNetProfit();
+        long currentMonthProfit = netProfitSummary.get(queryMonth - 1).getNetProfit();
+        double profitGrowthMoM = calculateGrowthRate(currentMonthProfit, prevMonthProfit);
+        double profitGrowthYoY = calculateGrowthRate(currentMonthProfit, prevYearSameMonthProfit);
 
-        // 6. 응답 데이터 구성
+        // 4. 응답 데이터 구성
         Map<String, Object> response = new HashMap<>();
-        // [차트용 데이터]
         response.put("netProfitSummary", netProfitSummary);
-        response.put("expenseSummary", expenseSummary);
 
-        // [상단 요약 카드용 재무 데이터]
+        // ✅ [핵심 수정] JSP가 찾는 이름인 "expenseSummary"로 보냅니다.
+        response.put("expenseSummary", monthlyExpenseSummary);
+
         response.put("totalSales", totalSales);
         response.put("totalExpense", totalExpense);
         response.put("netProfit", netProfit);
         response.put("profitMargin", profitMargin);
-
-        // [중단 요약 카드용 물류 데이터]
         response.put("monthlyInboundCount", inboundCount);
         response.put("monthlyOutboundCount", outboundCount);
-
-        // [기타 정보]
         response.put("selectedYear", year);
+        response.put("selectedMonth", queryMonth);
+        response.put("profitGrowthMoM", profitGrowthMoM);
+        response.put("profitGrowthYoY", profitGrowthYoY);
 
         return ResponseEntity.ok(response);
+    }
+
+    private double calculateGrowthRate(long current, long previous) {
+        if (previous == 0) return (current > 0) ? 100.0 : 0.0;
+        return ((double) (current - previous) / Math.abs(previous)) * 100;
     }
 }

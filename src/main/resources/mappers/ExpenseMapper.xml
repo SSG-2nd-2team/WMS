@@ -14,8 +14,7 @@
         <result property="modDate" column="mod_date"/>
     </resultMap>
 
-    <select id="findAll" resultMap="ExpenseResultMap" parameterType="com.ssg.wms.finance.dto.ExpenseRequestDTO">
-        SELECT * FROM expense
+    <sql id="searchConditions">
         <where>
             <if test="dateFrom != null">
                 AND expense_date &gt;= #{dateFrom}
@@ -32,23 +31,18 @@
                 )
             </if>
         </where>
-        ORDER BY expense_date DESC
+    </sql>
+
+    <select id="findAll" resultMap="ExpenseResultMap" parameterType="com.ssg.wms.finance.dto.ExpenseRequestDTO">
+        SELECT * FROM expense
+        <include refid="searchConditions"/>
+        ORDER BY expense_date DESC, expense_id DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
     <select id="count" resultType="int" parameterType="com.ssg.wms.finance.dto.ExpenseRequestDTO">
         SELECT COUNT(*) FROM expense
-        <where>
-            <if test="dateFrom != null">
-                AND expense_date &gt;= #{dateFrom}
-            </if>
-            <if test="dateTo != null">
-                AND expense_date &lt;= #{dateTo}
-            </if>
-            <if test="keyword != null and keyword != ''">
-                AND (description LIKE CONCAT('%', #{keyword}, '%') OR category LIKE CONCAT('%', #{keyword}, '%'))
-            </if>
-        </where>
+        <include refid="searchConditions"/>
     </select>
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id" keyColumn="expense_id">
@@ -91,6 +85,14 @@
         FROM expense
         WHERE YEAR(expense_date) = #{year}
         GROUP BY MONTH(expense_date)
+    </select>
+
+    <select id="findSummaryByCategoryForMonth" resultType="com.ssg.wms.finance.dto.CategorySummaryDTO">
+        SELECT category, SUM(amount) AS totalAmount
+        FROM expense
+        WHERE YEAR(expense_date) = #{year}
+          AND MONTH(expense_date) = #{month}
+        GROUP BY category
     </select>
 
 </mapper>
