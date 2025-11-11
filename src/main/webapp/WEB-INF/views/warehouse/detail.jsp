@@ -25,6 +25,20 @@
       font-weight: bold;
       border-bottom: 1px solid #ccc;
     }
+
+    /* 버튼 컨테이너 스타일 추가 */
+    .action-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .action-buttons button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -117,13 +131,17 @@
 <hr>
 
 <c:if test="${userRole == 'ADMIN' || userRole == 'MANAGER'}">
-  <div style="margin-top: 20px;">
-      <%--  수정 버튼: userRole을 사용하여 경로 동적 생성  --%>
-    <button onclick="location.href='${pageContext.request.contextPath}/${userRole == 'ADMIN' ? 'admin' : 'manager'}/warehouses/${detail.warehouseId}/modify'"
-            style="background-color: navy; color: white; padding: 10px 20px;">수정하기</button>
+  <div class="action-buttons">
 
     <button onclick="showDeleteModal()"
-            style="background-color: darkred; color: white; padding: 10px 20px;">삭제</button>
+            style="background-color: darkred; color: white;">
+      삭제
+    </button>
+
+    <button onclick="location.href='${pageContext.request.contextPath}/admin/warehouses'"
+            style="background-color: navy; color: white;">
+      목록으로
+    </button>
   </div>
 </c:if>
 
@@ -142,7 +160,6 @@
   </div>
 </div>
 
-<button onclick="location.href='${pageContext.request.contextPath}/admin/warehouses'" style="margin-top: 10px;">목록으로</button>
 <script src="${pageContext.request.contextPath}/static/warehouse/warehouse.js"></script>
 <script>
   // 마커 표시를 위한 데이터

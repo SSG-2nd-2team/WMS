@@ -104,6 +104,53 @@
 
     <h2>구역 정보 등록</h2>
     <div id="sectionsContainer">
+        <div class="section-container" id="section-1">
+            <div class="section-header">
+                <h4>새 구역 1</h4>
+                <button type="button" onclick="removeSection(1)" style="background-color: darkred; color: white; padding: 5px 10px;">삭제</button>
+            </div>
+
+            <label for="sections_0_name">구역 이름 (예: 나이키 보관구역)</label>
+            <input type="text" name="sections[0].sectionName" required>
+
+            <label for="sections_0_type">구역 타입</label>
+            <select name="sections[0].sectionType" required>
+                <option value="">선택</option>
+                <option value="A">A구역</option>
+                <option value="B">B구역</option>
+                <option value="C">C구역</option>
+                <option value="D">D구역</option>
+            </select>
+
+            <label for="sections_0_purpose">목적</label>
+            <select name="sections[0].sectionPurpose" required>
+                <option value="">선택</option>
+                <option value="보관">보관</option>
+                <option value="검수">검수</option>
+            </select>
+            <label for="sections_0_area">면적</label>
+            <input type="text" name="sections[0].allocatedArea" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
+
+            <h5 style="margin-top: 15px;">구역 위치 정보</h5>
+            <div id="locationsContainer_0">
+                <div class="location-list" id="location-1">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h6>위치 #1</h6>
+                        <button type="button" onclick="removeLocation(1)" style="background-color: #dc3545; color: white; padding: 3px 8px; font-size: 10px;">X</button>
+                    </div>
+
+                    <label>위치 코드</label>
+                    <input type="text" name="sections[0].locations[0].locationCode" required>
+
+                    <label>층수</label>
+                    <input type="text" name="sections[0].locations[0].floorNum" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
+
+                    <label>최대 부피</label>
+                    <input type="text" name="sections[0].locations[0].maxVolume" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
+                </div>
+            </div>
+            <button type="button" onclick="addLocation(0)" style="background-color: #17a2b8; color: white; padding: 5px 10px;">+ 위치 추가</button>
+        </div>
     </div>
 
     <button type="button" onclick="addSection()" style="background-color: #28a745; color: white; margin-bottom: 20px;">+ 구역 추가</button>
@@ -129,9 +176,10 @@
 </form>
 
 <script>
-    let sectionCount = 0; // 구역 인덱스를 관리
+    // locationCounter를 1로 시작합니다. (기본 위치 1개 이미 생성)
+    let locationCounter = 1;
 
-    // ==================== [AJAX URL 수정된] 중복 확인 함수 ====================
+    // ==================== [AJAX URL 수정 및 팝업 추가된] 중복 확인 함수 ====================
     function checkDuplication() {
         const name = $('#name').val().trim();
         const resultElement = $('#nameCheckResult');
@@ -143,7 +191,7 @@
             return;
         }
 
-        // ✨ 2. Controller의 실제 매핑 경로를 CONTEXT_PATH와 결합합니다. ✨
+        // Controller의 실제 매핑 경로를 CONTEXT_PATH와 결합합니다.
         const url = CONTEXT_PATH + '/admin/warehouses/api/check/name';
 
         $.ajax({
@@ -170,7 +218,6 @@
             }
         });
     }
-    // ==================== 중복 확인 함수 끝 ====================
 
     // ==================== [수정된] 유효성 검사 함수 ====================
     function validateForm() {
@@ -187,7 +234,8 @@
             return false;
         }
 
-        // DTO 바인딩 오류 방지 및 필수 항목 확인
+        // 기본 구역이 이미 존재하므로, 최소 구역 확인은 이제 필요 없습니다.
+        // 하지만 혹시 첫 구역이 삭제될 경우를 대비해, 최소 1개는 확인합니다.
         const sectionCount = document.getElementById("sectionsContainer").children.length;
         if (sectionCount === 0) {
             alert("최소한 하나 이상의 구역 정보를 등록해야 합니다.");
@@ -196,29 +244,8 @@
 
         return true;
     }
-    // ==================== 유효성 검사 함수 끝 ====================
 
-
-    $(document).ready(function() {
-        // 페이지 로드 시 지도 초기화 (warehouse.js의 함수 사용)
-        kakao.maps.load(function() {
-            if (typeof initMapForRegister === 'function') {
-                initMapForRegister('map');
-            } else {
-                console.error("initMapForRegister 함수를 찾을 수 없습니다. warehouse.js를 확인해주세요.");
-            }
-        });
-
-        // 주소 입력 필드에서 Enter 키 눌렀을 때 위치 확인 실행
-        $('#address').keypress(function(e) {
-            if (e.which == 13) {
-                e.preventDefault();
-                searchAddress();
-            }
-        });
-    });
-
-    // 구역 추가 함수
+    // ==================== [수정된] 구역 추가 함수 ====================
     function addSection() {
         // 현재 존재하는 섹션 개수를 정확한 인덱스로 사용 (0, 1, 2...)
         const index = $('#sectionsContainer > div.section-container').length;
@@ -262,24 +289,18 @@
         container.append(newSectionHtml);
     }
 
-    // 구역 삭제 함수
-    function removeSection(id) {
-        $(`#section-${id}`).remove();
-    }
-
-    // 위치 추가 함수 (구역 내 로케이션)
-    let locationCounter = 0; // 전체 로케이션 카운터
+    // ==================== [수정된] 위치 추가 함수 ====================
     function addLocation(sectionIndex) {
-        locationCounter++;
+        // 현재 해당 섹션 내에 존재하는 location 개수를 정확한 location 인덱스로 사용
         const locationIndex = $(`#locationsContainer_${sectionIndex} > div.location-list`).length;
-        const displayCounter = locationCounter; // 화면 표시용 번호
+        locationCounter++; // 전체 카운터 증가 (화면 표시용)
 
         const container = $(`#locationsContainer_${sectionIndex}`);
         const locationHtml = `
-      <div class="location-list" id="location-${displayCounter}">
+      <div class="location-list" id="location-${locationCounter}">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h6>위치 #${displayCounter}</h6>
-          <button type="button" onclick="removeLocation(${displayCounter})" style="background-color: #dc3545; color: white; padding: 3px 8px; font-size: 10px;">X</button>
+          <h6>위치 #${locationCounter}</h6>
+          <button type="button" onclick="removeLocation(${locationCounter})" style="background-color: #dc3545; color: white; padding: 3px 8px; font-size: 10px;">X</button>
         </div>
 
         <label>위치 코드</label>
@@ -293,6 +314,32 @@
       </div>
     `;
         container.append(locationHtml);
+    }
+
+    // ==================== 기타 함수 유지 ====================
+
+    $(document).ready(function() {
+        // 페이지 로드 시 지도 초기화 (warehouse.js의 함수 사용)
+        kakao.maps.load(function() {
+            if (typeof initMapForRegister === 'function') {
+                initMapForRegister('map');
+            } else {
+                console.error("initMapForRegister 함수를 찾을 수 없습니다. warehouse.js를 확인해주세요.");
+            }
+        });
+
+        // 주소 입력 필드에서 Enter 키 눌렀을 때 위치 확인 실행
+        $('#address').keypress(function(e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                searchAddress();
+            }
+        });
+    });
+
+    // 구역 삭제 함수
+    function removeSection(id) {
+        $(`#section-${id}`).remove();
     }
 
     // 위치 삭제 함수
