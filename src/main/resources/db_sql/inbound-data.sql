@@ -1,3 +1,5 @@
+use wmstestdb;
+
 -- ===========================
 -- 1. Partner (10건)
 -- ===========================
@@ -112,7 +114,7 @@ INSERT INTO inbound (warehouse_id, staff_id, member_id, inbound_status) VALUES
 -- ===========================
 -- 9. inbound_item (10건)
 -- ===========================
-INSERT INTO inbound_item (product_id, inbound_id, amount) VALUES
+INSERT INTO inbound_item (product_id, inbound_id, quantity) VALUES
                                                               ('P001',1,10),
                                                               ('P002',2,20),
                                                               ('P003',3,15),
