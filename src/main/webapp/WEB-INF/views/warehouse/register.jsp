@@ -6,6 +6,11 @@
     <title>창고 등록</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8284a9e56dbc80e2ab8f41c23c1bbb0a&libraries=services"></script>
+
+    <script>
+        const CONTEXT_PATH = '${pageContext.request.contextPath}';
+    </script>
+
     <script src="${pageContext.request.contextPath}/static/warehouse/warehouse.js"></script>
 
     <style>
@@ -124,12 +129,10 @@
 </form>
 
 <script>
-    // sectionCount를 사용하여 0부터 인덱스를 시작합니다.
-    let sectionCount = 0;
-    let locationCounter = 0; // 전체 로케이션 카운터
+    let sectionCount = 0; // 구역 인덱스를 관리
 
+    // ==================== [AJAX URL 수정된] 중복 확인 함수 ====================
     function checkDuplication() {
-        // ... (중복확인 로직 유지) ...
         const name = $('#name').val().trim();
         const resultElement = $('#nameCheckResult');
         const isNameChecked = $('#isNameChecked');
@@ -140,7 +143,8 @@
             return;
         }
 
-        const url = '${pageContext.request.contextPath}/admin/warehouses/api/check/name';
+        // ✨ 2. Controller의 실제 매핑 경로를 CONTEXT_PATH와 결합합니다. ✨
+        const url = CONTEXT_PATH + '/admin/warehouses/api/check/name';
 
         $.ajax({
             url: url,
@@ -166,8 +170,9 @@
             }
         });
     }
+    // ==================== 중복 확인 함수 끝 ====================
 
-    // ==================== [수정됨] 유효성 검사 함수: 최소 구역 등록 확인 로직 유지 ====================
+    // ==================== [수정된] 유효성 검사 함수 ====================
     function validateForm() {
         const nameChecked = document.getElementById("isNameChecked").value === "true";
         if (!nameChecked) {
@@ -182,6 +187,7 @@
             return false;
         }
 
+        // DTO 바인딩 오류 방지 및 필수 항목 확인
         const sectionCount = document.getElementById("sectionsContainer").children.length;
         if (sectionCount === 0) {
             alert("최소한 하나 이상의 구역 정보를 등록해야 합니다.");
@@ -190,11 +196,11 @@
 
         return true;
     }
-    // ==================== [수정됨] 유효성 검사 함수 끝 ====================
+    // ==================== 유효성 검사 함수 끝 ====================
 
 
-    $(document.ready(function() {
-        // ... (지도 초기화 및 주소 엔터키 로직 유지) ...
+    $(document).ready(function() {
+        // 페이지 로드 시 지도 초기화 (warehouse.js의 함수 사용)
         kakao.maps.load(function() {
             if (typeof initMapForRegister === 'function') {
                 initMapForRegister('map');
@@ -203,6 +209,7 @@
             }
         });
 
+        // 주소 입력 필드에서 Enter 키 눌렀을 때 위치 확인 실행
         $('#address').keypress(function(e) {
             if (e.which == 13) {
                 e.preventDefault();
@@ -211,14 +218,13 @@
         });
     });
 
-    // ==================== [수정됨] 구역 추가 함수: 인덱스 문제 해결 시도 ====================
+    // 구역 추가 함수
     function addSection() {
         // 현재 존재하는 섹션 개수를 정확한 인덱스로 사용 (0, 1, 2...)
         const index = $('#sectionsContainer > div.section-container').length;
+        const displayCount = index + 1; // 화면 표시용 번호
 
         const container = $('#sectionsContainer');
-        const displayCount = index + 1;
-
         const newSectionHtml = `
       <div class="section-container" id="section-${displayCount}">
         <div class="section-header">
@@ -227,10 +233,10 @@
         </div>
 
         <label for="sections_${index}_name">구역 이름 (예: 나이키 보관구역)</label>
-        <input type="text" id="sections_${index}_name" name="sections[${index}].sectionName" required>
+        <input type="text" name="sections[${index}].sectionName" required>
 
         <label for="sections_${index}_type">구역 타입</label>
-        <select id="sections_${index}_type" name="sections[${index}].sectionType" required>
+        <select name="sections[${index}].sectionType" required>
           <option value="">선택</option>
           <option value="A">A구역</option>
           <option value="B">B구역</option>
@@ -239,13 +245,13 @@
         </select>
 
         <label for="sections_${index}_purpose">목적</label>
-        <select id="sections_${index}_purpose" name="sections[${index}].sectionPurpose" required>
+        <select name="sections[${index}].sectionPurpose" required>
             <option value="">선택</option>
             <option value="보관">보관</option>
             <option value="검수">검수</option>
         </select>
         <label for="sections_${index}_area">면적</label>
-        <input type="text" id="sections_${index}_area" name="sections[${index}].allocatedArea" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
+        <input type="text" name="sections[${index}].allocatedArea" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
 
         <h5 style="margin-top: 15px;">구역 위치 정보</h5>
         <div id="locationsContainer_${index}">
@@ -255,13 +261,18 @@
     `;
         container.append(newSectionHtml);
     }
-    // ==================== [수정됨] 구역 추가 함수 끝 ====================
 
-    // ==================== [수정됨] 위치 추가 함수: 인덱스 문제 해결 시도 ====================
+    // 구역 삭제 함수
+    function removeSection(id) {
+        $(`#section-${id}`).remove();
+    }
+
+    // 위치 추가 함수 (구역 내 로케이션)
+    let locationCounter = 0; // 전체 로케이션 카운터
     function addLocation(sectionIndex) {
-        // 현재 해당 섹션 내에 존재하는 location 개수를 정확한 location 인덱스로 사용
+        locationCounter++;
         const locationIndex = $(`#locationsContainer_${sectionIndex} > div.location-list`).length;
-        const displayCounter = locationCounter++;
+        const displayCounter = locationCounter; // 화면 표시용 번호
 
         const container = $(`#locationsContainer_${sectionIndex}`);
         const locationHtml = `
@@ -282,14 +293,6 @@
       </div>
     `;
         container.append(locationHtml);
-    }
-    // ==================== [수정됨] 위치 추가 함수 끝 ====================
-
-
-    // 구역 삭제 함수
-    function removeSection(id) {
-        $(`#section-${id}`).remove();
-        // 삭제 후 인덱스를 재정렬하는 복잡한 로직이 필요하지만, Spring이 gap을 무시하는 경우를 활용하여 생략.
     }
 
     // 위치 삭제 함수
