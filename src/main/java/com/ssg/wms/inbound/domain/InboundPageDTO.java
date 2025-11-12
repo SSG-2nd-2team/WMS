@@ -5,16 +5,16 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class PageDTO {
+public class InboundPageDTO {
 
     private int startPage; //시작
     private int endPage; //화면에서 마지막 번호
     private boolean prev, next;
 
     private int total;
-    private Criteria cri;
+    private InboundCriteria cri;
 
-    public PageDTO(Criteria cri, int total) {
+    public InboundPageDTO(InboundCriteria cri, int total) {
 
         this.cri = cri;
         this.total = total;

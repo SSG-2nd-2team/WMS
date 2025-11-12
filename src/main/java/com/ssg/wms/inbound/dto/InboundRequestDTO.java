@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class InboundRequestDTO {
     // 등록/수정용 DTO
-
+    private int inboundId;
     private int warehouseId;
     private int staffId;
     private Long memberId;             // 필수

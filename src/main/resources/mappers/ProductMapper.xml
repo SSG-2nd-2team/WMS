@@ -15,8 +15,9 @@
     </select>
 
     <select id="selectCategory" resultType="com.ssg.wms.product_ehs.dto.CategoryDTO">
-        SELECT *
+        SELECT category_cd, category_name
         FROM category
+        ORDER BY category_cd
     </select>
 
 </mapper>

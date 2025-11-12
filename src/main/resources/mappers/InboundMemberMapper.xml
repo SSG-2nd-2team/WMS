@@ -17,9 +17,38 @@
             <id property="inboundItemId" column="inbound_item_id"/>
             <result property="productId" column="product_id"/>
             <result property="productName" column="product_name"/>
+            <result property="categoryCd" column="category_cd"/>
+            <result property="categoryName" column="category_name"/>
             <result property="quantity" column="quantity"/>
         </collection>
     </resultMap>
+
+    <resultMap id="InboundItemsDetailResultMap" type="com.ssg.wms.inbound.dto.InboundDetailDTO">
+        <id property="inboundId" column="inbound_id"/>
+        <result property="warehouseId" column="warehouse_id"/>
+        <result property="warehouseName" column="warehouse_name"/>
+        <result property="memberId" column="member_id"/>
+        <result property="memberName" column="member_name"/>
+        <result property="partnerId" column="partner_id"/>
+        <result property="partnerName" column="partner_name"/>
+        <result property="staffId" column="staff_id"/>
+        <result property="staffName" column="staff_name"/>
+        <result property="inboundStatus" column="inbound_status"/>
+        <result property="inboundRejectReason" column="inbound_reject_reason"/>
+        <result property="inboundRequestedAt" column="inbound_requested_at"/>
+        <result property="inboundUpdatedAt" column="inbound_updated_at"/>
+        <result property="inboundAt" column="inbound_at"/>
+        <collection property="inboundItems" ofType="com.ssg.wms.inbound.dto.InboundItemDTO">
+            <id property="inboundItemId" column="inbound_item_id"/>
+            <result property="inboundId" column="inbound_id"/>
+            <result property="productId" column="product_id"/>
+            <result property="productName" column="product_name"/>
+            <result property="categoryCd" column="category_cd"/>
+            <result property="categoryName" column="category_name"/>
+            <result property="quantity" column="quantity"/>
+        </collection>
+    </resultMap>
+
 
     <!-- 입고 요청 -->
     <insert id="insertInbound" parameterType="com.ssg.wms.inbound.domain.InboundVO"
@@ -78,6 +107,7 @@
         ii.inbound_item_id,
         ii.product_id,
         p.product_name,
+        c.category_cd,
         c.category_name,
         ii.quantity,
         i.inbound_requested_at,
@@ -94,8 +124,81 @@
         WHERE i.inbound_id = #{inboundId}
     </select>
 
+
+    <!-- 입고 요청 단건 조회(수정용-출력) -->
+    <select id="selectInboundWithItemsDetail" resultMap="InboundItemsDetailResultMap" parameterType="int">
+        SELECT
+        i.inbound_id,
+        i.warehouse_id,
+        w.name AS warehouse_name,
+        i.member_id,
+        m.member_name,
+        i.staff_id,
+        st.staff_name,
+        pt.partner_id AS partner_id,
+        pt.partner_name,
+        i.inbound_status,
+        ii.inbound_item_id,
+        ii.product_id,
+        p.product_name,
+        c.category_cd,
+        c.category_name,
+        ii.quantity,
+        i.inbound_requested_at,
+        i.inbound_at,
+        i.inbound_reject_reason
+        FROM inbound i
+        LEFT JOIN warehouse w ON i.warehouse_id = w.warehouse_id
+        JOIN member m ON i.member_id = m.member_id
+        JOIN partner pt ON m.partner_id = pt.partner_id
+        LEFT JOIN inbound_item ii ON i.inbound_id = ii.inbound_id
+        LEFT JOIN product p ON ii.product_id = p.product_id
+        LEFT JOIN category c ON p.category_cd = c.category_cd
+        LEFT JOIN staff st ON i.staff_id = st.staff_id
+        WHERE i.inbound_id = #{inboundId}
+    </select>
+
+
+
+
     <!-- 입고 요청 수정 -->
+    <!-- 입고 기본 정보 수정 -->
+    <update id="updateInbound" parameterType="com.ssg.wms.inbound.dto.InboundRequestDTO">
+        UPDATE inbound
+        SET
+        inbound_updated_at = NOW()
+        WHERE inbound_id = #{inboundId}
+    </update>
+
+    <!-- 기존 상품 삭제 -->
+    <delete id="deleteInboundItems" parameterType="int">
+        DELETE FROM inbound_item
+        WHERE inbound_id = #{inboundId}
+    </delete>
+
+<!--    &lt;!&ndash; 새로운 상품 목록 insert &ndash;&gt;-->
+<!--    <insert id="insertInboundItem" parameterType="com.ssg.wms.inbound.dto.InboundRequestItemDTO">-->
+<!--        INSERT INTO inbound_item (inbound_id, product_id, quantity)-->
+<!--        VALUES (#{inboundId}, #{productId}, #{quantity})-->
+<!--    </insert>-->
+
+    <!-- 여러 상품을 foreach로 batch insert -->
+    <insert id="insertInboundItemsBatch" parameterType="java.util.List">
+        INSERT INTO inbound_item (inbound_id, product_id, quantity)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.inboundId}, #{item.productId}, #{item.quantity})
+        </foreach>
+    </insert>
 
     <!-- 입고 요청 취소 -->
+    <update id="cancelInbound">
+        UPDATE inbound
+        SET
+        inbound_updated_at = NOW(),
+        inbound_status = 'cancelled'
+        WHERE inbound_id = #{inboundId}
+    </update>
+
 
 </mapper>

@@ -3,7 +3,7 @@ package com.ssg.wms.inbound.domain;
 import lombok.Data;
 
 @Data
-public class Criteria {
+public class InboundCriteria {
 
     private int pageNum = 1;
     private int amount = 10;
