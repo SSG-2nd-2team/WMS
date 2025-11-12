@@ -14,10 +14,12 @@
         <result property="description" column="description"/>
         <result property="regDate" column="reg_date"/>
         <result property="modDate" column="mod_date"/>
+        <result property="status" column="status"/>
     </resultMap>
 
     <sql id="searchConditions">
         <where>
+            AND status = 'ACTIVE'
             <if test="dateFrom != null">
                 AND sales_date &gt;= #{dateFrom}
             </if>
@@ -57,7 +59,7 @@
         SELECT *
         FROM sales
         WHERE sales_id = #{id}
-    </select>
+          AND status = 'ACTIVE' </select>
 
     <update id="update">
         UPDATE sales
@@ -69,25 +71,27 @@
             description    = #{description},
             mod_date       = NOW()
         WHERE sales_id = #{id}
-    </update>
+          AND status = 'ACTIVE' </update>
 
-    <delete id="delete">
-        DELETE
-        FROM sales
+    <update id="delete">
+        UPDATE sales
+        SET status = 'DELETED'
         WHERE sales_id = #{id}
-    </delete>
+    </update>
 
     <select id="findMonthlySummary" resultType="com.ssg.wms.finance.dto.DashboardSummaryDTO">
         SELECT MONTH(sales_date) AS month, SUM(amount) AS totalSales
         FROM sales
         WHERE YEAR(sales_date) = #{year}
+          AND status = 'ACTIVE'
         GROUP BY MONTH(sales_date)
     </select>
 
     <update id="updateCode">
         UPDATE sales
         SET sales_code = #{salesCode}
-        WHERE sales_id = #{id} </update>
+        WHERE sales_id = #{id}
+    </update>
 
     <select id="selectPartnerList" resultType="com.ssg.wms.finance.dto.SalesPartnerDTO">
         SELECT partner_id   as partnerId,
@@ -101,6 +105,7 @@
         FROM sales
         WHERE YEAR(sales_date) = #{year}
           AND MONTH(sales_date) = #{month}
+          AND status = 'ACTIVE'
     </select>
 
 </mapper>

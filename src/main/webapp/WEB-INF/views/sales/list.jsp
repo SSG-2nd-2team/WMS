@@ -46,7 +46,7 @@
                         <th>고객사명</th>
                         <th>창고명</th>
                         <th>카테고리</th>
-                        <th class="text-end">금액</th>
+                        <th class="text-end">금액 (만원)</th>
                         <th>설명</th>
                     </tr>
                     </thead>
@@ -185,7 +185,7 @@
 
         list.forEach(item => {
             // 금액 포맷
-            let amt = new Intl.NumberFormat('ko-KR').format(item.amount);
+            let amtInManWon = Math.floor(item.amount / 10000).toLocaleString('ko-KR');
 
             // 날짜 포맷: "2025,11,10" -> "2025-11-10"
             let formattedDate = item.salesDate ? String(item.salesDate).replace(/,/g, '-') : '-';
@@ -197,7 +197,7 @@
                 <td><strong>\${item.clientName}</strong></td>
                 <td>\${item.warehouseName}</td>
                 <td><span class="text-success fw-bold">\${item.category}</span></td>
-                <td class="text-end fw-bold text-success">\${amt}원</td>
+                <td class="text-end fw-bold text-success">\${amtInManWon}</td>
                 <td>\${item.description || '-'}</td>
             </tr>`);
         });

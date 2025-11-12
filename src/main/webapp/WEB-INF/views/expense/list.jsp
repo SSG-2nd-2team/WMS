@@ -42,11 +42,10 @@
                     <thead>
                     <tr>
                         <th>관리번호</th>
-                        <%-- [수정] "ID" -> "관리번호" --%>
                         <th>지출일자</th>
                         <th>창고명</th>
                         <th>카테고리</th>
-                        <th class="text-end">금액</th>
+                        <th class="text-end">금액 (만원)</th>
                         <th>설명</th>
                     </tr>
                     </thead>
@@ -163,19 +162,18 @@
         });
     }
 
-    // --- ▼ [수정] 지출 목록에 맞게 수정한 최종본 ---
+    // --- 지출 목록 ---
     function renderTable(list) {
         let tbody = $('#tableBody').empty();
 
         if (!list || list.length === 0) {
-            // [수정] colspan을 6으로 변경 (지출 목록 스크린샷 기준)
             tbody.append('<tr><td colspan="6" class="text-center py-3">데이터가 없습니다.</td></tr>');
             return;
         }
 
         list.forEach(item => {
-            // 금액 포맷
-            let amt = new Intl.NumberFormat('ko-KR').format(item.amount);
+            // 금액 포맷, 10000으로 나누고, 소수점 버리고, 천단위 쉼표 추가
+            let amtInManWon = Math.floor(item.amount / 10000).toLocaleString('ko-KR');
 
             // 날짜 포맷: "2025,11,10" -> "2025-11-10"
             let formattedDate = item.expenseDate ? String(item.expenseDate).replace(/,/g, '-') : '-';
@@ -187,7 +185,7 @@
                 <td>\${formattedDate}</td>
                 <td>\${item.warehouseName}</td>
                 <td><span class="text-danger fw-bold">\${item.category}</span></td>
-                <td class="text-end fw-bold text-danger">\${amt}원</td>
+                <td class="text-end fw-bold text-danger">\${amtInManWon}</td>
                 <td>\${item.description || '-'}</td>
             </tr>`);
         });
