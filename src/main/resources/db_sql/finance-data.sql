@@ -438,6 +438,8 @@ ALTER TABLE Sales
 ALTER TABLE Expense
     ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' COMMENT '상태 (ACTIVE, DELETED)';
 
+##############################
+
 CREATE TABLE Expense
 (
     expense_id     BIGINT AUTO_INCREMENT PRIMARY KEY                               NOT NULL COMMENT '지출 PK',
@@ -467,3 +469,5 @@ CREATE TABLE Sales
     mod_date       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL COMMENT '수정일시',
     status         VARCHAR(20)                                                     NOT NULL DEFAULT 'ACTIVE' COMMENT '상태 (ACTIVE, DELETED)'
 ) COMMENT '매출 관리 테이블';
+
+##############################
