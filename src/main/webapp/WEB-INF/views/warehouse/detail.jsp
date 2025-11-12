@@ -9,10 +9,10 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8284a9e56dbc80e2ab8f41c23c1bbb0a"></script>
   <style>
-    /* 기존 스타일 유지 */
+
     #map { width: 400px; height: 350px; margin-top: 10px; border: 1px solid #ccc; }
 
-    /* 레이아웃 변경을 위한 스타일 */
+
     .detail-container { display: flex; flex-wrap: wrap; gap: 20px; }
     .info-box, .map-box, .section-list-box {
       border: 1px solid #e0e0e0;
@@ -20,11 +20,11 @@
       border-radius: 8px;
       background-color: #fff;
     }
-    .info-box { flex-basis: 55%; } /* 창고 기본 정보 (좌상) */
-    .map-box { flex-basis: 40%; } /* 창고 위치 (우상) */
-    .section-list-box { flex-basis: 100%; margin-top: 20px; } /* 구역 정보 (하단 전체 너비) */
+    .info-box { flex-basis: 55%; }
+    .map-box { flex-basis: 40%; }
+    .section-list-box { flex-basis: 100%; margin-top: 20px; }
 
-    /* 기존 테이블 스타일 */
+
     table.info-table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
     table.info-table th, table.info-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
     table.info-table th { background-color: #f7f7f7; width: 30%; font-weight: 600; }
@@ -43,19 +43,32 @@
     .location-container { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 10px;}
     .single-section { flex: 1 1 48%; min-width: 300px; border: 1px dashed #ccc; padding: 10px; border-radius: 4px; }
 
-    /* 🌟 버튼 크기 확대 (수정된 부분) 🌟 */
+  
     .action-buttons {
       margin-top: 20px;
       display: flex;
       gap: 10px;
     }
     .action-buttons button {
-      padding: 12px 25px; /* 패딩을 늘려서 버튼 크기 확대 */
+      padding: 12px 25px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       font-weight: bold;
-      font-size: 16px; /* 폰트 크기도 살짝 키워서 가독성 높임 */
+      font-size: 16px;
+    }
+
+    /* 모달 기본 스타일 (필요시 추가) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
     }
   </style>
 </head>
@@ -104,9 +117,8 @@
               <table class="info-table location-table">
                 <thead>
                 <tr>
-                  <th>창고 코드</th>
+                  <th>위치 코드</th>
                   <th>층수</th>
-                  <th>창고 유형</th>
                   <th>최대 부피</th>
                 </tr>
                 </thead>
@@ -115,12 +127,11 @@
                   <tr>
                     <td>${location.locationCode}</td>
                     <td>${location.floorNum}</td>
-                    <td>${location.locationTypeCode}</td>
                     <td>${location.maxVolume}</td>
                   </tr>
                 </c:forEach>
                 <c:if test="${empty section.locations}">
-                  <tr><td colspan="4">등록된 위치가 없습니다.</td></tr>
+                  <tr><td colspan="3">등록된 위치가 없습니다.</td></tr>
                 </c:if>
                 </tbody>
               </table>
@@ -145,15 +156,26 @@
   </div>
 </c:if>
 
-<%-- 삭제 모달 기능 --%>
-<div id="deleteModal" class="modal">
-  <div class="modal-content">
-    <h2>정말 삭제하시겠습니까?</h2>
-    <p>창고 ${detail.name} (ID: ${detail.warehouseId}) 정보를 복구할 수 없습니다.</p>
-    <form action="${pageContext.request.contextPath}/${userRole == 'ADMIN' ? 'admin' : 'manager'}/warehouses/${detail.warehouseId}/delete" method="POST" style="display: inline;">
-      <button type="submit" style="background-color: navy; color: white;">예</button>
+<%-- ✨ 수정된 삭제 모달 기능 (더 명확하고 강조된 디자인) ✨ --%>
+<div id="deleteModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+  <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 450px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+    <div style="text-align: center; color: #d9534f; margin-bottom: 20px;">
+      <span style="font-size: 40px;">⚠️</span>
+    </div>
+
+    <h2 style="font-size: 20px; color: #333; margin-top: 0; text-align: center;">**창고 삭제 경고**</h2>
+    <p style="text-align: center; color: #666; line-height: 1.5; border-top: 1px dashed #eee; padding-top: 15px;">
+      정말로 **창고 ${detail.name}** (ID: ${detail.warehouseId}) 정보를 삭제하시겠습니까?
+    </p>
+    <p style="text-align: center; color: darkred; font-weight: bold; margin-bottom: 25px;">
+      이 작업은 되돌릴 수 없으며, 모든 관련 데이터가 영구적으로 삭제됩니다.
+    </p>
+
+    <form action="${pageContext.request.contextPath}/${userRole == 'ADMIN' ? 'admin' : 'manager'}/warehouses/${detail.warehouseId}/delete" method="POST" style="text-align: center;">
+      <button type="submit" style="background-color: darkred; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px; transition: background-color 0.3s ease;">영구 삭제</button>
+      <button type="button" onclick="hideDeleteModal()" style="background-color: #ccc; color: #333; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease;">취소</button>
     </form>
-    <button onclick="hideDeleteModal()" style="background-color: darkred; color: white;">아니요</button>
   </div>
 </div>
 
@@ -175,7 +197,7 @@
     }
   });
 
-  // 모달 제어 함수 (유지)
+  // 모달 제어 함수
   function showDeleteModal() {
     document.getElementById('deleteModal').style.display = 'block';
   }
