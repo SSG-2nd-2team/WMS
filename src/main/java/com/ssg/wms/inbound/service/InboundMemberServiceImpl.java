@@ -105,6 +105,10 @@ public class InboundMemberServiceImpl implements InboundMemberService {
     @Transactional
     @Override
     public InboundDTO updateInbound(InboundRequestDTO inboundRequestDTO) {
+
+        log.info("Update inbound - ID: {}", inboundRequestDTO.getInboundId());
+        log.info("Items count: {}", inboundRequestDTO.getInboundRequestItems().size());
+
         // 1 기본 정보 업데이트
         inboundMemberMapper.updateInbound(inboundRequestDTO);
 
@@ -114,7 +118,11 @@ public class InboundMemberServiceImpl implements InboundMemberService {
         // 3 새로운 상품 목록 등록
         if (inboundRequestDTO.getInboundRequestItems() != null &&
                 !inboundRequestDTO.getInboundRequestItems().isEmpty()) {
-            inboundMemberMapper.insertInboundItemsBatch(inboundRequestDTO.getInboundRequestItems());
+            for (InboundRequestItemDTO item : inboundRequestDTO.getInboundRequestItems()) {
+                item.setInboundId(inboundRequestDTO.getInboundId());
+                log.info("Item - inboundId: {}, productId: {}, quantity: {}",
+                        item.getInboundId(), item.getProductId(), item.getQuantity());
+            }
         }
 
         // 4 최신 데이터 조회 후 출력용 DTO 반환

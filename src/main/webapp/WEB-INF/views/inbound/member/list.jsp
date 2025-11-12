@@ -433,8 +433,9 @@
 
 
         // 수정 버튼 클릭 이벤트
+        // 수정 버튼 클릭 이벤트
         $(document).on('click', '#updateInboundBtn', function() {
-            const inboundId = $('#inboundModal').data('inbound-id'); // 모달에 저장된 입고ID
+            const inboundId = $('#inboundModal').data('inbound-id');
             if (!inboundId) {
                 alert('입고 요청 정보를 찾을 수 없습니다.');
                 return;
@@ -445,6 +446,7 @@
             $('#inboundItemsBody tr').each(function() {
                 const $row = $(this);
                 const item = {
+                    inboundId: inboundId,  // ✅ inboundId 추가
                     productId: $row.find('.productSelect').val(),
                     categoryCd: Number($row.find('.categorySelect').val()),
                     quantity: Number($row.find('.quantity').val())
@@ -454,25 +456,24 @@
 
             const requestData = {
                 inboundId: inboundId,
-                warehouseId: Number($('#warehouseId').val()), // 실제 select/input에서 값 가져오기
+                warehouseId: Number($('#warehouseId').val()),
                 staffId: Number($('#staffId').val()),
-                memberId: Number($('#memberId').val()), // session에서 가져온 memberId
+                memberId: Number($('#memberId').val()),
                 inboundStatus: $('#inboundStatus').val() || 'request',
                 inboundRejectReason: $('#inboundRejectReason').val() || null,
-                inboundItems: updatedItems
+                inboundRequestItems: updatedItems  // ✅ inboundItems → inboundRequestItems
             };
 
             console.log("수정 요청 데이터:", requestData);
 
-            // PUT 요청 전송
-            axios.put(`${contextPath}/inbound/member/\${inboundId}`, requestData)
+            axios.put(contextPath + '/inbound/member/' + inboundId, requestData)
                 .then(response => {
                     alert('입고 요청이 성공적으로 수정되었습니다.');
                     $('#inboundModal').modal('hide');
                     location.reload();
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.error('수정 오류:', error);
                     alert('수정 중 오류가 발생했습니다.');
                 });
         });
