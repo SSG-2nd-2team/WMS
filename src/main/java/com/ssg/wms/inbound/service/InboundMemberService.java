@@ -14,7 +14,7 @@ public interface InboundMemberService {
     @Transactional
     InboundRequestDTO createInbound(InboundRequestDTO inboundRequestDTO);
     
-    List<ProductDTO> getProductsByPartnerAndCategory(int partnerId, int categoryCd);
+//    List<ProductDTO> getProductsByPartnerAndCategory(int partnerId, int categoryCd);
 
     InboundDetailDTO getInboundById(int inboundId);
 

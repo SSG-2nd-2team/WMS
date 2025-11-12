@@ -74,7 +74,29 @@
         WHERE i.inbound_id = #{inboundId}
     </select>
 
+    <select id="selectWarehouseName" resultType="InboundWarehouseDTO">
+        SELECT
+        warehouse_id as warehouseId,
+        name as warehouseName
+        FROM warehouse;
+    </select>
 
+    <update id="approveInboundStatus">
+        UPDATE inbound SET
+        inbound_status = 'approved',
+        warehouse_id = #{warehouseId},
+        inbound_updated_at = NOW(),
+        inbound_at = NOW()
+        WHERE inbound_id = #{inboundId}
+    </update>
+
+    <update id="updateInboundStatusRejected" >
+        UPDATE inbound
+        SET inbound_status = 'rejected',
+        inbound_reject_reason = #{reason},
+        inbound_updated_at = NOW()
+        WHERE inbound_id = #{inboundId}
+    </update>
 
 
 

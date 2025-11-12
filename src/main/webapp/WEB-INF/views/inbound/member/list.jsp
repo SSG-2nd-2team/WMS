@@ -60,6 +60,7 @@
 
 <script>
     const contextPath = '<%=request.getContextPath()%>';
+    const currentPartnerId = '<%= session.getAttribute("partnerId") != null ? session.getAttribute("partnerId") : "" %>';
 
     $(document).ready(function() {
 
@@ -102,7 +103,10 @@
             $.ajax({
                 url: "<%=contextPath%>/inbound/admin/list",
                 type: "get",
-                data: { status: status },
+                data: {
+                    status: status,
+                    partnerId: currentPartnerId
+                },
                 success: function(data) {
                     const newBody = $(data).find("#inboundTableBody").html();
                     $("#inboundTableBody").html(newBody);
