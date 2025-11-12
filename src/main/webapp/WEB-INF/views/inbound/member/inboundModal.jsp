@@ -1,8 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
-<!-- 입고 상세 모달 -->
 <div class="modal fade" id="inboundModal" tabindex="-1" aria-labelledby="inboundModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl"> <!-- xl로 변경 - 정보가 많아서 -->
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-light">
                 <h5 class="modal-title fw-bold" id="inboundModalLabel">
@@ -19,7 +18,7 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">입고 번호</label>
-                                <input type="text" id="inboundId" class="form-control" readonly>
+                                <input type="text" id="inboundId" name="inboundId" class="form-control" readonly>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">입고 상태</label>
@@ -58,7 +57,7 @@
                                 <label class="form-label fw-bold">입고 승인자</label>
                                 <input type="text" id="staffName" class="form-control" readonly>
                             </div>
-                            <div class="col-md-6" id="rejectReasonSection" style="display: none;">
+                            <div class="col-md-6" id="rejectReasonSection" style="display:none;">
                                 <label class="form-label fw-bold text-danger">반려 사유</label>
                                 <textarea id="inboundRejectReason" class="form-control" rows="2" readonly></textarea>
                             </div>
@@ -68,32 +67,39 @@
 
                 <!-- 상품 리스트 -->
                 <div class="card">
-                    <div class="card-header bg-success text-white"><strong>입고 상품 내역</strong></div>
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <strong>입고 상품 내역</strong>
+                        <button type="button" class="btn btn-sm btn-light" id="addInboundItemBtn">
+                            <i class="bi bi-plus-circle"></i> 상품 추가
+                        </button>
+                    </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover table-bordered mb-0">
                                 <thead class="table-light">
                                 <tr>
-                                    <th width="10%">상품 ID</th>
-                                    <th width="20%">카테고리</th>
-                                    <th width="40%">상품명</th>
-                                    <th width="15%" class="text-end">수량</th>
+                                    <th>카테고리</th>
+                                    <th>상품명</th>
+                                    <th class="text-end">수량</th>
+                                    <th>삭제</th>
                                 </tr>
                                 </thead>
                                 <tbody id="inboundItemsBody">
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
-                                        상품 정보를 불러오는 중...
-                                    </td>
+                                    <td colspan="4" class="text-center text-muted py-3">상품 정보를 불러오는 중...</td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="updateInboundBtn">
+                    수정
+                </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x-circle me-1"></i>닫기
                 </button>

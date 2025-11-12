@@ -1,22 +1,21 @@
-package com.ssg.wms.admin.dto;
+package com.ssg.wms.member.domain;
 
 import com.ssg.wms.common.AccountStatus;
 import com.ssg.wms.common.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberDTO {
-    private long memberId;
+public class Member {
+    private Long memberId;
     private String memberLoginId;
     private String memberName;
+    private String memberPw;
     private String memberPhone;
     private String memberEmail;
     private Role role;
@@ -24,5 +23,4 @@ public class MemberDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String businessNumber;
-
 }

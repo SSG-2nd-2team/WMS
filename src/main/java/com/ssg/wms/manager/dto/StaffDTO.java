@@ -1,4 +1,4 @@
-package com.ssg.wms.admin.dto;
+package com.ssg.wms.manager.dto;
 
 import com.ssg.wms.common.AccountStatus;
 import com.ssg.wms.common.Role;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StaffDTO {
-    private long staffId;
+    private Long staffId;
     private String staffLoginId;
     private String staffName;
     private String staffPhone;

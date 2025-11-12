@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <% String contextPath = request.getContextPath(); %>
 <%@ include file="../../admin/admin-header.jsp" %>
@@ -54,6 +54,50 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+
+    function submitApprove() {
+        const inboundId = document.getElementById('inboundId').value;
+        const warehouseId = document.getElementById('warehouseId').value;
+
+        if (!inboundId) {
+            alert('입고 번호가 없습니다.');
+            return;
+        }
+        if (!warehouseId) {
+            alert('입고 창고를 선택해주세요.');
+            return;
+        }
+
+        // hidden input에 값 세팅
+        document.getElementById('approveInboundId').value = inboundId;
+        document.getElementById('approveWarehouseId').value = warehouseId;
+
+        // form submit
+        document.getElementById('approveForm').submit();
+    }
+
+    function submitReject() {
+        const inboundId = document.getElementById('inboundId').value.trim();
+        const reason = document.getElementById('inboundRejectReason').value.trim();
+
+        if (!inboundId) {
+            alert('입고 번호가 없습니다.');
+            return;
+        }
+        if (!reason) {
+            alert('반려 사유를 입력해주세요.');
+            return;
+        }
+
+        // hidden input에 값 세팅
+        document.getElementById('rejectInboundId').value = inboundId;
+        document.getElementById('rejectReasonInput').value = reason;
+
+        // form submit
+        document.getElementById('rejectForm').submit();
+    }
+
+
     $(document).ready(function() {
         // 모달 초기화
         const inboundModalElement = document.getElementById('inboundModal');
@@ -93,6 +137,9 @@
             }
             return String(dateInput);
         }
+
+
+
 
         // 입고 상품 렌더링
         function renderInboundItems(items) {
@@ -142,9 +189,9 @@
 
                     // 기본 정보 세팅
                     document.getElementById('inboundId').value = data.inboundId || '';
-                    // document.getElementById('inboundStatus').value = data.inboundStatus || '';
+                    document.getElementById('inboundStatus').value = data.inboundStatus || '';
                     document.getElementById('inboundStatus').value = data.inboundStatusKor || '';
-                    document.getElementById('warehouseName').value = data.warehouseName || '';
+                    document.getElementById('warehouseId').value = data.warehouseId || '';
                     document.getElementById('partnerName').value = data.partnerName || '';
                     document.getElementById('memberName').value = data.memberName || '';
                     document.getElementById('staffName').value = data.staffName || '미지정';
@@ -155,12 +202,33 @@
 
                     // 반려 사유 처리
                     const rejectSection = document.getElementById('rejectReasonSection');
+                    const rejectTextarea = document.getElementById('inboundRejectReason');
+                    // 항상 textarea 보이도록
+                    rejectTextarea.style.display = 'block';
+
                     if (data.inboundStatus === 'rejected' && data.inboundRejectReason) {
-                        document.getElementById('inboundRejectReason').value = data.inboundRejectReason;
-                        rejectSection.style.display = 'block';
+                        rejectTextarea.value = data.inboundRejectReason;
+                        rejectTextarea.readOnly = true; // 입력 불가
                     } else {
-                        rejectSection.style.display = 'none';
+                        rejectTextarea.value = '';      // 비워두기
+                        rejectTextarea.readOnly = false; // 입력 가능
                     }
+
+                    // 승인/반려 버튼 element 가져오기
+                    const approveBtn = document.querySelector('#approveForm button');
+                    const rejectBtn = document.querySelector('#rejectForm button');
+                    const warehouseSelect = document.getElementById('warehouseId');
+
+                    if (data.inboundStatus === 'request') { // 대기 상태일 때만 버튼 표시
+                        approveBtn.style.display = 'inline-block';
+                        rejectBtn.style.display = 'inline-block';
+                        warehouseSelect.disabled = false;
+                    } else { // cancelled / approved / rejected 상태이면 버튼 숨김
+                        approveBtn.style.display = 'none';
+                        rejectBtn.style.display = 'none';
+                        warehouseSelect.disabled = true;
+                    }
+
 
                     // 상품 목록 렌더링
                     renderInboundItems(data.inboundItems);
@@ -175,6 +243,8 @@
         }
 
         // 전역 함수로 노출
+        /*현재 스코프에 있는 openInboundModal 함수를 전역 객체 window의 openInboundModal 속성으로 등록.
+            이렇게 하면 어디서든 window.openInboundModal() 혹은 단순히 openInboundModal()로 호출 가능.*/
         window.openInboundModal = openInboundModal;
     });
 </script>

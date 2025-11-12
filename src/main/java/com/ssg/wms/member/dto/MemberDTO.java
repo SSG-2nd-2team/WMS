@@ -1,21 +1,23 @@
-package com.ssg.wms.admin.domain;
+package com.ssg.wms.member.dto;
 
 import com.ssg.wms.common.AccountStatus;
 import com.ssg.wms.common.Role;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
-@ToString
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member {
-    private long memberId;
+public class MemberDTO {
+    private Long memberId;
     private String memberLoginId;
-    private String memberName;
     private String memberPw;
+    private String memberName;
     private String memberPhone;
     private String memberEmail;
     private Role role;

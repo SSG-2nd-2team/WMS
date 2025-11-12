@@ -21,7 +21,6 @@ public class InboundDTO {
     private Long memberId;
     private Long partnerId;
     private String partnerName;
-    private String categoryName;
     private String memberName;
     private int staffId;
     private String staffName;
@@ -68,5 +67,6 @@ class InboundItemDTO {
     private String productId;
     private String productName;
     private int quantity;
+    private int categoryCd;
     private String categoryName; // JS에서 사용 중
 }

@@ -74,11 +74,14 @@ public class AnnouncementController {
     public String postUpdateForm(@Valid @ModelAttribute("announcement") AnnouncementDTO announcementDTO,
                                  BindingResult bindingResult,
                                  @PathVariable("id") Long id) {
+
         if (bindingResult.hasErrors()) {
+            log.info("Binding Error: 수정 오류");
             return "announcements/edit";
         }
 
         announcementService.updateAnnouncement(announcementDTO);
+        log.info("수정 완료: {}", announcementDTO);
         return "redirect:/announcements/" + id;
     }
 

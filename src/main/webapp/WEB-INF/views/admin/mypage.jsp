@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -17,7 +17,7 @@
                 <h5 class="card-header">프로필 정보</h5>
                 <div class="card-body">
                     <div class="d-flex align-items-start align-items-sm-center gap-4">
-                        <img src="${pageContext.request.contextPath}/assets/img/avatars/1.png"
+                        <img src="${pageContext.request.contextPath}/resources/assets/img/avatars/1.png"
                              alt="user-avatar" class="d-block rounded" height="100" width="100" id="uploadedAvatar"/>
                         <div class="button-wrapper">
                             <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
@@ -36,68 +36,44 @@
                 </div>
                 <hr class="my-0"/>
                 <div class="card-body">
-                    <form id="formAccountSettings" method="POST" onsubmit="return false">
-                        <div class="row">
-                            <div class="mb-3 col-md-6">
-                                <label for="staffName" class="form-label">이름</label>
-                                <input class="form-control" type="text" id="staffName" name="staffName"
-                                       value="${staff.staffName}" readonly/>
-                            </div>
-                            <div class="mb-3 col-md-6">
-                                <label for="staffLoginId" class="form-label">아이디</label>
-                                <input class="form-control" type="text" name="staffLoginId" id="staffLoginId"
-                                       value="${staff.staffLoginId}" readonly/>
-                            </div>
-                            <div class="mb-3 col-md-6">
-                                <label for="staffEmail" class="form-label">이메일</label>
-                                <input class="form-control" type="text" id="staffEmail" name="staffEmail"
-                                       value="${staff.staffEmail}" placeholder="example@racl.com"/>
-                            </div>
-                            <div class="mb-3 col-md-6">
-                                <label class="form-label" for="staffPhone">전화번호</label>
-                                <div class="input-group input-group-merge">
-                                    <span class="input-group-text">KR (+82)</span>
-                                    <input type="text" id="staffPhone" name="staffPhone" class="form-control"
-                                           value="${staff.staffPhone}" placeholder="010-1234-5678"/>
-                                </div>
-                            </div>
-                            <div class="mb-3 col-md-6">
-                                <label for="role" class="form-label">권한</label>
-                                <input type="text" class="form-control" id="role" name="role" value="${staff.role}"
-                                       readonly/>
-                            </div>
-                            <div class="mb-3 col-md-6">
-                                <label for="createdAt" class="form-label">가입일</label>
-                                <input type="text" class="form-control" id="createdAt" name="createdAt"
-                                       value="${staff.createdAt}" readonly/>
+                    <div class="row">
+                        <div class="mb-3 col-md-6">
+                            <label for="staffName" class="form-label">이름</label>
+                            <input class="form-control" type="text" id="staffName" name="staffName"
+                                   value="${staff.staffName}" readonly/>
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <label for="staffLoginId" class="form-label">아이디</label>
+                            <input class="form-control" type="text" name="staffLoginId" id="staffLoginId"
+                                   value="${staff.staffLoginId}" readonly/>
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <label for="staffEmail" class="form-label">이메일</label>
+                            <input class="form-control" type="text" id="staffEmail" name="staffEmail"
+                                   value="${staff.staffEmail}" readonly/>
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <label class="form-label" for="staffPhone">전화번호</label>
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-text">KR (+82)</span>
+                                <input type="text" id="staffPhone" name="staffPhone" class="form-control"
+                                       value="${staff.staffPhone}" readonly/>
                             </div>
                         </div>
-                        <div class="mt-2">
-                            <button type="submit" class="btn btn-primary me-2">변경사항 저장</button>
-                            <button type="reset" class="btn btn-outline-secondary">취소</button>
+                        <div class="mb-3 col-md-6">
+                            <label for="role" class="form-label">권한</label>
+                            <input type="text" class="form-control" id="role" name="role" value="${staff.role}"
+                                   readonly/>
                         </div>
-                    </form>
-                </div>
-            </div>
-            <div class="card">
-                <h5 class="card-header">계정 삭제</h5>
-                <div class="card-body">
-                    <div class="mb-3 col-12 mb-0">
-                        <div class="alert alert-warning">
-                            <h6 class="alert-heading fw-bold mb-1">정말로 계정을 삭제하시겠습니까?</h6>
-                            <p class="mb-0">계정이 삭제되면 되돌릴 수 없습니다. 신중하게 결정해주세요.</p>
+                        <div class="mb-3 col-md-6">
+                            <label for="createdAt" class="form-label">가입일</label>
+                            <input type="text" class="form-control" id="createdAt" name="createdAt"
+                                   value="${staff.createdAt}" readonly/>
                         </div>
                     </div>
-                    <form id="formAccountDeactivation" onsubmit="return false">
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" name="accountActivation"
-                                   id="accountActivation"/>
-                            <label class="form-check-label" for="accountActivation">계정 삭제에 동의합니다.</label>
-                        </div>
-                        <button type="submit" class="btn btn-danger deactivate-account">계정 삭제</button>
-                    </form>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

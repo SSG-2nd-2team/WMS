@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <% String contextPath = request.getContextPath(); %>
 <%@ include file="../../member/member-header.jsp" %>
@@ -29,7 +29,7 @@
         </thead>
         <tbody id="inboundTableBody">
         <c:forEach var="item" items="${list}">
-            <tr style="cursor:pointer;">
+            <tr style="cursor:pointer" data-inbound-id="${item.inboundId}">
                 <td>${item.inboundId}</td>
                 <td>${item.partnerName}</td>
                 <td>${item.memberName}</td>
@@ -55,16 +55,48 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    const contextPath = '<%=request.getContextPath()%>';
+
     $(document).ready(function() {
-        // 모달 초기화
+
         const inboundModalElement = document.getElementById('inboundModal');
         const inboundModal = new bootstrap.Modal(inboundModalElement);
 
+        function formatDate(dateInput) {
+            if (!dateInput) return '';
+            if (typeof dateInput === 'string') return dateInput.length >= 16 ? dateInput.substring(0,16).replace('T',' ') : dateInput;
+            if (dateInput instanceof Date) return dateInput.toISOString().substring(0,16).replace('T',' ');
+            return String(dateInput);
+        }
+
+
         // 상태 필터 변경 시 리스트 새로고침
+        // 서버사이드(vs 클라이언트사이드) 방식으로 대량의 데이터 처리하기가 좀더 용이함
+        // 서버에서 필터링되지만 새로고침이 필요해서 해당 방식은 채용하지 않는것으로
+        // 클라이언트사이드 방식은 가장빠르지만 모든 데이터를 처음에 로드 -> 대량 데이터 부적합
+        // 페이징 구현도 거의 어려움
+/*        $('#statusFilter').on('change', function() {
+            const selectedStatus = $(this).val();
+            const currentUrl = new URL(window.location.href);
+
+            if (selectedStatus) {
+                currentUrl.searchParams.set('status', selectedStatus);
+            } else {
+                currentUrl.searchParams.delete('status');
+            }
+
+            // 페이지 새로고침하여 필터링된 결과 가져오기
+            window.location.href = currentUrl.toString();
+        });*/
+
+
+        // 추후 페이징 리팩토링까지 고려하여 새로고침 없이도
+        // 대량의 데이터를 서버에서 필터링 가능한 AJAX방식으로 채택
+        // URL도 유지됨
         $("#statusFilter").change(function() {
             const status = $(this).val();
             $.ajax({
-                url: "<%=contextPath%>/inbound/member/list",
+                url: "<%=contextPath%>/inbound/admin/list",
                 type: "get",
                 data: { status: status },
                 success: function(data) {
@@ -77,107 +109,317 @@
             });
         });
 
-        // 테이블 행 클릭 시 상세 모달 띄우기
-        $(document).on('click', '#inboundTableBody tr', function() {
-            const inboundId = $(this).find('td:first').text().trim();
-            openInboundModal(inboundId);
-        });
 
-        // 날짜 포맷팅 함수
-        function formatDate(dateInput) {
-            if (!dateInput) return '';
-            if (typeof dateInput === 'string') {
-                return dateInput.length >= 16 ? dateInput.substring(0,16).replace('T',' ') : dateInput;
-            }
-            if (dateInput instanceof Date) {
-                return dateInput.toISOString().substring(0,16).replace('T',' ');
-            }
-            return String(dateInput);
-        }
 
-        // 입고 상품 렌더링
-        function renderInboundItems(items) {
+        // 전역 변수 선언
+        let categories = [];
+        let products = [];
+
+
+
+        // 상품 렌더링 함수
+        function renderInboundItems(items, categories) {
             const tbody = document.getElementById('inboundItemsBody');
             tbody.innerHTML = '';
 
-            if (items && items.length > 0) {
-                items.forEach(item => {
-                    // DTO 구조에 따라 item 객체의 속성에 직접 접근합니다.
-                    const row = `
-                        <tr>
-                            <td>\${item.productId || ''}</td>
-                            <td>\${item.categoryName || '미분류'}</td>
-                            <td>\${item.productName || ''}</td>
-                            <td class="text-end">\${item.quantity ? item.quantity.toLocaleString() : '0'}</td>
-                        </tr>`;
-                    tbody.insertAdjacentHTML('beforeend', row);
-                });
-            } else {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="text-center text-muted py-3">
-                            입고 상품이 없습니다.
-                        </td>
-                    </tr>`;
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">입고 상품이 없습니다.</td></tr>';
+                return;
             }
+
+            items.forEach(function(item) {
+                // 카테고리 select
+                let categoryOptions = '';
+                categories.forEach(function(c) {
+                    const selected = c.categoryCd === item.categoryCd ? 'selected' : '';
+                    categoryOptions += '<option value="' + c.categoryCd + '" ' + selected + '>' + c.categoryName + '</option>';
+                });
+
+                // 초기 상품 select
+                const initialProductOption = '<option value="' + item.productId + '" data-category="' + item.categoryCd + '" selected>' + item.productName + '</option>';
+
+                const row =
+                    '<tr>' +
+                        '<td>' +
+                            '<select class="form-select categorySelect" data-original-category="' + item.categoryCd + '">' +
+                                categoryOptions +
+                            '</select>' +
+                        '</td>' +
+                        '<td>' +
+                            '<select class="form-select productSelect" data-original-product="' + item.productId + '">' +
+                                initialProductOption +
+                            '</select>' +
+                        '</td>' +
+                        '<td class="text-end">' +
+                            '<input type="number" class="form-control quantity" value="' + item.quantity + '" min="1"/>' +
+                        '</td>' +
+                        '<td>' +
+                            '<button type="button" class="btn btn-sm btn-danger removeItemBtn">삭제</button>' +
+                        '</td>' +
+                    '</tr>';
+
+                tbody.insertAdjacentHTML('beforeend', row);
+
+                // 초기 상품 데이터 저장
+                $(tbody).find('tr:last').data('products', [item]);
+            });
         }
 
-        // 입고 상세 모달 열기
+
+        // 카테고리 변경 시 상품 목록 API 호출
+        $(document).on('change', '.categorySelect', function() {
+            const $categorySelect = $(this);
+            const $row = $categorySelect.closest('tr');
+            const $productSelect = $row.find('.productSelect');
+            const partnerId = $('#inboundModal').data('partnerId');
+            const selectedCategory = $categorySelect.val();
+
+            if (!selectedCategory) {
+                $productSelect.html('<option value="">카테고리를 먼저 선택하세요</option>').prop('disabled', true);
+                return;
+            }
+
+            if (!partnerId) {
+                alert('거래처 정보를 찾을 수 없습니다.');
+                $productSelect.html('<option value="">거래처 정보 없음</option>').prop('disabled', true);
+                return;
+            }
+
+            $productSelect.html('<option>로딩 중...</option>').prop('disabled', true);
+
+            axios.get('<%=contextPath%>/inbound/member/products/byCategory', {
+                params: {
+                    categoryCd: selectedCategory,
+                    partnerId: partnerId
+                }
+            })
+                .then(function(response) {
+                    const products = response.data || [];
+                    $productSelect.empty().prop('disabled', false);
+
+                    if (products.length === 0) {
+                        $productSelect.append('<option value="">해당 카테고리의 상품이 없습니다</option>');
+                        $row.data('products', []);
+                        return;
+                    }
+
+                    $productSelect.append('<option value="">상품을 선택하세요</option>');
+
+                    products.forEach(function(p) {
+                        $productSelect.append(
+                            '<option value="' + p.productId + '" data-category="' + p.categoryCd + '">' + p.productName + '</option>'
+                        );
+                    });
+
+                    // 선택한 행에 products 데이터 저장
+                    $row.data('products', products);
+                })
+                .catch(function(err) {
+                    console.error('상품 목록 조회 오류:', err);
+                    $productSelect.html('<option value="">조회 실패</option>').prop('disabled', false);
+                    alert('상품 목록을 불러오는데 실패했습니다.');
+                });
+        });
+
+        // 상품 선택 시 해당 데이터 적용
+        $(document).on('change', '.productSelect', function() {
+            const $productSelect = $(this);
+            const $row = $productSelect.closest('tr');
+            const selectedProductId = $productSelect.val();
+
+            if (!selectedProductId) {
+                alert('상품을 선택하세요');
+                return;
+            }
+
+            const rowProducts = $row.data('products') || [];
+            const productData = rowProducts.find(function(p) {
+                return String(p.productId) === String(selectedProductId);
+            });
+
+            if (!productData) {
+                alert('상품 데이터를 불러올 수 없습니다.');
+                return;
+            }
+
+            // 예시: 수량 초기화 및 category 자동 변경
+            $row.find('.quantity').val(productData.defaultQuantity || 1);
+            // $row.find('.categorySelect').val(productData.categoryCd);
+        });
+
+
+
+        // 상품 삭제
+        $(document).on('click', '.removeItemBtn', function() {
+            $(this).closest('tr').remove();
+        });
+
+
+
+
+        // 상품 추가
+        $('#addInboundItemBtn').click(function() {
+            const tbody = $('#inboundItemsBody');
+            const categories = $('#inboundModal').data('categories') || [];
+            let categoryOptions = '<option value="">카테고리 선택</option>';
+            categories.forEach(function(c) {
+                categoryOptions += '<option value="' + c.categoryCd + '">' + c.categoryName + '</option>';
+            });
+
+            const row = '<tr>' +
+                '<td><select class="form-select categorySelect">' + categoryOptions + '</select></td>' +
+                '<td><select class="form-select productSelect" disabled><option value="">카테고리를 먼저 선택하세요</option></select></td>' +
+                '<td class="text-end"><input type="number" class="form-control quantity" value="1" min="1"/></td>' +
+                '<td><button type="button" class="btn btn-sm btn-danger removeItemBtn">삭제</button></td>' +
+                '</tr>';
+
+            tbody.append(row);
+            $(tbody).find('tr:last').data('products', []);
+        });
+
+
+
+        // 모달 열기
         function openInboundModal(inboundId) {
-            axios.get("<%=contextPath%>/inbound/member/" + inboundId)
+            // 모달 root 먼저 가져오기
+            const modalEl = document.getElementById('inboundModal');
+            if (!modalEl) {
+                console.error('❌ inboundModal NOT found in current document.');
+                return;
+            }
+            const inboundModal = new bootstrap.Modal(modalEl);
+
+            // 데이터 조회
+            axios.get('<%=contextPath%>/inbound/member/' + inboundId)
                 .then(function(response) {
                     const data = response.data;
-
-
-                    console.log('--- Axios 응답 전체 데이터 ---');
-                    console.log(data);
-                    console.log('--- 렌더링에 전달될 아이템 배열 ---');
-                    console.log(data.inboundItems);
-
-
-
                     if (!data) {
                         alert('데이터를 불러올 수 없습니다.');
                         return;
                     }
 
-                    // 기본 정보 세팅
-                    document.getElementById('inboundId').value = data.inboundId || '';
-                    // document.getElementById('inboundStatus').value = data.inboundStatus || '';
-                    document.getElementById('inboundStatus').value = data.inboundStatusKor || '';
-                    document.getElementById('warehouseName').value = data.warehouseName || '';
-                    document.getElementById('partnerName').value = data.partnerName || '';
-                    document.getElementById('memberName').value = data.memberName || '';
-                    document.getElementById('staffName').value = data.staffName || '미지정';
+                    // 모달 내부에서 요소들을 안전하게 가져오기
+                    const inboundInput          = modalEl.querySelector('#inboundId');
+                    const inboundStatusEl       = modalEl.querySelector('#inboundStatus');
+                    const warehouseIdEl         = modalEl.querySelector('#warehouseId');
+                    const warehouseNameEl       = modalEl.querySelector('#warehouseName');
+                    const partnerNameEl         = modalEl.querySelector('#partnerName');
+                    const memberIdEl            = modalEl.querySelector('#memberId');
+                    const memberNameEl          = modalEl.querySelector('#memberName');
+                    const staffIdEl             = modalEl.querySelector('#staffId');
+                    const staffNameEl           = modalEl.querySelector('#staffName');
+                    const inboundRequestedAtEl  = modalEl.querySelector('#inboundRequestedAt');
+                    const inboundAtEl           = modalEl.querySelector('#inboundAt');
+                    const rejectSection         = modalEl.querySelector('#rejectReasonSection');
+                    const inboundRejectReasonEl = modalEl.querySelector('#inboundRejectReason');
 
-                    // 날짜 포맷팅
-                    document.getElementById('inboundRequestedAt').value = formatDate(data.inboundRequestedAt);
-                    document.getElementById('inboundAt').value = formatDate(data.inboundAt);
-
-                    // 반려 사유 처리
-                    const rejectSection = document.getElementById('rejectReasonSection');
-                    if (data.inboundStatus === 'rejected' && data.inboundRejectReason) {
-                        document.getElementById('inboundRejectReason').value = data.inboundRejectReason;
-                        rejectSection.style.display = 'block';
-                    } else {
-                        rejectSection.style.display = 'none';
+                    if (!inboundInput) {
+                        console.error('❌ inboundId input not found INSIDE modal. modalEl.innerHTML snapshot:', modalEl.innerHTML.slice(0,500));
+                        return;
                     }
 
-                    // 상품 목록 렌더링
-                    renderInboundItems(data.inboundItems);
+                    // 데이터 채우기
+                    inboundInput.value = data.inboundId || '';
+                    if (inboundStatusEl) inboundStatusEl.value = data.inboundStatusKor || '';
+                    if (warehouseIdEl) warehouseIdEl.value = data.warehouseId || '';
+                    if (warehouseNameEl) warehouseNameEl.value = data.warehouseName || '미지정';
+                    if (partnerNameEl) partnerNameEl.value = data.partnerName || '';
+                    if (memberIdEl) memberIdEl.value = data.memberId || '';
+                    if (memberNameEl) memberNameEl.value = data.memberName || '';
+                    if (staffIdEl) staffIdEl.value = data.staffId || '';
+                    if (staffNameEl) staffNameEl.value = data.staffName || '미지정';
+                    if (inboundRequestedAtEl) inboundRequestedAtEl.value = formatDate(data.inboundRequestedAt);
+                    if (inboundAtEl) inboundAtEl.value = formatDate(data.inboundAt) || '미지정';
 
-                    // 모달 표시
+                    // 반려 사유 표시
+                    if (data.inboundStatus === 'rejected' && data.inboundRejectReason) {
+                        if (inboundRejectReasonEl) inboundRejectReasonEl.value = data.inboundRejectReason;
+                        if (rejectSection) rejectSection.style.display = 'block';
+                    } else {
+                        if (rejectSection) rejectSection.style.display = 'none';
+                    }
+
+                    // 상품 렌더링
+                    renderInboundItems(data.inboundItems, data.categories || []);
+
+                    // 모달 열기
                     inboundModal.show();
+
+                    // 모달에 데이터 저장 (전역 사용 가능)
+                    $(modalEl).data('inbound-id', inboundId);
+                    $(modalEl).data('partnerId', data.partnerId);
+                    $(modalEl).data('categories', data.categories || []);
                 })
-                .catch(function(error) {
-                    console.error('입고 상세 조회 오류:', error);
+                .catch(function(err) {
+                    console.error('입고 상세 조회 오류:', err);
                     alert('입고 상세 조회 중 오류가 발생했습니다.');
                 });
         }
 
-        // 전역 함수로 노출
+
+        // 테이블 행 클릭
+        $(document).on('click', '#inboundTableBody tr', function() {
+            const inboundId = $(this).find('td:first').text().trim();
+            if (inboundId) openInboundModal(inboundId);
+        });
+
+
+
+        // 수정 버튼 클릭 이벤트
+        $(document).on('click', '#updateInboundBtn', function() {
+            const inboundId = $('#inboundModal').data('inbound-id'); // 모달에 저장된 입고ID
+            if (!inboundId) {
+                alert('입고 요청 정보를 찾을 수 없습니다.');
+                return;
+            }
+
+            // 수정할 데이터 수집
+            const updatedItems = [];
+            $('#inboundItemsBody tr').each(function() {
+                const $row = $(this);
+                const item = {
+                    productId: $row.find('.productSelect').val(),
+                    categoryCd: Number($row.find('.categorySelect').val()),
+                    quantity: Number($row.find('.quantity').val())
+                };
+                updatedItems.push(item);
+            });
+
+            const requestData = {
+                inboundId: inboundId,
+                warehouseId: Number($('#warehouseId').val()), // 실제 select/input에서 값 가져오기
+                staffId: Number($('#staffId').val()),
+                memberId: Number($('#memberId').val()), // session에서 가져온 memberId
+                inboundStatus: $('#inboundStatus').val() || 'request',
+                inboundRejectReason: $('#inboundRejectReason').val() || null,
+                inboundItems: updatedItems
+            };
+
+            console.log("수정 요청 데이터:", requestData);
+
+            // PUT 요청 전송
+            axios.put(`${contextPath}/inbound/member/\${inboundId}`, requestData)
+                .then(response => {
+                    alert('입고 요청이 성공적으로 수정되었습니다.');
+                    $('#inboundModal').modal('hide');
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('수정 중 오류가 발생했습니다.');
+                });
+        });
+
+
+
+        // 전역 노출
+        /*현재 스코프에 있는 openInboundModal 함수를 전역 객체 window의 openInboundModal 속성으로 등록.
+            이렇게 하면 어디서든 window.openInboundModal() 혹은 단순히 openInboundModal()로 호출 가능.*/
         window.openInboundModal = openInboundModal;
     });
 </script>
+
+
+
 
 <%@ include file="../../member/member-footer.jsp" %>
