@@ -1,4 +1,4 @@
-package com.ssg.wms.admin.dto;
+package com.ssg.wms.manager.dto;
 
 import com.ssg.wms.common.AccountStatus;
 import com.ssg.wms.common.Role;

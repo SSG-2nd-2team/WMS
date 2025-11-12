@@ -2,7 +2,7 @@ package com.ssg.wms.admin.service;
 
 import com.ssg.wms.member.domain.Member;
 import com.ssg.wms.admin.dto.MemberCriteria;
-import com.ssg.wms.admin.dto.StaffDTO;
+import com.ssg.wms.manager.dto.StaffDTO;
 import com.ssg.wms.common.AccountStatus;
 
 import java.util.List;

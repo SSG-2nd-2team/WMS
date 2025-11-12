@@ -40,35 +40,35 @@
                             <div class="mb-3 col-md-6">
                                 <label for="memberName" class="form-label">이름</label>
                                 <input class="form-control" type="text" id="memberName" name="memberName"
-                                       value="${member.memberName}" readonly/>
+                                       value="${loginMember.memberName}" readonly/>
                             </div>
                             <div class="mb-3 col-md-6">
                                 <label for="memberLoginId" class="form-label">아이디</label>
                                 <input class="form-control" type="text" name="memberLoginId" id="memberLoginId"
-                                       value="${member.memberLoginId}" readonly/>
+                                       value="${loginMember.memberLoginId}" readonly/>
                             </div>
                             <div class="mb-3 col-md-6">
                                 <label for="memberEmail" class="form-label">이메일</label>
                                 <input class="form-control" type="text" id="memberEmail" name="memberEmail"
-                                       value="${member.memberEmail}" placeholder="example@racl.com"/>
+                                       value="${loginMember.memberEmail}" placeholder="example@racl.com"/>
                             </div>
                             <div class="mb-3 col-md-6">
                                 <label class="form-label" for="memberPhone">전화번호</label>
                                 <div class="input-group input-group-merge">
                                     <span class="input-group-text">KR (+82)</span>
                                     <input type="text" id="memberPhone" name="memberPhone" class="form-control"
-                                           value="${member.memberPhone}" placeholder="010-1234-5678"/>
+                                           value="${loginMember.memberPhone}" placeholder="010-1234-5678"/>
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
                                 <label for="role" class="form-label">권한</label>
-                                <input type="text" class="form-control" id="role" name="role" value="${member.role}"
+                                <input type="text" class="form-control" id="role" name="role" value="${loginMember.role}"
                                        readonly/>
                             </div>
                             <div class="mb-3 col-md-6">
                                 <label for="createdAt" class="form-label">가입일</label>
                                 <input type="text" class="form-control" id="createdAt" name="createdAt"
-                                       value="${member.createdAt}" readonly/>
+                                       value="${loginMember.createdAt}" readonly/>
                             </div>
                         </div>
                         <div class="mt-2">
@@ -100,6 +100,120 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('formAccountSettings');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const resetBtn = form.querySelector('button[type="reset"]');
+
+        // 초기 값 저장
+        const initialValues = {
+            memberEmail: document.getElementById('memberEmail').value,
+            memberPhone: document.getElementById('memberPhone').value
+        };
+
+        // 폼 제출 처리
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const memberEmail = document.getElementById('memberEmail').value.trim();
+            const memberPhone = document.getElementById('memberPhone').value.trim();
+
+            // 유효성 검사
+            if (!validateEmail(memberEmail)) {
+                alert('올바른 이메일 형식을 입력해주세요.');
+                return;
+            }
+
+            if (!validatePhone(memberPhone)) {
+                alert('올바른 전화번호 형식을 입력해주세요. (예: 010-1234-5678)');
+                return;
+            }
+
+            // 버튼 비활성화
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>저장 중...';
+
+            try {
+                // CSRF 토큰 가져오기
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+
+                // CSRF 토큰이 있으면 헤더에 추가
+                if (csrfToken && csrfHeader) {
+                    headers[csrfHeader] = csrfToken;
+                }
+
+                const response = await fetch('/member/update', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        memberEmail: memberEmail,
+                        memberPhone: memberPhone
+                    })
+                });
+
+                if (response.ok) {
+                    showAlert('success', '회원 정보가 성공적으로 수정되었습니다.');
+                    initialValues.memberEmail = memberEmail;
+                    initialValues.memberPhone = memberPhone;
+                } else {
+                    showAlert('danger', data.message || '정보 수정에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('danger', '서버와의 통신 중 오류가 발생했습니다.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '변경사항 저장';
+            }
+        });
+
+        // 취소 버튼 처리
+        resetBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('memberEmail').value = initialValues.memberEmail;
+            document.getElementById('memberPhone').value = initialValues.memberPhone;
+            showAlert('info', '변경사항이 취소되었습니다.');
+        });
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function validatePhone(phone) {
+            const phoneRegex = /^01[0-9]-\d{3,4}-\d{4}$/;
+            return phoneRegex.test(phone);
+        }
+
+        function showAlert(type = 'info', message = '') {
+            const existingAlert = document.querySelector('.alert-custom');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible alert-custom`;
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+            <span>${message}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+
+            form.insertAdjacentElement('beforebegin', alertDiv);
+
+            // setTimeout(() => {
+            //     alertDiv.remove();
+            // }, 3000);
+        }
+    });
+</script>
 
 <%-- 푸터 include (필수!) --%>
 <%@ include file="member-footer.jsp" %>

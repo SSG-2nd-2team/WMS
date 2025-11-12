@@ -14,7 +14,7 @@ public class CommonController {
     // 전역 컨트롤러
     @GetMapping("/login")
     public String getMemberLogin() {
-        // 로그인 화면
+        // 로그인 화면(권한별로 분기 시작)
         return "/login";
     }
 }

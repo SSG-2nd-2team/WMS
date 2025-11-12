@@ -1,12 +1,15 @@
 package com.ssg.wms.member.service;
 
 import com.ssg.wms.member.dto.MemberDTO;
+import com.ssg.wms.member.dto.MemberUpdateDTO;
 import com.ssg.wms.member.mappers.MemberMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class MemberServiceImpl implements MemberService {
 
     private final MemberMapper memberMapper;
@@ -27,7 +30,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void updateMember(MemberDTO memberDTO) {
-        memberMapper.updateMember(memberDTO);
+    public void updateMember(long memberId, MemberUpdateDTO memberUpdateDTO) {
+        memberUpdateDTO.setMemberId(memberId);
+        memberMapper.updateMember(memberUpdateDTO);
     }
 }

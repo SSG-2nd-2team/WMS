@@ -129,21 +129,21 @@
             <ul class="menu-inner py-1">
                 <!-- Dashboard -->
                 <li class="menu-item">
-                    <a href="index.html" class="menu-link">
+                    <a href="/member" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-home-circle"></i>
                         <div data-i18n="Analytics">Dashboard</div>
                     </a>
                 </li>
 
-                <!-- Dashboard -->
+                <!-- Documentation -->
                 <li class="menu-item">
-                    <a href="index.html" class="menu-link">
+                    <a href="https://github.com/SSG-2nd-2team/WMS" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-layout"></i>
                         <div data-i18n="Layouts">Documentation</div>
                     </a>
                 </li>
 
-                <!-- Admin Menu -->
+                <!-- Member Menu -->
                 <li class="menu-header small text-uppercase">
                     <span class="menu-header-text">Member Menu</span>
                 </li>
@@ -256,7 +256,7 @@
                         <li class="nav-item navbar-dropdown dropdown-user dropdown">
                             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                                 <div class="avatar avatar-online">
-                                    <img src="${pageContext.request.contextPath}/resources/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                                    <img src="${pageContext.request.contextPath}/resources/assets/img/avatars/5.png" alt class="w-px-40 h-auto rounded-circle" />
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -265,12 +265,12 @@
                                         <div class="d-flex">
                                             <div class="flex-shrink-0 me-3">
                                                 <div class="avatar avatar-online">
-                                                    <img src="${pageContext.request.contextPath}/resources/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                                                    <img src="${pageContext.request.contextPath}/resources/assets/img/avatars/5.png" alt class="w-px-40 h-auto rounded-circle" />
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <span class="fw-semibold d-block">${loginId != null ? loginId : 'Member'}</span>
-                                                <small class="text-muted">직원</small>
+                                                <span class="fw-semibold d-block">${loginId != null ? loginId : '로그인해주세요'}</span>
+                                                <small class="text-muted">고객</small>
                                             </div>
                                         </div>
                                     </a>
@@ -288,7 +288,7 @@
                                     <div class="dropdown-divider"></div>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="${pageContext.request.contextPath}/admin/logout">
+                                    <a class="dropdown-item" href="${pageContext.request.contextPath}/member/logout">
                                         <i class="bx bx-power-off me-2"></i>
                                         <span class="align-middle">Log Out</span>
                                     </a>

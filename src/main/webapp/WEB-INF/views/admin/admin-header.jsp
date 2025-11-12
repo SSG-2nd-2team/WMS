@@ -110,7 +110,7 @@
                 </li>
 
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
+                    <a href="https://github.com/SSG-2nd-2team/WMS" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-file"></i>
                         <div data-i18n="Documentation">Documentation</div>
                     </a>
@@ -123,7 +123,7 @@
                 <li class="menu-item">
                     <a href="${pageContext.request.contextPath}/admin/members" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-user-check"></i>
-                        <div data-i18n="Member Approval">고객 승인</div>
+                        <div data-i18n="Member Approval">고객 관리</div>
                     </a>
                 </li>
 

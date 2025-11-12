@@ -17,8 +17,8 @@
     </resultMap>
 
     <!-- 고객 정보 조회 -->
-    <select id="getMemberDetails" resultType="MemberDTO">
-        SELECT member_login_id, member_name, member_phone, member_email, role, status, created_at, updated_at
+    <select id="getMemberDetails" resultType="com.ssg.wms.member.dto.MemberDTO">
+        SELECT *
         FROM member
         WHERE member_id = #{memberId}
     </select>
@@ -36,9 +36,10 @@
         VALUES (#{memberLoginId}, #{memberPw}, #{memberName}, #{memberPhone}, #{memberEmail}, #{businessNumber});
     </insert>
 
-    <update id="updateMember">
+    <update id="updateMember" parameterType="com.ssg.wms.member.dto.MemberUpdateDTO">
         UPDATE member
-        SET status = #{status}
+        SET member_email = #{memberEmail},
+            member_phone = #{memberPhone}
         WHERE member_id = #{memberId}
     </update>
 
