@@ -451,7 +451,7 @@ WHERE expense_id = LAST_INSERT_ID();
 -- 2025년 10월 입고 완료 (ID 1~5)
 UPDATE inbound
 SET
-    inbound_status = 'COMPLETED',
+    inbound_status = 'approved',
     inbound_at = '2025-10-15 14:00:00'
 WHERE inbound_id BETWEEN 1 AND 5;
 
@@ -461,6 +461,9 @@ SET
     inbound_status = 'COMPLETED',
     inbound_at = '2025-11-05 10:00:00'
 WHERE inbound_id BETWEEN 6 AND 10;
+
+UPDATE inbound
+SET inbound_status = 'approved';
 
 -- ===========================
 -- 2. Outbound (출고 완료) Mock Data (INSERT)

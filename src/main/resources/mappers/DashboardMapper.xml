@@ -6,14 +6,16 @@
     <select id="countMonthlyInbound" resultType="int">
         SELECT COUNT(*)
         FROM inbound
-        WHERE YEAR(inbound_at) = #{year}
+        WHERE inbound_status = 'approved'
+          AND YEAR(inbound_at) = #{year}
           AND MONTH(inbound_at) = #{month}
     </select>
 
     <select id="countMonthlyOutbound" resultType="int">
         SELECT COUNT(*)
         FROM outboundRequest
-        WHERE YEAR(outboundDate) = #{year}
+        WHERE approvedStatus = 'APPROVED'
+          AND YEAR(outboundDate) = #{year}
           AND MONTH(outboundDate) = #{month}
     </select>
 
