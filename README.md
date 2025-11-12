@@ -1,13 +1,33 @@
-# 🚀 SSG 2차 2팀 프로젝트
+# 🚀 SSG 2차 2팀 프로젝트 
 
 ## 📌 프로젝트 소개
-- **프로젝트명**: (프로젝트 이름)
-- **개발 기간**: 2025.10.20 ~ 2025.11.14
+- **프로젝트명**: RACL
+- **팀명**: 빌더스(Builders)
+- **개발 기간**: 2025.11.07 ~ 2025.11.14
 - **주요 기능**: WMS 창고관리 (의류 중심)
-- **기술 스택**: 
-  - Frontend: 
-  - Backend: 
-  - Database: 
+- **기술 스택**:
+  - **Frontend**:
+    - HTML5 / CSS3
+    - JavaScript (ES6+)
+    - jQuery 3.x
+    - Bootstrap 5
+    - ApexCharts.js
+  - **Backend**:
+    - Java 17
+    - Spring Framework 5.x
+    - Spring MVC
+    - MyBatis 3.x
+    - JSP (JavaServer Pages)
+    - Tomcat 9.0
+    - HikariCP
+    - Gradle
+  - **Database**:
+    - MySQL 8.x
+  - **Tools & Collaboration**:
+    - Git
+    - GitHub
+    - ERD Cloud
+    - IntelliJ IDEA
 
 ## 👥 팀원
 | 역할 | 이름 | GitHub |
@@ -188,4 +208,4 @@ npm install  # 또는 필요한 설치 명령어
 
 ---
 
-**마지막 업데이트**: 2025.11.07
+**마지막 업데이트**: 2025.11.12

@@ -1,7 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ include file="../admin/admin-header.jsp" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:choose>
+    <c:when test="${sessionScope.role eq 'ADMIN'}">
+        <jsp:include page="/WEB-INF/views/admin/admin-header.jsp" />
+    </c:when>
+    <c:when test="${sessionScope.role eq 'MANAGER'}">
+        <jsp:include page="/WEB-INF/views/manager/manager-header.jsp" />
+    </c:when>
+    <c:otherwise>
+        <jsp:include page="/WEB-INF/views/member/member-header.jsp" />
+    </c:otherwise>
+</c:choose>
 <div class="container">
     <h1>공지사항</h1>
 
@@ -20,11 +31,11 @@
     <table>
         <thead>
         <tr>
+            <th style="width: 10%;">중요</th>
             <th style="width: 10%;">번호</th>
             <th style="width: 50%;">제목</th>
             <th style="width: 15%;">작성자</th>
             <th style="width: 15%;">작성일</th>
-            <th style="width: 10%;">중요</th>
         </tr>
         </thead>
         <tbody>
@@ -35,9 +46,15 @@
                 </tr>
             </c:when>
             <c:otherwise>
-                <c:forEach var="announcement" items="${announcements}">
+                <c:set var="listSize" value="${announcements.size()}" />
+                <c:forEach var="announcement" items="${announcements}" varStatus="status">
                     <tr>
-                        <td>${announcement.announcementId}</td>
+                        <td>
+                            <c:if test="${announcement.important}">
+                            🔴
+                            </c:if>
+                        </td>
+                        <td>${listSize - status.index}</td>
                         <td>
                             <a href="/announcements/${announcement.announcementId}" class="announcement-title">
                                     ${announcement.title}
@@ -47,7 +64,6 @@
                         <td>
                             ${announcement.createdAt}
                         </td>
-                        <td>${announcement.important}</td>
                     </tr>
                 </c:forEach>
             </c:otherwise>
@@ -77,4 +93,14 @@
         </div>
     </c:if>
 </div>
-<%@ include file="../admin/admin-footer.jsp" %>
+<c:choose>
+    <c:when test="${sessionScope.role eq 'ADMIN'}">
+        <jsp:include page="/WEB-INF/views/admin/admin-footer.jsp" />
+    </c:when>
+    <c:when test="${sessionScope.role eq 'MANAGER'}">
+        <jsp:include page="/WEB-INF/views/manager/manager-footer.jsp" />
+    </c:when>
+    <c:otherwise>
+        <jsp:include page="/WEB-INF/views/member/member-footer.jsp" />
+    </c:otherwise>
+</c:choose>

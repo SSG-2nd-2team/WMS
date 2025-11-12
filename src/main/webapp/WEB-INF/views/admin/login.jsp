@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%-- 💡 이 한 줄만 남겨둡니다. --%>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %> <%-- 💡 이 한 줄만 남겨둡니다. --%>
 <html
         lang="en"
         class="light-style customizer-hide"

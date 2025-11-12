@@ -10,4 +10,5 @@ public interface ProductService {
     List<ProductDTO> getProductsByPartnerAndCategory(int partnerId, int categoryCd);
 
     List<CategoryDTO> getCategory();
+
 }

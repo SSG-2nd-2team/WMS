@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html
@@ -58,7 +58,8 @@
                                       id="path-1"></path>
                                 <path d="M5.47320593,6.00457225 C4.05321814,8.216144 4.36334763,10.0722806 6.40359441,11.5729822 C8.61520715,12.571656 10.0999176,13.2171421 10.8577257,13.5094407 L15.5088241,14.433041 L18.6192054,7.984237 C15.5364148,3.11535317 13.9273018,0.573395879 13.7918663,0.358365126 C13.5790555,0.511491653 10.8061687,2.3935607 5.47320593,6.00457225 Z"
                                       id="path-3"></path>
-                                <path d="M7.50063644,21.2294429 L12.3234468,23.3159332 C14.1688022,24.7579751 14.397098,26.4880487 13.008334,28.506154 C11.6195701,30.5242593 10.3099883,31.790241 9.07958868,32.3040991 C5.78142938,33.4346997 4.13234973,34 4.13234973,34 2.75489982,33.0538207 2.37032616e-14,31.1614621 C-0.55822714,27.8186216 -0.55822714,26.0572515 -4.05231404e-15,25.8773518 C0.83734071,25.6075023 2.77988457,22.8248993 3.3049379,22.52991 C3.65497346,22.3332504 5.05353963,21.8997614 7.50063644,21.2294429 Z"
+
+                                <path d="M7.50063644,21.2294429 L12.3234468,23.3159332 C 14.1688022,24.7579751 14.397098,26.4880487 13.008334,28.506154 C 11.6195701,30.5242593 10.3099883,31.790241 9.07958868,32.3040991 C 5.78142938,33.4346997 4.13234973,34 4.13234973,34 2.75489982,33.0538207 2.37032616e-14,31.1614621 C -0.55822714,27.8186216 -0.55822714,26.0572515 -4.05231404e-15,25.8773518 C 0.83734071,25.6075023 2.77988457,22.8248993 3.3049379,22.52991 C 3.65497346,22.3332504 5.05353963,21.8997614 7.50063644,21.2294429 Z"
                                       id="path-4"></path>
                                 <path d="M20.6,7.13333333 L25.6,13.8 C26.2627417,14.6836556 26.0836556,15.9372583 25.2,16.6 C24.8538077,16.8596443 24.4327404,17 24,17 L14,17 C12.8954305,17 12,16.1045695 12,15 C12,14.5672596 12.1403557,14.1461923 12.4,13.8 L17.4,7.13333333 C18.0627417,6.24967773 19.3163444,6.07059163 20.2,6.73333333 C20.3516113,6.84704183 20.4862915,6.981722 20.6,7.13333333 Z"
                                       id="path-5"></path>
@@ -110,7 +111,7 @@
                 </li>
 
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
+                    <a href="https://github.com/SSG-2nd-2team/WMS" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-file"></i>
                         <div data-i18n="Documentation">Documentation</div>
                     </a>
@@ -123,7 +124,7 @@
                 <li class="menu-item">
                     <a href="${pageContext.request.contextPath}/admin/members" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-user-check"></i>
-                        <div data-i18n="Member Approval">고객 승인</div>
+                        <div data-i18n="Member Approval">고객 관리</div>
                     </a>
                 </li>
 
@@ -174,23 +175,23 @@
                     </ul>
                 </li>
 
-                <li class="menu-item">
+                <li class="menu-item ${(pageActive == 'stock_list' || pageActive == 'physical_inventory' || pageActive == 'sotck_product_list') ? 'active open' : ''}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="menu-icon tf-icons bx bx-package"></i>
                         <div data-i18n="Stock">재고 관리</div>
                     </a>
                     <ul class="menu-sub">
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
+                        <li class="menu-item ${pageActive == 'stock_list' ? 'active' : ''}">
+                            <a href="${pageContext.request.contextPath}/stock/search" class="menu-link">
                                 <div data-i18n="Stock List">재고 조회</div>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
+                        <li class="menu-item ${pageActive == 'physical_inventory' ? 'active' : ''}">
+                            <a href="${pageContext.request.contextPath}/physical_inventory" class="menu-link">
                                 <div data-i18n="Stock Inspection">재고 실사</div>
                             </a>
                         </li>
-                        <li class="menu-item">
+                        <li class="menu-item ${pageActive == 'sotck_product_list' ? 'active' : ''}">
                             <a href="#" class="menu-link">
                                 <div data-i18n="Product Status">품목 현황</div>
                             </a>
@@ -271,7 +272,7 @@
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/inquiries" class="menu-link">
                                 <div data-i18n="QnA">문의사항</div>
                             </a>
                         </li>

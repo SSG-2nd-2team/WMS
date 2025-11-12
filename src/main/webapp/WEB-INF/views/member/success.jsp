@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%-- 💡 이 한 줄만 남겨둡니다. --%>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %> <%-- 💡 이 한 줄만 남겨둡니다. --%>
 <html
         lang="en"
         class="light-style customizer-hide"
@@ -14,11 +14,11 @@
             content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Register</title>
+    <title>Registration Success | RACL WMS</title>
 
     <meta name="description" content=""/>
 
-    <link rel="icon" type="image/x-xicon"
+    <link rel="icon" type="image/x-icon"
           href="${pageContext.request.contextPath}/resources/assets/img/favicon/favicon.ico"/>
 
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -75,4 +75,65 @@
                                 id="path-4"
                         ></path>
                         <path
-                                d="M20.6,7.13333333 L25.6,13.8 C26.2627417,14.6836556 26.0836556,15.9372583 25.2,16.6 C24.8538077,16.8596443 24.4327404,17 24,17 L14,17 C12.8954305,17 12,16.1045695 12,15 C12,14.5672596 12.1403557,14.1461923 12.4,13.
+                                d="M20.6,7.13333333 L25.6,13.8 C26.2627417,14.6836556 26.0836556,15.9372583 25.2,16.6 C24.8538077,16.8596443 24.4327404,17 24,17 L14,17 C12.8954305,17 12,16.1045695 12,15 C12,14.5672596 12.1403557,14.1461923 12.4,13.8 L17.4,7.13333333 C18.0627417,6.24967773 19.3163444,6.07059163 20.2,6.73333333 C20.3516113,6.84704183 20.4862915,6.981722 20.6,7.13333333 Z"
+                                id="path-5"
+                        ></path>
+                      </defs>
+                      <g id="g-app-brand" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Brand-Logo" transform="translate(-27.000000, -15.000000)">
+                          <g id="Icon" transform="translate(27.000000, 15.000000)">
+                            <g id="Mask" transform="translate(0.000000, 8.000000)">
+                              <mask id="mask-2" fill="white">
+                                <use xlink:href="#path-1"></use>
+                              </mask>
+                              <use fill="#696cff" xlink:href="#path-1"></use>
+                              <g id="Path-3" mask="url(#mask-2)">
+                                <use fill="#696cff" xlink:href="#path-3"></use>
+                                <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-3"></use>
+                              </g>
+                              <g id="Path-4" mask="url(#mask-2)">
+                                <use fill="#696cff" xlink:href="#path-4"></use>
+                                <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-4"></use>
+                              </g>
+                            </g>
+                            <g
+                                    id="Triangle"
+                                    transform="translate(19.000000, 11.000000) rotate(-300.000000) translate(-19.000000, -11.000000) "
+                            >
+                              <use fill="#696cff" xlink:href="#path-5"></use>
+                              <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-5"></use>
+                            </g>
+                          </g>
+                        </g>
+                      </g>
+                    </svg>
+                  </span>
+                            <span class="app-brand-text demo text-body fw-bolder">RACL</span>
+                        </a>
+                    </div>
+                    <h4 class="mb-3">회원가입이 완료되었습니다! 🎉</h4>
+                    <p class="mb-4">
+                        RACL WMS의 회원이 되신 것을 환영합니다.<br>
+                        관리자 승인 후 RACL의 모든 서비스를 이용하실 수 있습니다.
+                    </p>
+
+                    <div>
+                        <a href="/member/login" class="btn btn-primary">로그인 하러 가기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/libs/jquery/jquery.js"></script>
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/libs/popper/popper.js"></script>
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/js/bootstrap.js"></script>
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/js/menu.js"></script>
+<script src="${pageContext.request.contextPath}/resources/assets/js/main.js"></script>
+
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+</body>
+</html>

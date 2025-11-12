@@ -12,9 +12,9 @@ public class AnnouncementPageDTO {
   private boolean prev, next;
 
   private int total;
-
   private int pageNum;
   private int amount;
+  private int totalPages;
 
   public AnnouncementPageDTO(int pageNum, int amount, int total) {
 
@@ -26,6 +26,7 @@ public class AnnouncementPageDTO {
     this.startPage = this.endPage - 9;
 
     int realEnd = (int) Math.ceil((total * 1.0) / amount);
+    totalPages = realEnd;
 
     if(realEnd < endPage) {
       endPage = realEnd;
@@ -33,6 +34,7 @@ public class AnnouncementPageDTO {
 
     this.prev = startPage > 1;
     this.next = endPage < realEnd;
+
   }
   
 }
