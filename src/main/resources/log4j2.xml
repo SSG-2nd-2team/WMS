@@ -28,15 +28,6 @@
             <AppenderRef ref="CONSOLE"/>
         </root>
 
-<!--        추후에 지우기    -->
-        <Logger name="jdbc.sqlonly" level="info" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
-
-        <Logger name="com.ssg.wms.product_stock.mappers.ProductListMapper" level="debug" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
-
     </Loggers>
 
 </Configuration>
