@@ -18,7 +18,7 @@ public class ReplyController {
     private final ReplyService replyService;
 
     // 문의 답글 목록 조회
-    @GetMapping("/replies")
+    @GetMapping("")
     public ResponseEntity<List<ReplyDTO>> getReplies(@PathVariable Long inquiryId) {
         log.info("getReplies inquiryId:" + inquiryId);
         return ResponseEntity.ok(replyService.getReplies(inquiryId));
@@ -41,18 +41,8 @@ public class ReplyController {
         return ResponseEntity.ok(replyService.getReplyDetail(inquiryId, replyId));
     }
 
-    // 문의 답글 수정
+    // 문의 답글 삭제 = 내용만 바꿈(삭제되었습니다)
     @PutMapping("/reply/{replyId}")
-    public ResponseEntity<ReplyDTO> updateReply(@PathVariable Long inquiryId,
-                                                @PathVariable Long replyId,
-                                                @Valid @RequestBody ReplyDTO replyDTO) {
-        ReplyDTO updated = replyService.updateReply(inquiryId, replyId, replyDTO);
-        log.info("updateReply inquiryId:" + inquiryId + " replyDTO:" + updated);
-        return ResponseEntity.ok(updated);
-    }
-
-    // 문의 답글 삭제
-    @DeleteMapping("/reply/{replyId}")
     public ResponseEntity<String> deleteReply(@PathVariable Long inquiryId,
                                               @PathVariable Long replyId) {
         replyService.deleteReply(inquiryId, replyId);

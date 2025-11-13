@@ -8,4 +8,7 @@ public interface MemberService {
     long findMemberIdByMemberLoginId(String memberLoginId);
     void insertMember(MemberDTO memberDTO);
     void updateMember(long memberId, MemberUpdateDTO memberUpdateDTO);
+    MemberDTO loginCheck(String loginId, String password);
+    String getPartnerName(int partnerId);
+    int getPartnerIdByBusinessNumber(String businessNumber);
 }

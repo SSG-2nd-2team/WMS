@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <%-- 같은 admin 폴더 내에 있으므로 경로 없이 바로 include --%>
-<%@ include file="admin-header.jsp" %>
+<%@ include file="manager-header.jsp" %>
 
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="fw-bold py-3 mb-4">
@@ -21,35 +21,35 @@
                         <div class="mb-3 col-md-6">
                             <label for="staffName" class="form-label">이름</label>
                             <input class="form-control" type="text" id="staffName" name="staffName"
-                                   value="${loginAdmin.staffName}" readonly/>
+                                   value="${loginManager.staffName}" readonly/>
                         </div>
                         <div class="mb-3 col-md-6">
                             <label for="staffLoginId" class="form-label">아이디</label>
                             <input class="form-control" type="text" name="staffLoginId" id="staffLoginId"
-                                   value="${loginAdmin.staffLoginId}" readonly/>
+                                   value="${loginManager.staffLoginId}" readonly/>
                         </div>
                         <div class="mb-3 col-md-6">
                             <label for="staffEmail" class="form-label">이메일</label>
                             <input class="form-control" type="text" id="staffEmail" name="staffEmail"
-                                   value="${loginAdmin.staffEmail}" readonly/>
+                                   value="${loginManager.staffEmail}" readonly/>
                         </div>
                         <div class="mb-3 col-md-6">
                             <label class="form-label" for="staffPhone">전화번호</label>
                             <div class="input-group input-group-merge">
                                 <span class="input-group-text">KR (+82)</span>
                                 <input type="text" id="staffPhone" name="staffPhone" class="form-control"
-                                       value="${loginAdmin.staffPhone}" readonly/>
+                                       value="${loginManager.staffPhone}" readonly/>
                             </div>
                         </div>
                         <div class="mb-3 col-md-6">
                             <label for="role" class="form-label">권한</label>
-                            <input type="text" class="form-control" id="role" name="role" value="${loginAdmin.role}"
+                            <input type="text" class="form-control" id="role" name="role" value="${loginManager.role}"
                                    readonly/>
                         </div>
                         <div class="mb-3 col-md-6">
                             <label for="createdAt" class="form-label">가입일</label>
                             <input type="text" class="form-control" id="createdAt" name="createdAt"
-                                   value="${loginAdmin.createdAt}" readonly/>
+                                   value="${loginManager.createdAt}" readonly/>
                         </div>
                     </div>
                 </div>
@@ -60,4 +60,4 @@
 </div>
 
 <%-- 푸터 include (필수!) --%>
-<%@ include file="admin-footer.jsp" %>
+<%@ include file="manager-footer.jsp" %>

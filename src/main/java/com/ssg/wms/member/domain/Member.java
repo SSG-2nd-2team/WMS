@@ -23,4 +23,5 @@ public class Member {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String businessNumber;
+    private int partnerId;
 }

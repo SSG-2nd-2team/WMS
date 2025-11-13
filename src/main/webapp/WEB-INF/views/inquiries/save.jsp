@@ -5,7 +5,7 @@
         <jsp:include page="/WEB-INF/views/admin/admin-header.jsp" />
     </c:when>
     <c:when test="${sessionScope.role eq 'MANAGER'}">
-        <jsp:include page="/WEB-INF/views/manager/manager-header.jsp" />
+        <jsp:include page="/WEB-INF/views/warehousemanager/manager-header.jsp" />
     </c:when>
     <c:otherwise>
         <jsp:include page="/WEB-INF/views/member/member-header.jsp" />
@@ -77,7 +77,7 @@
         <jsp:include page="/WEB-INF/views/admin/admin-footer.jsp" />
     </c:when>
     <c:when test="${sessionScope.role eq 'MANAGER'}">
-        <jsp:include page="/WEB-INF/views/manager/manager-footer.jsp" />
+        <jsp:include page="/WEB-INF/views/warehousemanager/manager-footer.jsp" />
     </c:when>
     <c:otherwise>
         <jsp:include page="/WEB-INF/views/member/member-footer.jsp" />
