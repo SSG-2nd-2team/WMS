@@ -247,7 +247,7 @@
                 </div>
 
                 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-                    <a class="navbar-brand" href="javascript:void(0)">Navbar</a>
+                    <a class="navbar-brand" href="${pageContext.request.contextPath}/member">RACL WMS</a>
 
                     <ul class="navbar-nav flex-row align-items-center ms-auto">
                         <!-- Place this tag where you want the button to render. -->

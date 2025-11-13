@@ -38,5 +38,8 @@ public class SectionDTO {
 
     /// 창고 구역에 할당된 면적
     @NotNull(message = "면적은 필수 입력 항목입니다.")
-    private Integer allocatedArea;
+    private double allocatedArea;
+
+
+
 }

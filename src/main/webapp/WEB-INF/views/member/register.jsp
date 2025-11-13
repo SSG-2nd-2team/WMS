@@ -186,9 +186,9 @@
                     </form>
 
                         <p class="text-center">
-                            <span>처음이신가요? </span>
+                            <span>이미 회원이신가요? </span>
                             <a href="/member/login">
-                                <span>회원가입</span>
+                                <span>로그인하기</span>
                             </a>
                         </p>
                 </div>

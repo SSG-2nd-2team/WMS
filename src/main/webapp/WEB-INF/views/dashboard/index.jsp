@@ -67,7 +67,7 @@
                     <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
                         <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
                             <div class="card-title">
-                                <h5 class="text-nowrap mb-2">순이익</h5>
+                                <h5 class="text-nowrap mb-2">총 순이익</h5>
                                 <span class="badge bg-label-primary rounded-pill" id="summaryScopeLabel3">Yearly</span>
                             </div>
                             <div class="mt-sm-auto">
@@ -122,7 +122,7 @@
                     <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
                         <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
                             <div class="card-title">
-                                <h5 class="text-nowrap mb-2">월 순수익</h5>
+                                <h5 class="text-nowrap mb-2">월 순이익</h5>
                                 <span class="badge bg-label-primary rounded-pill">Monthly</span>
                             </div>
                             <div class="mt-sm-auto">

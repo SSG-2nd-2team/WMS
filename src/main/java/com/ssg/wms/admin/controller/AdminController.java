@@ -31,7 +31,7 @@ public class AdminController {
     @GetMapping("")
     public String getAdminMain() {
         // 메인 화면
-        return "admin/connect";
+        return "admin/dashboard";
     }
 
     @GetMapping("/login")
@@ -56,7 +56,7 @@ public class AdminController {
         session.setAttribute("loginId", loginId);
         session.setAttribute("role", Role.ADMIN);
 
-        return "redirect:/admin";
+        return "redirect:/admin/dashboard";
     }
 
     @Transactional
@@ -125,7 +125,7 @@ public class AdminController {
     public ResponseEntity<?> rejectMember(@PathVariable long memberId) {
         // 거절 로직 처리
         log.info("Rejecting member " + memberId);
-        adminService.changeMemberStatus(memberId, AccountStatus.INACTIVE);
+        adminService.changeMemberStatus(memberId, AccountStatus.REJECTED);
         return ResponseEntity.ok().build();
     }
 

@@ -14,74 +14,121 @@
     </c:otherwise>
 </c:choose>
 
-<div class="container">
-    <h1>문의사항</h1>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">커뮤니티 /</span> 문의사항</h4>
 
-    <div class="header-actions">
-        <form method="get" action="/inquiries" class="search-box">
-            <input type="text" name="keyword" placeholder="검색어를 입력하세요"
-                   value="${keyword}">
-            <button type="submit" class="btn btn-primary">검색</button>
-        </form>
-    </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">문의사항 목록</h5>
+            <a href="/inquiries/save" class="btn btn-primary">
+                <i class="bx bx-plus me-1"></i> 문의 작성
+            </a>
+        </div>
+        <div class="card-body">
+            <!-- 검색 영역 -->
+            <form action="/inquiries" method="get" class="mb-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-10">
+                        <label class="form-label">검색어</label>
+                        <input type="text" name="keyword" class="form-control"
+                               placeholder="제목, 작성자 등" value="${keyword}"/>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bx bx-search me-1"></i> 검색
+                        </button>
+                    </div>
+                </div>
+            </form>
 
-    <table>
-        <thead>
-        <tr>
-            <th style="width: 10%;">번호</th>
-            <th style="width: 50%;">제목</th>
-            <th style="width: 15%;">작성자</th>
-            <th style="width: 15%;">작성일</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:choose>
-            <c:when test="${empty inquiries}">
-                <tr>
-                    <td colspan="5" class="no-data">등록된 문의글이 없습니다.</td>
-                </tr>
-            </c:when>
-            <c:otherwise>
-                <c:set var="listSize" value="${inquiries.size()}" />
-                <c:forEach var="inquiry" items="${inquiries}" varStatus="status">
+            <!-- 테이블 -->
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover">
+                    <thead>
                     <tr>
-                        <td>${listSize - status.index}</td>
-                        <td>
-                            <a href="/inquiries/${inquiry.inquiryId}" class="inquiry-title">
-                                    ${inquiry.title}
-                            </a>
-                        </td>
-                        <td>${inquiry.writer}</td>
-                        <td>${inquiry.createdAt}</td>
+                        <th style="width: 10%;">번호</th>
+                        <th style="width: 55%;">제목</th>
+                        <th style="width: 15%;">작성자</th>
+                        <th style="width: 20%;">작성일</th>
                     </tr>
-                </c:forEach>
-            </c:otherwise>
-        </c:choose>
-        </tbody>
-    </table>
+                    </thead>
+                    <tbody>
+                    <c:choose>
+                        <c:when test="${empty inquiries}">
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    등록된 문의글이 없습니다.
+                                </td>
+                            </tr>
+                        </c:when>
+                        <c:otherwise>
+                            <c:set var="listSize" value="${inquiries.size()}" />
+                            <c:forEach var="inquiry" items="${inquiries}" varStatus="status">
+                                <tr>
+                                    <td class="text-center">${listSize - status.index}</td>
+                                    <td>
+                                        <a href="/inquiries/${inquiry.inquiryId}"
+                                           class="text-dark text-decoration-none">
+                                                ${inquiry.title}
+                                        </a>
+                                    </td>
+                                    <td>${inquiry.writer}</td>
+                                    <td>${fn:replace(inquiry.createdAt, 'T', ' ')}</td>
+                                </tr>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
+                    </tbody>
+                </table>
+            </div>
 
-    <!-- 페이징 -->
-    <c:if test="${not empty inquiries}">
-        <div class="pagination">
-            <c:if test="${currentPage > 1}">
-                <a href="?page=${currentPage - 1}&keyword=${keyword}"
-                   class="page-link">이전</a>
-            </c:if>
+            <!-- 페이지네이션 -->
+            <c:if test="${not empty inquiries}">
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <!-- 처음 페이지 -->
+                            <li class="page-item first ${currentPage == 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="?page=1&keyword=${keyword}">
+                                    <i class="tf-icon bx bx-chevrons-left"></i>
+                                </a>
+                            </li>
+                            <!-- 이전 페이지 -->
+                            <li class="page-item prev ${currentPage == 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="?page=${currentPage - 1}&keyword=${keyword}">
+                                    <i class="tf-icon bx bx-chevron-left"></i>
+                                </a>
+                            </li>
 
-            <c:forEach begin="${startPage}" end="${endPage}" var="i">
-                <a href="?page=${i}&keyword=${keyword}"
-                   class="page-link ${i == currentPage ? 'active' : ''}">
-                        ${i}
-                </a>
-            </c:forEach>
+                            <!-- 페이지 번호 -->
+                            <c:forEach begin="${startPage}" end="${endPage}" var="i">
+                                <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                    <a class="page-link" href="?page=${i}&keyword=${keyword}">
+                                            ${i}
+                                    </a>
+                                </li>
+                            </c:forEach>
 
-            <c:if test="${currentPage < totalPages}">
-                <a href="?page=${currentPage + 1}&keyword=${keyword}"
-                   class="page-link">다음</a>
+                            <!-- 다음 페이지 -->
+                            <li class="page-item next ${currentPage == totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="?page=${currentPage + 1}&keyword=${keyword}">
+                                    <i class="tf-icon bx bx-chevron-right"></i>
+                                </a>
+                            </li>
+                            <!-- 마지막 페이지 -->
+                            <li class="page-item last ${currentPage == totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="?page=${totalPages}&keyword=${keyword}">
+                                    <i class="tf-icon bx bx-chevrons-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </c:if>
         </div>
-    </c:if>
+    </div>
 </div>
+
 <c:choose>
     <c:when test="${sessionScope.role eq 'ADMIN'}">
         <jsp:include page="/WEB-INF/views/admin/admin-footer.jsp" />

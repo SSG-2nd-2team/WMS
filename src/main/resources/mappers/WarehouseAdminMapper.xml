@@ -117,7 +117,7 @@
             latest_update_date = NOW()
         WHERE warehouse_id = #{id}
     </update>
-<!--    창고 등록 ASC설정 추가 -->
+    <!--    창고 등록 ASC설정 추가 -->
     <select id="selectWarehouses" parameterType="com.ssg.wms.warehouse.dto.WarehouseSearchDTO" resultMap="warehouseListResultMap">
         SELECT
         warehouse_id,

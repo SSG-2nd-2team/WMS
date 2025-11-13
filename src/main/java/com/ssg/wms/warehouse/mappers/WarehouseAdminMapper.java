@@ -12,7 +12,6 @@ public interface WarehouseAdminMapper {
     int insertWarehouse(WarehouseSaveDTO saveDTO);
 
     /// 구역 등록
-    // XML 매퍼에 useGeneratedKeys="true" keyProperty="sectionId" 설정이 필요합니다.
     int insertSection(SectionDTO section);
 
     ///위치 등록
@@ -23,19 +22,14 @@ public interface WarehouseAdminMapper {
     int countWarehouseName(@Param("name") String name);
 
 
-
-
-
-    ///조회/수정/삭제
-
     /// 창고 수정
     int updateWarehouse(WarehouseUpdateDTO updateDTO);
 
     /// 창고 삭제
     int deleteWarehouse(Long id);
 
-    /// 창고 상태 업데이트
-    int updateWarehouseStatus(@Param("id") Long id, @Param("newStatus") Byte newStatus);
+//    /// 창고 상태 업데이트
+//    int updateWarehouseStatus(@Param("id") Long id, @Param("newStatus") Byte newStatus);
 
     ///창고 목록 조회
     List<WarehouseListDTO> selectWarehouses(WarehouseSearchDTO searchForm);

@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +15,10 @@ public class LocationDTO {
     /// 수정시만 등록
     private Long locationId;
 
-    /// - 위치가 속한 창고 ID -> LOCATION 테이블에 저장됨)
+
+    private Long sectionId;
+
+    /// - 위치가 속한 창고 ID
     private Long warehouseId;
 
     /// 위치 코드 (예: A-01-01)
@@ -32,7 +33,8 @@ public class LocationDTO {
     private String locationTypeCode;
 
     ///해당 위치의 최대 적재 가능 부피
-
     @NotNull(message = "최대 부피는 필수 입력 항목입니다.")
-    private Integer maxVolume;
+    private double maxVolume;
+
+
 }

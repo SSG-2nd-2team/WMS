@@ -26,6 +26,7 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.findMemberIdByMemberLoginId(memberLoginId);
     }
 
+    @Transactional
     @Override
     public void insertMember(MemberDTO memberDTO) {
         memberMapper.insertMember(memberDTO);

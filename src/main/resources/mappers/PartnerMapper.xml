@@ -23,7 +23,7 @@
         <if test="businessNumber != null and businessNumber != ''">
             AND business_number = #{businessNumber}
         </if>
-        ORDER BY partner_name DESC
+        ORDER BY partner_name
     </select>
 
     <!-- 거래처 요금 정책 조회 -->

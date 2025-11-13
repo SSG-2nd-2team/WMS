@@ -63,7 +63,7 @@
     </select>
 
     <!-- 고객의 사업자등록번호로 partnerId 얻기 -->
-    <select id="getPartnerId" resultType="int">
+    <select id="getPartnerIdByBusinessNumber" resultType="int">
         SELECT partner_id
         FROM partner
         WHERE business_number = #{businessNumber}
