@@ -49,17 +49,24 @@ public interface OutboundMapper {
     String getOutboundOrderStatusByRequestId(Long outboundRequestId);
 
 
-    int deleteOutboundItemsByRequestId(@Param("outboundRequestId") Long outboundRequestId);
-
+    // 1️⃣ 출고 지시서 삭제 (자식 테이블)
     int deleteShipmentOrder(@Param("outboundRequestId") Long outboundRequestId);
 
+    // 2️⃣ 출고 품목 삭제 (자식 테이블)
+    int deleteOutboundItemsByRequestId(@Param("outboundRequestId") Long outboundRequestId);
+
+    // 3️⃣ 출고 요청 삭제 (부모 테이블)
     int deleteRequest(@Param("outboundRequestId") Long outboundRequestId,
                       @Param("memberId") Long memberId);
+
+    int deleteWaybillByRequestId(@Param("outboundRequestId")Long outboundRequestId);
+    int deleteDispatchByRequestId(@Param("outboundRequestId") Long outboundRequestId);
 
 
 
     // ✅ 출고요청 후 출고지시서 자동 생성
     void insertOutboundOrderAfterRequest(OutboundOrderDTO order);
+
 
     List<OutboundItemDTO> getOutboundRequestItems(@Param("outboundRequestId") Long outboundRequestId);
 }

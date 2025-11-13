@@ -52,6 +52,7 @@
         outboundDate,
         approvedStatus,
         outboundAddress,
+        requestedDeliveryDate,
         member_id,
         warehouse_id,
         staff_id
@@ -60,6 +61,7 @@
         NOW(),
         'PENDING',
         #{outboundAddress},
+        #{requestedDeliveryDate},
         #{memberId},
         #{warehouseId},
         #{staffId}
@@ -83,7 +85,12 @@
         Pt.partner_name AS brandName,
         M.member_name AS requestUserName,
         sr.outboundDate,
-        sr.approvedStatus
+        CASE
+        WHEN sr.approvedStatus = 'APPROVED' THEN '승인'
+        WHEN sr.approvedStatus = 'PENDING' THEN '승인대기'
+        WHEN sr.approvedStatus = 'COMPANION' THEN '반려'
+        ELSE sr.approvedStatus
+        END AS approvedStatus
         FROM outboundRequest sr
         INNER JOIN Member M ON sr.member_id = M.member_id
         INNER JOIN Partner Pt ON M.partner_id = Pt.partner_id
@@ -101,7 +108,12 @@
         p.partner_name AS brandName,
         m.member_name AS requestUserName,
         sr.outboundDate,
-        sr.approvedStatus
+        CASE
+        WHEN sr.approvedStatus = 'APPROVED' THEN '승인'
+        WHEN sr.approvedStatus = 'PENDING' THEN '승인대기'
+        WHEN sr.approvedStatus = 'COMPANION' THEN '반려'
+        ELSE sr.approvedStatus
+        END AS approvedStatus
         FROM outboundRequest sr
         INNER JOIN Member m ON sr.member_id = m.member_id
         INNER JOIN Partner p ON p.partner_id = m.partner_id
@@ -178,24 +190,45 @@
         AND outboundRequest_ID = #{outboundRequestId}
     </update>
 
-    <!-- ✅ 출고 품목 삭제 -->
+
+
+    <!-- 1️⃣ 운송장 삭제 -->
+    <delete id="deleteWaybillByRequestId">
+        DELETE w
+        FROM waybill w
+        INNER JOIN dispatch d ON w.dispatch_ID = d.dispatch_ID
+        INNER JOIN outboundOrder o ON d.approvedOrder_ID = o.approvedOrder_ID
+        WHERE o.outboundRequest_ID = #{outboundRequestId}
+    </delete>
+
+    <!-- 2️⃣ 배차 삭제 -->
+    <delete id="deleteDispatchByRequestId">
+        DELETE d
+        FROM dispatch d
+        INNER JOIN outboundOrder o ON d.approvedOrder_ID = o.approvedOrder_ID
+        WHERE o.outboundRequest_ID = #{outboundRequestId}
+    </delete>
+
+    <!-- 3️⃣ 출고지시서 삭제 -->
+    <delete id="deleteShipmentOrder">
+        DELETE FROM outboundOrder
+        WHERE outboundRequest_ID = #{outboundRequestId}
+    </delete>
+
+    <!-- 4️⃣ 품목 삭제 -->
     <delete id="deleteOutboundItemsByRequestId">
         DELETE FROM outboundItem
         WHERE outboundRequest_ID = #{outboundRequestId}
     </delete>
 
-    <!-- ✅ 출고 지시서 삭제 -->
-    <delete id="deleteShipmentOrder">
-        DELETE FROM shipmentOrder
-        WHERE outboundRequest_ID = #{outboundRequestId}
-    </delete>
-
-    <!-- ✅ 출고요청 본문 삭제 -->
+    <!-- 5️⃣ 출고요청 삭제 -->
     <delete id="deleteRequest">
         DELETE FROM outboundRequest
         WHERE outboundRequest_ID = #{outboundRequestId}
         AND member_id = #{memberId}
     </delete>
+
+
 
     <!-- ✅ 출고 승인 상태 조회 -->
     <select id="getOutboundOrderStatusByRequestId" resultType="java.lang.String">

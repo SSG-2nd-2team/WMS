@@ -7,6 +7,7 @@ import com.ssg.wms.product_ehs.dto.ProductDTO;
 import com.ssg.wms.product_ehs.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,8 +27,7 @@ public class OutboundController {
 
 
 //     * 출고요청 전체 조회 (사용자)
-//     * 예: GET /member/outbound?userId=1&status=승인대기
-// ✅ 출고요청 전체 조회 (화면용)
+// 출고요청 전체 조회 (화면용)
 @GetMapping
 public String getAllOutboundRequests(
         @RequestParam(value = "memberId", required = false) Long memberId,
@@ -158,16 +158,24 @@ public String getAllOutboundRequests(
     // ======================================================
     // 6️⃣ 출고 요청 삭제 (DELETE)
     // ======================================================
-    @DeleteMapping("/request/{outboundRequestId}")
+    @DeleteMapping(value = "/request/{outboundRequestId}", produces = "text/plain; charset=UTF-8")
     @ResponseBody
-    public ResponseEntity<Void> deleteOutboundRequest(
+    public ResponseEntity<String> deleteOutboundRequest(
             @PathVariable Long outboundRequestId,
             @RequestParam Long memberId) {
 
         log.info("출고 요청 삭제 - outboundRequestId: {}, memberId: {}", outboundRequestId, memberId);
-        outboundService.deleteRequest(outboundRequestId, memberId);
-
-        return ResponseEntity.ok().build();
+        try {
+            outboundService.deleteRequest(outboundRequestId, memberId);
+            return ResponseEntity.ok("삭제 완료");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(e.getMessage()); // 승인된 건 삭제 불가 메시지 반환
+        } catch (Exception e) {
+            log.error("❌ 삭제 중 예외 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("삭제 중 오류 발생");
+        }
     }
 
 

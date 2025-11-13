@@ -2,6 +2,7 @@ package com.ssg.wms.outbound.service;
 
 
 import com.ssg.wms.outbound.domain.Criteria;
+import com.ssg.wms.outbound.domain.OutboundStatus;
 import com.ssg.wms.outbound.domain.dto.OutboundDTO;
 import com.ssg.wms.outbound.domain.dto.OutboundItemDTO;
 import com.ssg.wms.outbound.domain.dto.OutboundOrderDTO;
@@ -59,6 +60,13 @@ public class OutboundServiceImpl implements OutboundService {
      */
     @Override
     public List<OutboundDTO> getRequestsByUserId(Long memberId, String status) {
+        // 한글 → 영어 변환
+        if (status != null && !status.isEmpty()) {
+            OutboundStatus enumStatus = OutboundStatus.fromKorean(status);
+            if (enumStatus != null) {
+                status = enumStatus.name(); // "승인" → "APPROVED"
+            }
+        }
         return outboundMapper.selectOutboundRequestByUserId(memberId, status);
     }
 
@@ -68,6 +76,14 @@ public class OutboundServiceImpl implements OutboundService {
     @Override
     public List<OutboundDTO> allOutboundRequests(Long memberId, String status) {
         log.info("🔍 Service - memberId: {}, status: {}", memberId, status);
+
+        // 한글 → 영어 변환
+        if (status != null && !status.isEmpty()) {
+            OutboundStatus enumStatus = OutboundStatus.fromKorean(status);
+            if (enumStatus != null) {
+                status = enumStatus.name(); // "승인" → "APPROVED"
+            }
+        }
 
         List<OutboundDTO> list = outboundMapper.selectAllShipment(memberId, status);
 
@@ -118,7 +134,7 @@ public class OutboundServiceImpl implements OutboundService {
     public void updateRequest(Long outboundRequestId, Long memberId, OutboundDTO dto) {
         String approveStatus = outboundMapper.getOutboundOrderStatusByRequestId(outboundRequestId);
 
-        if ("승인".equalsIgnoreCase(approveStatus)) {
+        if ("APPROVED".equalsIgnoreCase(approveStatus)) {
             throw new IllegalStateException("이미 승인된 출고요청은 수정할 수 없습니다.");
         }
 
@@ -137,16 +153,31 @@ public class OutboundServiceImpl implements OutboundService {
     @Override
     @Transactional
     public boolean deleteRequest(Long outboundRequestId, Long memberId) {
-        String approveStatus = outboundMapper.getOutboundOrderStatusByRequestId(outboundRequestId);
+        log.info("출고 요청 삭제 시작 - outboundRequestId: {}, memberId: {}", outboundRequestId, memberId);
 
-        if ("승인".equalsIgnoreCase(approveStatus)) {
-            throw new IllegalStateException("이미 승인된 출고요청은 삭제할 수 없습니다.");
+        // 현재 승인 상태 조회
+        String approvedStatus = outboundMapper.getOutboundOrderStatusByRequestId(outboundRequestId);
+
+        // ✅ 승인된 요청은 삭제 금지
+        if ("APPROVED".equalsIgnoreCase(approvedStatus)) {
+            log.warn("승인된 출고요청은 삭제할 수 없습니다. (outboundRequestId={})", outboundRequestId);
+            throw new IllegalStateException("승인된 출고요청은 삭제할 수 없습니다.");
         }
 
-        outboundMapper.deleteOutboundItemsByRequestId(outboundRequestId);
+        // 1️⃣ 운송장 → 배차 → 출고지시서 → 품목 → 요청 순으로 삭제
+        outboundMapper.deleteWaybillByRequestId(outboundRequestId);
+        outboundMapper.deleteDispatchByRequestId(outboundRequestId);
         outboundMapper.deleteShipmentOrder(outboundRequestId);
-        int result = outboundMapper.deleteRequest(outboundRequestId, memberId);
+        outboundMapper.deleteOutboundItemsByRequestId(outboundRequestId);
+        int deleted = outboundMapper.deleteRequest(outboundRequestId, memberId);
 
-        return result > 0;
+        if (deleted == 0) {
+            log.warn("❌ 삭제 실패: 해당 출고요청이 존재하지 않음");
+            return false;
+        }
+
+        log.info("✅ 출고 요청 삭제 완료");
+        return true;
     }
+
 }
