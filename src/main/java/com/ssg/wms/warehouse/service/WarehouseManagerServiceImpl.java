@@ -131,16 +131,16 @@ public class WarehouseManagerServiceImpl implements WarehouseManagerService {
     }
 
     /// 창고 상태 업데이트 구현
-    @Override
-    @Transactional
-    public void updateWarehouseStatus(Long id, Byte newStatus) {
-        log.debug("창고 상태 업데이트 시작 (Manager). ID: {}, New Status: {}", id, newStatus);
-        int updatedRows = adminManagerMapper.updateWarehouseStatus(id, newStatus);
-
-        if (updatedRows != 1) {
-            log.warn("상태 업데이트 실패 (Manager): 창고 ID({})가 존재하지 않습니다.", id);
-            throw new IllegalArgumentException("상태를 변경하려는 창고를 찾을 수 없습니다.");
-        }
-        log.info("창고 상태 업데이트 성공 (Manager). ID: {}", id);
-    }
+//    @Override
+//    @Transactional
+//    public void updateWarehouseStatus(Long id, Byte newStatus) {
+//        log.debug("창고 상태 업데이트 시작 (Manager). ID: {}, New Status: {}", id, newStatus);
+//        int updatedRows = adminManagerMapper.updateWarehouseStatus(id, newStatus);
+//
+//        if (updatedRows != 1) {
+//            log.warn("상태 업데이트 실패 (Manager): 창고 ID({})가 존재하지 않습니다.", id);
+//            throw new IllegalArgumentException("상태를 변경하려는 창고를 찾을 수 없습니다.");
+//        }
+//        log.info("창고 상태 업데이트 성공 (Manager). ID: {}", id);
+//    }
 }

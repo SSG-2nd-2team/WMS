@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="../admin/admin-header.jsp" %>
 
 <!DOCTYPE html>
@@ -11,8 +12,6 @@
   <style>
 
     #map { width: 400px; height: 350px; margin-top: 10px; border: 1px solid #ccc; }
-
-
     .detail-container { display: flex; flex-wrap: wrap; gap: 20px; }
     .info-box, .map-box, .section-list-box {
       border: 1px solid #e0e0e0;
@@ -43,7 +42,7 @@
     .location-container { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 10px;}
     .single-section { flex: 1 1 48%; min-width: 300px; border: 1px dashed #ccc; padding: 10px; border-radius: 4px; }
 
-  
+
     .action-buttons {
       margin-top: 20px;
       display: flex;
@@ -58,7 +57,7 @@
       font-size: 16px;
     }
 
-    /* 모달 기본 스타일 (필요시 추가) */
+    /* 모달 기본 스타일 유지 */
     .modal {
       display: none;
       position: fixed;
@@ -98,7 +97,7 @@
   </div>
 
   <div class="section-list-box">
-    <h2>창고 정보</h2>
+    <h2>창고 구역 정보</h2>
     <c:choose>
       <c:when test="${not empty detail.sections}">
         <div class="location-container">
@@ -112,29 +111,31 @@
                 <tr><th>보관 목적</th><td>${section.sectionPurpose}</td></tr>
                 <tr><th>보관 면적</th><td>${section.allocatedArea}</td></tr>
               </table>
-
-              <h4>창고구역 정보</h4>
-              <table class="info-table location-table">
-                <thead>
-                <tr>
-                  <th>위치 코드</th>
-                  <th>층수</th>
-                  <th>최대 부피</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach items="${section.locations}" var="location">
+<%--              리팩토링 해야함.--%>
+                <%--
+                <h4>창고구역 정보</h4>
+                <table class="info-table location-table">
+                  <thead>
                   <tr>
-                    <td>${location.locationCode}</td>
-                    <td>${location.floorNum}</td>
-                    <td>${location.maxVolume}</td>
+                    <th>위치 코드</th>
+                    <th>층수</th>
+                    <th>최대 부피</th>
                   </tr>
-                </c:forEach>
-                <c:if test="${empty section.locations}">
-                  <tr><td colspan="3">등록된 위치가 없습니다.</td></tr>
-                </c:if>
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                  <c:forEach items="${section.locations}" var="location">
+                    <tr>
+                      <td>${location.locationCode}</td>
+                      <td>${location.floorNum}</td>
+                      <td>${location.maxVolume}</td>
+                    </tr>
+                  </c:forEach>
+                  <c:if test="${empty section.locations}">
+                    <tr><td colspan="3">등록된 위치가 없습니다.</td></tr>
+                  </c:if>
+                  </tbody>
+                </table>
+                --%>
             </div>
           </c:forEach>
         </div>
@@ -156,7 +157,7 @@
   </div>
 </c:if>
 
-<%-- ✨ 수정된 삭제 모달 기능 (더 명확하고 강조된 디자인) ✨ --%>
+<%-- 삭제 모달 기능 유지 --%>
 <div id="deleteModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
   <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 450px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 

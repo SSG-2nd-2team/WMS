@@ -291,8 +291,10 @@
         <div class="input-group">
             <select id="warehouseStatus" name="warehouseStatus" required>
                 <option value="">선택하세요</option>
-                <option value="1">운영 중</option>
+                <option value="2">운영 중</option>
+                <option value="1">준비 중</option>
                 <option value="0">점검 중</option>
+
             </select>
         </div>
 
@@ -331,35 +333,37 @@
                 <label for="sections_0_area">면적 (단위: 제곱미터(m2))</label>
                 <input type="text" name="sections[0].allocatedArea" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
 
-                <h5 style="margin-top: 25px; color: #4a5568;">📍 구역 위치 정보</h5>
-                <div id="locationsContainer_0">
-                    <div class="location-list" id="location-1">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h6>위치 #1</h6>
-                            <button type="button" onclick="removeLocation(1)" class="remove-btn">X</button>
-                        </div>
 
-                        <label>위치 코드</label>
-                        <input type="text" name="sections[0].locations[0].locationCode" required>
+<%--                리팩토링 예정--%>
+<%--                <h5 style="margin-top: 25px; color: #4a5568;">📍 구역 위치 정보</h5>--%>
+<%--                <div id="locationsContainer_0">--%>
+<%--                    <div class="location-list" id="location-1">--%>
+<%--                        <div style="display: flex; justify-content: space-between; align-items: center;">--%>
+<%--                            <h6>위치 #1</h6>--%>
+<%--                            <button type="button" onclick="removeLocation(1)" class="remove-btn">X</button>--%>
+<%--                        </div>--%>
 
-                        <label>층수</label>
-                        <select name="sections[0].locations[0].floorNum" required>
-                            <option value="">선택</option>
-                            <option value="1">1층</option>
-                            <option value="2">2층</option>
-                        </select>
+<%--                        <label>위치 코드</label>--%>
+<%--                        <input type="text" name="sections[0].locations[0].locationCode" required>--%>
 
-                        <label>최대 부피 (단위 : m^3)</label>
-                        <input type="text" name="sections[0].locations[0].maxVolume" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
-                    </div>
-                </div>
-                <button type="button" onclick="addLocation(0)" class="add-location-btn">+ 위치 추가</button>
-            </div>
-        </div>
+<%--                        <label>층수</label>--%>
+<%--                        <select name="sections[0].locations[0].floorNum" required>--%>
+<%--                            <option value="">선택</option>--%>
+<%--                            <option value="1">1층</option>--%>
+<%--                            <option value="2">2층</option>--%>
+<%--                        </select>--%>
 
-        <button type="button" onclick="addSection()" class="add-section-btn">+ 구역 추가</button>
+<%--                        <label>최대 부피 (단위 : m^3)</label>--%>
+<%--                        <input type="text" name="sections[0].locations[0].maxVolume" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">--%>
+<%--                    </div>--%>
+<%--                </div>--%>
+<%--                <button type="button" onclick="addLocation(0)" class="add-location-btn">+ 위치 추가</button>--%>
+<%--            </div>--%>
+<%--        </div>--%>
 
-        <hr>
+<%--        <button type="button" onclick="addSection()" class="add-section-btn">+ 구역 추가</button>--%>
+
+<%--        <hr>--%>
 
 
         <h2>🗺️ 창고 위치 설정</h2>

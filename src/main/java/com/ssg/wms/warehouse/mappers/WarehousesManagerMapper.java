@@ -1,26 +1,39 @@
 package com.ssg.wms.warehouse.mappers;
 
-import com.ssg.wms.warehouse.dto.SectionDTO;
-import com.ssg.wms.warehouse.dto.WarehouseSaveDTO;
-import com.ssg.wms.warehouse.dto.WarehouseUpdateDTO;
+import com.ssg.wms.warehouse.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface WarehousesManagerMapper { // MANAGER 전용 Mapper (WarehousesManagerController에서 사용)
-
-    // ADMIN과 동일한 기능 리팩토링
+    ///창고 등록 Warehouse ID
     int insertWarehouse(WarehouseSaveDTO saveDTO);
 
-    int updateWarehouse(WarehouseUpdateDTO updateDTO);
-
-    int deleteWarehouse(Long id);
-
-    int countWarehouseName(String name);
-
-    int updateWarehouseStatus(@Param("id") Long id, @Param("newStatus") Byte newStatus);
-
+    /// 구역 등록
     int insertSection(SectionDTO section);
 
-    // NOTE: 필요하다면 XML 쿼리 파일은 동일한 쿼리를 참조하거나, Admin과 동일한 XML 파일을 사용하도록 설정할 수 있습니다.
+    ///위치 등록
+
+    int insertLocation(LocationDTO location);
+
+    /// 창고 이름 중복 확인
+    int countWarehouseName(@Param("name") String name);
+
+
+    /// 창고 수정
+    int updateWarehouse(WarehouseUpdateDTO updateDTO);
+
+    /// 창고 삭제
+    int deleteWarehouse(Long id);
+
+//    /// 창고 상태 업데이트
+//    int updateWarehouseStatus(@Param("id") Long id, @Param("newStatus") Byte newStatus);
+
+    ///창고 목록 조회
+    List<WarehouseListDTO> selectWarehouses(WarehouseSearchDTO searchForm);
+
+    /// 창고 상세 조회
+    WarehouseDetailDTO selectWarehouseDetailById(Long id);
 }

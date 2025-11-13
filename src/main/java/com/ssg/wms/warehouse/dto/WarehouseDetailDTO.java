@@ -44,4 +44,3 @@ public class WarehouseDetailDTO {
     ///창고 위치 목록
     private List<LocationDTO> locations;
 }
-

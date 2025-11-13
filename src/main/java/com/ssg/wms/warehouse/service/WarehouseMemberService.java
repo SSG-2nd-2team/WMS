@@ -13,7 +13,7 @@ public interface WarehouseMemberService {
     List<WarehouseListDTO> findWarehouses(WarehouseSearchDTO warehouseSearch);
 
     ///창고 상세 조회
-   ///  MEMBER는 단순 데이터 조회 목적으로만  (수정/삭제 권한 없음)
+    ///  MEMBER는 단순 데이터 조회 목적으로만  (수정/삭제 권한 없음)
 
     WarehouseDetailDTO findWarehouseDetailById(Long id);
 }
