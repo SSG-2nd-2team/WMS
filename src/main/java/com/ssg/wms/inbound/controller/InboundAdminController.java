@@ -49,11 +49,6 @@ public class InboundAdminController {
                                                  HttpSession session) {
         InboundDTO inboundDTO = inboundAdminService.getInboundById(inboundId);
 
-        // 테스트용 하드코딩
-        if (inboundDTO.getPartnerId() == null) {
-            inboundDTO.setPartnerId(1L); // 원하는 partnerId 값
-        }
-
         if(inboundDTO == null) {
             return ResponseEntity.notFound().build();
         }

@@ -23,7 +23,7 @@ public interface InboundAdminMapper {
                              @Param("warehouseId") Long warehouseId);
 
     // 입고 승인에 쓰일 창고 리스트 조회
-    List<InboundWarehouseDTO> selectWarehouse();
+    List<InboundWarehouseDTO> selectWarehouseName();
 
     // 입고 요청 리젝
     int updateInboundStatusRejected(

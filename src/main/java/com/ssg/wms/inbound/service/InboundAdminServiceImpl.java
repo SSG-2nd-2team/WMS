@@ -41,7 +41,7 @@ public class InboundAdminServiceImpl implements InboundAdminService {
     // 요청 승인에 쓰일 창고 리스트
     @Override
     public List<InboundWarehouseDTO> getWarehouseList() {
-        return inboundAdminMapper.selectWarehouse();
+        return inboundAdminMapper.selectWarehouseName();
     }
 
     // 입고 요청 반려

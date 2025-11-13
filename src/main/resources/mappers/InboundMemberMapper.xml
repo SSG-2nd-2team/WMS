@@ -171,6 +171,13 @@
     </update>
 
     <!-- 기존 상품 삭제 -->
+    <delete id="deleteProductStockByInboundId" parameterType="int">
+        DELETE ps
+        FROM product_stock ps
+        INNER JOIN inbound_item ii ON ps.inbound_item_id = ii.inbound_item_id
+        WHERE ii.inbound_id = #{inboundId}
+    </delete>
+
     <delete id="deleteInboundItems" parameterType="int">
         DELETE FROM inbound_item
         WHERE inbound_id = #{inboundId}

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/manager")
+@RequestMapping("/warehousemanager")
 @RequiredArgsConstructor
 @Log4j2
 public class ManagerController {
@@ -26,27 +26,32 @@ public class ManagerController {
     @GetMapping("")
     public String getManagerMain() {
         // 메인 화면
-        return "manager/connect";
+        return "warehousemanager/connect";
     }
 
     @GetMapping("/login")
     public String getManagerLogin() {
         // 로그인 화면
-        return "manager/login";
+        return "warehousemanager/login";
     }
 
     @PostMapping("")
-    public String postManagerLogin(@RequestParam("loginId") String id,
-                                  HttpSession session,
-                                  Model model) {
+    public String postManagerLogin(@RequestParam("loginId") String loginId,
+                                   @RequestParam String password,
+                                   HttpSession session,
+                                   Model model) {
+
+        StaffDTO manager = managerService.loginCheck(loginId, password);
+        if (manager == null) {
+            model.addAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
+            return "warehousemanager/login"; // 로그인 페이지로 다시 이동
+        }
+
         // 세션에 저장
-        session.setAttribute("loginId", id);
+        session.setAttribute("loginManager", manager);
+        session.setAttribute("loginId", loginId);
         session.setAttribute("role", Role.MANAGER);
-
-        // 모델에 담아서 뷰로 전달
-        model.addAttribute("loginId", id);
-
-        return "manager/connect";
+        return "redirect:/warehousemanager";
     }
 
     @Transactional
@@ -65,7 +70,7 @@ public class ManagerController {
         // 세션에 저장하고 모델로 넘김
         session.setAttribute("loginManager", staffDTO);
         model.addAttribute("loginManager", staffDTO);
-        return "manager/mypage";
+        return "warehousemanager/mypage";
     }
 
     @GetMapping("/logout")

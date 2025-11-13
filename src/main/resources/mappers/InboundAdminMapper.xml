@@ -12,9 +12,7 @@
         <result property="memberName" column="member_name"/>
         <result property="partnerName" column="partner_name"/>
         <result property="inboundRequestedAt" column="inbound_requested_at"/>
-        <result property="inboundUpdatedAt" column="inbound_updated_at"/>
         <result property="inboundStatus" column="inbound_status"/>
-        <result property="inboundRejectReason" column="inbound_reject_reason"/>
         <collection property="inboundItems" ofType="com.ssg.wms.inbound.dto.InboundItemDTO">
             <id property="inboundItemId" column="inbound_item_id"/>
             <result property="productId" column="product_id"/>
@@ -64,8 +62,7 @@
         ii.quantity,
         i.inbound_requested_at,
         i.inbound_at,
-        i.inbound_reject_reason,
-        i.inbound_updated_at
+        i.inbound_reject_reason
         FROM inbound i
         LEFT JOIN warehouse w ON i.warehouse_id = w.warehouse_id
         JOIN member m ON i.member_id = m.member_id
@@ -77,8 +74,7 @@
         WHERE i.inbound_id = #{inboundId}
     </select>
 
-
-    <select id="selectWarehouse" resultType="InboundWarehouseDTO">
+    <select id="selectWarehouseName" resultType="InboundWarehouseDTO">
         SELECT
         warehouse_id as warehouseId,
         name as warehouseName
@@ -101,6 +97,7 @@
         inbound_updated_at = NOW()
         WHERE inbound_id = #{inboundId}
     </update>
+
 
 
 

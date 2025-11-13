@@ -8,11 +8,11 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="org.springframework" level="DEBUG" additivity="false">
+        <Logger name="org.springframework" level="WARN" additivity="false">
             <AppenderRef ref="CONSOLE"/>
         </Logger>
 
-        <Logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
+        <Logger name="com.zaxxer.hikari" level="WARN" additivity="false">
             <AppenderRef ref="CONSOLE"/>
         </Logger>
 

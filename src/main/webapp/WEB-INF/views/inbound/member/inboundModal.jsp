@@ -100,6 +100,9 @@
                 <button type="button" class="btn btn-primary" id="updateInboundBtn">
                     수정
                 </button>
+                <button type="button" class="btn btn-primary" id="cancelInboundBtn">
+                    입고 취소
+                </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x-circle me-1"></i>닫기
                 </button>

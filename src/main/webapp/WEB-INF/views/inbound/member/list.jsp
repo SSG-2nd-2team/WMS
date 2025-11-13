@@ -19,9 +19,9 @@
                 <!-- 상태 필터 드롭다운 -->
                 <select id="statusFilter" class="form-select w-auto d-inline mb-3">
                     <option value="">전체</option>
-                    <option value="request" ${param.status == 'request' ? 'selected' : ''}>대기</option>
-                    <option value="cancelled" ${param.status == 'cancelled' ? 'selected' : ''}>취소</option>
-                    <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>승인</option>
+                    <option value="request" ${param.status == 'request' ? 'selected' : ''}>처리 대기</option>
+                    <option value="cancelled" ${param.status == 'cancelled' ? 'selected' : ''}>요청 취소</option>
+                    <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>승인 완료</option>
                     <option value="rejected" ${param.status == 'rejected' ? 'selected' : ''}>반려</option>
                 </select>
             </th>
@@ -46,6 +46,10 @@
     </table>
 </div>
 
+<form id="inboundForm" method="post" style="display:none;">
+    <input type="hidden" name="inboundId" id="formInboundId" value="">
+</form>
+
 <!-- 모달 JSP 인클루드 -->
 <%@ include file="inboundModal.jsp" %>
 
@@ -56,6 +60,7 @@
 
 <script>
     const contextPath = '<%=request.getContextPath()%>';
+    const currentPartnerId = '<%= session.getAttribute("partnerId") != null ? session.getAttribute("partnerId") : "" %>';
 
     $(document).ready(function() {
 
@@ -98,7 +103,10 @@
             $.ajax({
                 url: "<%=contextPath%>/inbound/admin/list",
                 type: "get",
-                data: { status: status },
+                data: {
+                    status: status,
+                    partnerId: currentPartnerId
+                },
                 success: function(data) {
                     const newBody = $(data).find("#inboundTableBody").html();
                     $("#inboundTableBody").html(newBody);
@@ -284,7 +292,7 @@
             // 모달 root 먼저 가져오기
             const modalEl = document.getElementById('inboundModal');
             if (!modalEl) {
-                console.error('❌ inboundModal NOT found in current document.');
+                console.error('inboundModal NOT found in current document.');
                 return;
             }
             const inboundModal = new bootstrap.Modal(modalEl);
@@ -313,14 +321,41 @@
                     const rejectSection         = modalEl.querySelector('#rejectReasonSection');
                     const inboundRejectReasonEl = modalEl.querySelector('#inboundRejectReason');
 
+                    // 버튼 속성 제어용 변수 선언
+                    const updateBtn = modalEl.querySelector('#updateInboundBtn');
+                    const cancelBtn = modalEl.querySelector('#cancelInboundBtn');
+
                     if (!inboundInput) {
-                        console.error('❌ inboundId input not found INSIDE modal. modalEl.innerHTML snapshot:', modalEl.innerHTML.slice(0,500));
+                        console.error('inboundId input not found INSIDE modal. modalEl.innerHTML snapshot:', modalEl.innerHTML.slice(0,500));
                         return;
                     }
 
                     // 데이터 채우기
                     inboundInput.value = data.inboundId || '';
-                    if (inboundStatusEl) inboundStatusEl.value = data.inboundStatusKor || '';
+                    if (inboundStatusEl) {
+                        inboundStatusEl.value = data.inboundStatusKor || '';
+
+                        // 기존 Bootstrap 클래스 제거
+                        inboundStatusEl.classList.remove('bg-success', 'bg-primary', 'bg-danger', 'text-white');
+
+                        // 상태에 따라 Bootstrap 클래스 추가
+                        switch(data.inboundStatus) {
+                            case 'approved':
+                                inboundStatusEl.classList.add('bg-success', 'text-white');
+                                break;
+                            case 'request':
+                                inboundStatusEl.classList.add('bg-primary', 'text-white');
+                                break;
+                            case 'rejected':
+                            case 'cancelled':
+                                inboundStatusEl.classList.add('bg-danger', 'text-white');
+                                break;
+                        }
+                    }
+
+
+
+
                     if (warehouseIdEl) warehouseIdEl.value = data.warehouseId || '';
                     if (warehouseNameEl) warehouseNameEl.value = data.warehouseName || '미지정';
                     if (partnerNameEl) partnerNameEl.value = data.partnerName || '';
@@ -339,8 +374,44 @@
                         if (rejectSection) rejectSection.style.display = 'none';
                     }
 
+                    // 버튼 상태 제어: 취소, 승인, 반려 시 수정/취소 버튼 숨김
+                    if (['cancelled', 'approved', 'rejected'].includes(data.inboundStatus)) {
+                        if (updateBtn) updateBtn.style.display = 'none';
+                        if (cancelBtn) cancelBtn.style.display = 'none';
+                    } else {
+                        if (updateBtn) updateBtn.style.display = 'inline-block';
+                        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+                    }
+
+
+
                     // 상품 렌더링
                     renderInboundItems(data.inboundItems, data.categories || []);
+
+
+
+                    // 버튼 상태 제어: 취소, 승인, 반려 시 수정/취소 버튼 숨김
+                    if (['cancelled', 'approved', 'rejected'].includes(data.inboundStatus)) {
+                        if (updateBtn) updateBtn.style.display = 'none';
+                        if (cancelBtn) cancelBtn.style.display = 'none';
+                    } else {
+                        if (updateBtn) updateBtn.style.display = 'inline-block';
+                        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+                    }
+
+                    // 상품 추가/삭제 버튼 비활성화/활성화
+                    const addItemBtn = modalEl.querySelector('#addInboundItemBtn');
+                    const deleteBtns = modalEl.querySelectorAll('#inboundItemsBody .removeItemBtn');
+
+                    if (data.inboundStatus === 'request') {
+                        if (addItemBtn) addItemBtn.disabled = false;
+                        deleteBtns.forEach(btn => btn.disabled = false);
+                    } else {
+                        if (addItemBtn) addItemBtn.disabled = true;
+                        deleteBtns.forEach(btn => btn.disabled = true);
+                    }
+
+
 
                     // 모달 열기
                     inboundModal.show();
@@ -366,8 +437,9 @@
 
 
         // 수정 버튼 클릭 이벤트
+        // 수정 버튼 클릭 이벤트
         $(document).on('click', '#updateInboundBtn', function() {
-            const inboundId = $('#inboundModal').data('inbound-id'); // 모달에 저장된 입고ID
+            const inboundId = $('#inboundModal').data('inbound-id');
             if (!inboundId) {
                 alert('입고 요청 정보를 찾을 수 없습니다.');
                 return;
@@ -378,6 +450,7 @@
             $('#inboundItemsBody tr').each(function() {
                 const $row = $(this);
                 const item = {
+                    inboundId: inboundId,  // ✅ inboundId 추가
                     productId: $row.find('.productSelect').val(),
                     categoryCd: Number($row.find('.categorySelect').val()),
                     quantity: Number($row.find('.quantity').val())
@@ -387,28 +460,37 @@
 
             const requestData = {
                 inboundId: inboundId,
-                warehouseId: Number($('#warehouseId').val()), // 실제 select/input에서 값 가져오기
+                warehouseId: Number($('#warehouseId').val()),
                 staffId: Number($('#staffId').val()),
-                memberId: Number($('#memberId').val()), // session에서 가져온 memberId
+                memberId: Number($('#memberId').val()),
                 inboundStatus: $('#inboundStatus').val() || 'request',
                 inboundRejectReason: $('#inboundRejectReason').val() || null,
-                inboundItems: updatedItems
+                inboundRequestItems: updatedItems  // ✅ inboundItems → inboundRequestItems
             };
 
             console.log("수정 요청 데이터:", requestData);
 
-            // PUT 요청 전송
-            axios.put(`${contextPath}/inbound/member/\${inboundId}`, requestData)
+            axios.put(contextPath + '/inbound/member/' + inboundId, requestData)
                 .then(response => {
                     alert('입고 요청이 성공적으로 수정되었습니다.');
                     $('#inboundModal').modal('hide');
                     location.reload();
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.error('수정 오류:', error);
                     alert('수정 중 오류가 발생했습니다.');
                 });
         });
+
+        // 입고 취소 버튼
+        document.getElementById("cancelInboundBtn").addEventListener("click", function() {
+            const form = document.getElementById("inboundForm");
+            form.action = "/inbound/member/cancel";
+            form.formInboundId.value = document.getElementById("inboundId").value;
+            form.submit();
+        });
+
+
 
 
 

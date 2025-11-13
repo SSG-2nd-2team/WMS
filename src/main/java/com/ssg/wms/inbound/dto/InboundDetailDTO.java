@@ -50,11 +50,11 @@ public class InboundDetailDTO {
         }
         switch (inboundStatus) {
             case "request":
-                return "대기";
+                return "처리 대기";
             case "cancelled":
-                return "취소";
+                return "요청 취소";
             case "approved":
-                return "승인";
+                return "승인 완료";
             case "rejected":
                 return "반려";
             default:

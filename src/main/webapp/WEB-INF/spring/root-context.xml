@@ -13,46 +13,40 @@
        http://www.springframework.org/schema/tx
        http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <!-- ✅ 스프링 컴포넌트 스캔 (Controller 제외) -->
     <context:component-scan base-package="com.ssg.wms">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
         <context:exclude-filter type="annotation"
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
     </context:component-scan>
 
-    <!-- ✅ MyBatis Mapper 스캔 (모든 하위 모듈 포함) -->
     <mybatis-spring:scan base-package="com.ssg.wms.**.mappers"/>
 
-    <!-- ✅ HikariCP 설정 -->
     <bean name="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
         <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
         <property name="jdbcUrl"
-                  value="jdbc:mysql://localhost:3306/project2?serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8"/>
+                  value="jdbc:mysql://localhost:3306/wmstestdb?serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8"/>
         <property name="username" value="root"/>
-        <property name="password" value="mysql1234!"/>
+        <property name="password" value="mysql1234"/>
         <property name="connectionTimeout" value="30000"/>
         <property name="minimumIdle" value="2"/>
         <property name="maximumPoolSize" value="10"/>
     </bean>
 
-    <!-- ✅ DataSource 등록 -->
     <bean name="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
         <constructor-arg ref="hikariConfig"/>
     </bean>
 
-    <!-- ✅ 트랜잭션 매니저 -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-
-    <!-- ✅ @Transactional 어노테이션 활성화 -->
     <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 
-    <!-- ✅ MyBatis 설정 -->
     <bean class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="typeAliasesPackage" value="com.ssg.wms"/>
+
         <property name="mapperLocations" value="classpath:mappers/**/*.xml"/>
+
         <property name="configuration">
             <bean class="org.apache.ibatis.session.Configuration">
                 <property name="mapUnderscoreToCamelCase" value="true"/>
