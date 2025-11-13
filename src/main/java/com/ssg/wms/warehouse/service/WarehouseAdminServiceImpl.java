@@ -85,7 +85,7 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
                 if (section.getLocations() != null) {
                     for (LocationDTO location : section.getLocations()) {
                         // 참고: 층수 3 초과 시 WARN 로그 및 예외 발생
-                        if (location.getFloorNum() > 3) {
+                        if (location.getFloorNum() > 2) {
                             log.warn("등록 실패 (Admin): 층수({})가 최대 2층을 초과합니다.", location.getFloorNum());
                             throw new IllegalArgumentException("위치 정보의 층수는 최대 2층까지 등록 가능합니다.");
                         }
@@ -173,19 +173,19 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
     }
 
     /// 창고 상태 업데이트 구현
-    @Override
-    @Transactional
-    public void updateWarehouseStatus(Long id, Byte newStatus) {
-        log.debug("창고 상태 업데이트 시작 (Admin). ID: {}, New Status: {}", id, newStatus);
-
-        int updatedRows = warehouseAdminMapper.updateWarehouseStatus(id, newStatus);
-
-        if (updatedRows != 1) {
-            log.warn("상태 업데이트 실패 (Admin): 창고 ID({})가 존재하지 않습니다.", id);
-            throw new IllegalArgumentException("상태를 변경하려는 창고를 찾을 수 없습니다.");
-        }
-        log.info("창고 상태 업데이트 성공 (Admin). ID: {}", id);
-    }
+//    @Transactional
+//    @Override
+//    public void updateWarehouseStatus(Long id, Byte newStatus) {
+//        log.debug("창고 상태 업데이트 시작 (Admin). ID: {}, New Status: {}", id, newStatus);
+//
+//        int updatedRows = warehouseAdminMapper.updateWarehouseStatus(id, newStatus);
+//
+//        if (updatedRows != 1) {
+//            log.warn("상태 업데이트 실패 (Admin): 창고 ID({})가 존재하지 않습니다.", id);
+//            throw new IllegalArgumentException("상태를 변경하려는 창고를 찾을 수 없습니다.");
+//        }
+//        log.info("창고 상태 업데이트 성공 (Admin). ID: {}", id);
+//    }
 
     @Override
     public List<WarehouseListDTO> findWarehouses(WarehouseSearchDTO searchForm) {

@@ -4,6 +4,7 @@ import com.ssg.wms.warehouse.dto.WarehouseListDTO;
 import com.ssg.wms.warehouse.dto.WarehouseSaveDTO;
 import com.ssg.wms.warehouse.dto.WarehouseSearchDTO;
 import com.ssg.wms.warehouse.dto.WarehouseUpdateDTO;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,8 +22,11 @@ public interface WarehouseAdminService {
     /// 창고 삭제
     void deleteWarehouse(Long id);
 
+
+
+
     //// 창고 상태 업데이트
-    void updateWarehouseStatus(Long id, Byte newStatus);
+//    void updateWarehouseStatus(Long id, Byte newStatus);
 
     List<WarehouseListDTO> findWarehouses(WarehouseSearchDTO searchForm);
 }

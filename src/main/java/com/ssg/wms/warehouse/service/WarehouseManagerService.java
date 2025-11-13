@@ -18,6 +18,6 @@ public interface WarehouseManagerService {
 
     void deleteWarehouse(Long id);
 
-    
-    void updateWarehouseStatus(Long id, Byte newStatus);
+
+//    void updateWarehouseStatus(Long id, Byte newStatus);
 }

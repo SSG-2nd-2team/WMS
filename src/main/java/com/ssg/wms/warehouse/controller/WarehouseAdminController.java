@@ -11,10 +11,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 
+
 import javax.validation.Valid;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2; // 로그 추가
+
+
+//세션
+import com.ssg.wms.common.Role;
+import javax.servlet.http.HttpSession;
 
 @Log4j2 // 로그 사용을 위해 추가
 @Controller
@@ -75,7 +81,7 @@ public class WarehouseAdminController {
 
         log.info("창고 등록 요청 시작. 주소: {}", saveDTO.getAddress());
 
-        // 1. DTO 유효성 검사 (바인딩 오류 및 @Valid 검사)
+
         if (bindingResult.hasErrors()) {
             // BindingResult와 입력 데이터를 Flash Attribute로 전달
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.saveDTO", bindingResult);
@@ -90,12 +96,12 @@ public class WarehouseAdminController {
             log.info("창고 등록 성공. ID: {}", newWarehouseId);
 
             // 2. 성공: 창고 리스트 페이지로 리다이렉트
-            redirectAttributes.addFlashAttribute("message", "✅ " + newWarehouseId + "번 창고 등록이 완료되었습니다.");
+            redirectAttributes.addFlashAttribute("message", " V" + newWarehouseId + "번 창고 등록이 완료되었습니다.");
             return "redirect:/admin/warehouses";
 
         } catch (IllegalArgumentException e) {
-            // 3. 비즈니스 오류 (예: 이름 중복, 층수 초과 등)
-            // 오류를 BindingResult에 추가하고, 데이터와 함께 리다이렉트하여 폼을 다시 보여줌
+
+            // 오류를 BindingResult에 추가  데이터와 함께 리다이렉트하여 폼을 다시 보여줌
             log.error("창고 등록 비즈니스 오류 발생: {}", e.getMessage());
             bindingResult.rejectValue("name", "name.duplicate", e.getMessage()); // 오류를 특정 필드(name)에 연결
 
@@ -105,8 +111,8 @@ public class WarehouseAdminController {
             return "redirect:/admin/warehouses/register";
 
         } catch (Exception e) {
-            // 4. 시스템/API 오류 (예: Geocoding 실패, DB 연결 오류 등)
-            // Global 오류 메시지를 BindingResult에 추가하고, 데이터와 함께 리다이렉트
+
+
             log.error("창고 등록 중 시스템 오류 발생: {}", e.getMessage(), e);
             bindingResult.reject("globalError", e.getMessage()); // 서비스에서 던진 상세 메시지를 Global Error로 사용
 

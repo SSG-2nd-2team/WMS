@@ -23,7 +23,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
-@RequestMapping("/wh/info")
+@RequestMapping("/member/warehouses")
 public class WarehouseMemberController {
 
     private final WarehouseMemberService memberService;

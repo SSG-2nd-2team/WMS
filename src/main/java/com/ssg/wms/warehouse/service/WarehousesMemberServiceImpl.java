@@ -13,7 +13,6 @@ import java.util.List;
 
 @Log4j2
 @Service
-// Member Service는 주로 조회를 수행하므로 readOnly = true로 설정합니다.
 @Transactional(readOnly = true)
 public class WarehousesMemberServiceImpl implements WarehouseMemberService {
 
