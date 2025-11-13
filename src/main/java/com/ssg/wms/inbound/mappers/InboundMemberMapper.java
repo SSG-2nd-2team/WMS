@@ -33,6 +33,8 @@ public interface InboundMemberMapper {
     void insertInboundItemsBatch(List<InboundRequestItemDTO> items);
 
     // 입고 요청 취소
-    void cancelInbound(int inboundId);
+    int cancelInbound(int inboundId);
+    // 입고 요청 취소시 FK제약조건으로 인하여 재고테이블에 해당 입고품목 아이템이 있다면 삭제
+    int cancelInboundItems(int inboundId);
 
 }

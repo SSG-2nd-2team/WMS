@@ -22,7 +22,16 @@ public class WebConfig implements WebMvcConfigurer {
                         "/announcements/*/edit",
                         "/announcements/*/delete",
                         "/admin/**",
-                        "*/admin/**"
+                        "*/admin/**")
+                .excludePathPatterns(
+                        "/admin/login"
                 );
+
+        registry.addInterceptor(new StatusCheckInterceptor("INACTIVE"))
+                .excludePathPatterns(
+                        "*/member/**",
+                        "/member/**"
+                );
+
     }
 }

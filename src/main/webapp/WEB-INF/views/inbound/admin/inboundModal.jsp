@@ -65,7 +65,7 @@
                             </div>
                             <div class="col-md-6" id="rejectReasonSection">
                                 <label class="form-label fw-bold text-danger">반려 사유</label>
-                                <textarea id="inboundRejectReason" class="form-control" rows="2" placeholder="반려시 이유를 입력해주세요."></textarea>
+                                <textarea id="inboundRejectReason" class="form-control" rows="2" placeholder="반려시 사유를 작성해주세요."></textarea>
                             </div>
                         </div>
                     </div>

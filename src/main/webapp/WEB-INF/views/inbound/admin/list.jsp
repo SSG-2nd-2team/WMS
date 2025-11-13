@@ -18,9 +18,9 @@
                 상태
                 <select id="statusFilter" class="form-select w-auto d-inline mb-3">
                     <option value="">전체</option>
-                    <option value="request" ${param.status == 'request' ? 'selected' : ''}>대기</option>
-                    <option value="cancelled" ${param.status == 'cancelled' ? 'selected' : ''}>취소</option>
-                    <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>승인</option>
+                    <option value="request" ${param.status == 'request' ? 'selected' : ''}>처리 대기</option>
+                    <option value="cancelled" ${param.status == 'cancelled' ? 'selected' : ''}>요청 취소</option>
+                    <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>승인 완료</option>
                     <option value="rejected" ${param.status == 'rejected' ? 'selected' : ''}>반려</option>
                 </select>
             </th>
@@ -191,6 +191,27 @@
                     document.getElementById('inboundId').value = data.inboundId || '';
                     document.getElementById('inboundStatus').value = data.inboundStatus || '';
                     document.getElementById('inboundStatus').value = data.inboundStatusKor || '';
+
+
+                    // status에 따른 상태별 색상 변화 추가
+                    const inboundStatusEl = document.getElementById('inboundStatus');
+                    // 기존 Bootstrap 클래스 제거
+                    inboundStatusEl.classList.remove('bg-success', 'bg-primary', 'bg-danger', 'text-white');
+                    // 상태에 따라 Bootstrap 클래스 추가
+                    switch(data.inboundStatus) {
+                        case 'approved':
+                            inboundStatusEl.classList.add('bg-success', 'text-white');
+                            break;
+                        case 'request':
+                            inboundStatusEl.classList.add('bg-primary', 'text-white');
+                            break;
+                        case 'rejected':
+                        case 'cancelled':
+                            inboundStatusEl.classList.add('bg-danger', 'text-white');
+                            break;
+                    }
+
+
                     document.getElementById('warehouseId').value = data.warehouseId || '';
                     document.getElementById('partnerName').value = data.partnerName || '';
                     document.getElementById('memberName').value = data.memberName || '';
@@ -206,12 +227,14 @@
                     // 항상 textarea 보이도록
                     rejectTextarea.style.display = 'block';
 
-                    if (data.inboundStatus === 'rejected' && data.inboundRejectReason) {
-                        rejectTextarea.value = data.inboundRejectReason;
-                        rejectTextarea.readOnly = true; // 입력 불가
+                    if (data.inboundStatus === 'request') {
+                        // request 상태일 때만 입력 가능
+                        rejectTextarea.value = '';
+                        rejectTextarea.readOnly = false;
                     } else {
-                        rejectTextarea.value = '';      // 비워두기
-                        rejectTextarea.readOnly = false; // 입력 가능
+                        // 그 외 상태에서는 읽기 전용
+                        rejectTextarea.value = data.inboundRejectReason || '';
+                        rejectTextarea.readOnly = true;
                     }
 
                     // 승인/반려 버튼 element 가져오기

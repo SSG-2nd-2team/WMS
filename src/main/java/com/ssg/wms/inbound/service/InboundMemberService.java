@@ -22,4 +22,7 @@ public interface InboundMemberService {
 
     @Transactional
     InboundDTO updateInbound(InboundRequestDTO inboundRequestDTO);
+
+    @Transactional
+    boolean cancelInbound(int inboundId);
 }

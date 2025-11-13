@@ -111,7 +111,7 @@
                 </li>
 
                 <li class="menu-item">
-                    <a href="https://github.com/SSG-2nd-2team/WMS" class="menu-link">
+                    <a href="https://github.com/SSG-2nd-2team/WMS" target="_blank" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-file"></i>
                         <div data-i18n="Documentation">Documentation</div>
                     </a>
@@ -124,7 +124,7 @@
                 <li class="menu-item">
                     <a href="${pageContext.request.contextPath}/admin/members" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-user-check"></i>
-                        <div data-i18n="Member Approval">고객 관리</div>
+                        <div data-i18n="MemberApproval">고객 관리</div>
                     </a>
                 </li>
 
@@ -136,7 +136,7 @@
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="#" class="menu-link">
-                                <div data-i18n="Estimate List">견적 조회</div>
+                                <div data-i18n="EstimateList">견적 조회</div>
                             </a>
                         </li>
                     </ul>
@@ -149,8 +149,8 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div data-i18n="Inbound List">입고 요청 조회/승인</div>
+                            <a href="${pageContext.request.contextPath}/inbound/admin/list" class="menu-link">
+                                <div data-i18n="InboundList">입고 요청 조회/승인</div>
                             </a>
                         </li>
                     </ul>
@@ -175,23 +175,23 @@
                     </ul>
                 </li>
 
-                <li class="menu-item ${(pageActive == 'stock_list' || pageActive == 'physical_inventory' || pageActive == 'sotck_product_list') ? 'active open' : ''}">
+                <li class="menu-item ${(pageActive == 'stock_list' || pageActive == 'physical_inventory' || pageActive == 'stock_product_list') ? 'active open' : ''}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="menu-icon tf-icons bx bx-package"></i>
                         <div data-i18n="Stock">재고 관리</div>
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item ${pageActive == 'stock_list' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/stock/search" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/stock/list" class="menu-link">
                                 <div data-i18n="Stock List">재고 조회</div>
                             </a>
                         </li>
                         <li class="menu-item ${pageActive == 'physical_inventory' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/physical_inventory" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/physical-inventory" class="menu-link">
                                 <div data-i18n="Stock Inspection">재고 실사</div>
                             </a>
                         </li>
-                        <li class="menu-item ${pageActive == 'sotck_product_list' ? 'active' : ''}">
+                        <li class="menu-item ${pageActive == 'stock_product_list' ? 'active' : ''}">
                             <a href="#" class="menu-link">
                                 <div data-i18n="Product Status">품목 현황</div>
                             </a>
@@ -226,17 +226,17 @@
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="#" class="menu-link">
-                                <div data-i18n="Warehouse Register">창고 등록</div>
+                                <div data-i18n="WarehouseRegister">창고 등록</div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="#" class="menu-link">
-                                <div data-i18n="Warehouse List">창고 목록 조회/수정</div>
+                                <div data-i18n="WarehouseList">창고 목록 조회/수정</div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="#" class="menu-link">
-                                <div data-i18n="Warehouse Location">창고 위치 조회</div>
+                                <div data-i18n="WarehouseLocation">창고 위치 조회</div>
                             </a>
                         </li>
                     </ul>
@@ -249,8 +249,8 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div data-i18n="Client List">거래처 조회</div>
+                            <a href="${pageContext.request.contextPath}/partner" class="menu-link">
+                                <div data-i18n="ClientList">거래처 조회</div>
                             </a>
                         </li>
                     </ul>

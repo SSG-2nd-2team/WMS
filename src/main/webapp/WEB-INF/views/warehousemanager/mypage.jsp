@@ -51,6 +51,12 @@
                             <input type="text" class="form-control" id="createdAt" name="createdAt"
                                    value="${loginManager.createdAt}" readonly/>
                         </div>
+                        <div class="mb-3 col-md-6">
+                            <label for="status" class="form-label">계정상태</label>
+                            <input type="text" class="form-control" id="status" name="status"
+                                   value="${loginManager.status}" readonly/>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -58,6 +64,34 @@
         </div>
     </div>
 </div>
+
+<script>
+    const roleMap = {
+        ADMIN: "총관리자",
+        MANAGER: "창고관리자",
+        MEMBER: "일반회원"
+    };
+
+    const statusMap = {
+        PENDING: "승인대기",
+        REJECTED: "승인거절",
+        ACTIVE: "활성",
+        INACTIVE: "비활성"
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+        const roleInput = document.getElementById("role");
+        const statusInput = document.getElementById("status");
+
+        if (roleInput && roleMap[roleInput.value]) {
+            roleInput.value = `\${roleMap[roleInput.value]}`;
+        }
+
+        if (statusInput && statusMap[statusInput.value]) {
+            statusInput.value = `\${statusMap[statusInput.value]}`;
+        }
+    });
+</script>
 
 <%-- 푸터 include (필수!) --%>
 <%@ include file="manager-footer.jsp" %>

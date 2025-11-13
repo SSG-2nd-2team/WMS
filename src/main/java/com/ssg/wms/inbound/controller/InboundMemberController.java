@@ -4,6 +4,7 @@ import com.ssg.wms.inbound.dto.InboundDTO;
 import com.ssg.wms.inbound.dto.InboundDetailDTO;
 import com.ssg.wms.inbound.dto.InboundListDTO;
 import com.ssg.wms.inbound.dto.InboundRequestDTO;
+import com.ssg.wms.member.dto.MemberDTO;
 import com.ssg.wms.product_ehs.dto.CategoryDTO;
 import com.ssg.wms.product_ehs.dto.ProductDTO;
 import com.ssg.wms.inbound.service.InboundMemberService;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -32,27 +34,21 @@ public class InboundMemberController {
     private final InboundMemberService inboundMemberService;
     private final ProductService productService;
 
-    // 관리자가 승인시에 창고 위치 지정할때 창고 리스트 보려고 사용
-//    private final WarehouseService warehouseService
-
     // 입고 요청 화면 이동
     @GetMapping("/request")
     public String getInboundRequestForm(
-//            HttpSession session,
+            HttpSession session,
             Model model) {
         // 로그인한 사용자의 user_id를 자동으로 가져오도록
-        Long memberId = 1L;  // Integer → Long으로 변경!
-//        Long memberId = (Long) session.getAttribute("loginMemberId");
-//        String memberName = (String) session.getAttribute("loginMemberName");
-        String memberName = "엄홍길";
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
+        String memberName = memberDTO.getMemberName();
         model.addAttribute("memberId", memberId);
         model.addAttribute("memberName", memberName);
 
         // 로그인한 사용자가 속한 거래처를 자동으로 가져오도록
-        int partnerId = 1;
-//        int partnerId = (Integer) session.getAttribute("loginMemberBrandId");
-//        String partnerName = (String) session.getAttribute("loginMemberBrandId");
-        String partnerName = "아디다스";
+        int partnerId = memberDTO.getPartnerId();
+        String partnerName = (String) session.getAttribute("partnerName");
         model.addAttribute("partnerId", partnerId);
         model.addAttribute("partnerName", partnerName);
 
@@ -71,8 +67,8 @@ public class InboundMemberController {
             HttpSession session) {
 
         // 세션에서 partnerId 가져오기
-        Integer partnerId = 1; // 예제
-        // 실제 구현: session.getAttribute("loginMemberBrandId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        int partnerId = memberDTO.getPartnerId();
 
         try {
             List<ProductDTO> products = productService.getProductsByPartnerAndCategory(partnerId, categoryCd);
@@ -95,8 +91,8 @@ public class InboundMemberController {
                                  @Valid @ModelAttribute InboundRequestDTO inboundRequestDTO) {
 
         // 로그인한 사용자의 memberId 가져오기
-        Long memberId = 1L;
-//        Long memberId = (Long) session.getAttribute("loginMemberId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
         inboundRequestDTO.setMemberId(memberId);
 
         log.info("=== 입고 요청 디버깅 ===");
@@ -115,8 +111,8 @@ public class InboundMemberController {
     public String inboundList(HttpSession session, Model model,
                               @RequestParam(value = "status", required = false) String status) {
 
-        Long memberId = 1L;
-//        Long memberId = (Long)session.getAttribute("memberId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
         List<InboundListDTO> list = inboundMemberService.getInboundListByPartner(memberId, status);
         model.addAttribute("list", list);
 
@@ -125,31 +121,11 @@ public class InboundMemberController {
 
     // 입고 요청 단건 조회
     @GetMapping("/{inboundId}")
-    public ResponseEntity<InboundDetailDTO> getInboundById(@PathVariable int inboundId,
-                                                           Model model,
-                                                           HttpSession session) {
+    public ResponseEntity<InboundDetailDTO> getInboundById(@PathVariable int inboundId) {
         InboundDetailDTO inboundDetailDTO = inboundMemberService.getInboundById(inboundId);
-
-        // 테스트용 하드코딩
-        if (inboundDetailDTO.getPartnerId() == null) {
-            inboundDetailDTO.setPartnerId(1); // 원하는 partnerId 값
-        }
 
         if(inboundDetailDTO == null) {
             return ResponseEntity.notFound().build();
-        }
-
-
-        Long partnerId = 1L;
-        // 세션에서 로그인 사용자의 거래처 정보 가져오기
-//        Long partnerId = (Long) session.getAttribute("partnerId");
-        if (partnerId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        // 거래처 권한 체크
-        if (partnerId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         return ResponseEntity.ok(inboundDetailDTO);
@@ -162,10 +138,9 @@ public class InboundMemberController {
             @PathVariable int inboundId,
             @RequestBody InboundRequestDTO inboundRequestDTO) {
 
-        Long memberId = (Long) session.getAttribute("memberId");
-        if(memberId == null) {
-            memberId = 1L; // 테스트용
-        }
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
+
         inboundRequestDTO.setMemberId(memberId);
         inboundRequestDTO.setInboundId(inboundId);
 
@@ -178,5 +153,29 @@ public class InboundMemberController {
     }
 
     // 입고 요청 취소
+    @PostMapping("/cancel")
+    public String cancelInbound(HttpSession session,
+                                @RequestParam("inboundId") int inboundId,
+                                RedirectAttributes redirectAttributes) {
+
+        try {
+            boolean result = inboundMemberService.cancelInbound(inboundId);
+
+            if (result) {
+                redirectAttributes.addFlashAttribute("message", "입고 요청이 취소되었습니다.");
+                redirectAttributes.addFlashAttribute("messageType", "success");
+            } else {
+                redirectAttributes.addFlashAttribute("message", "입고 요청 취소에 실패했습니다.");
+                redirectAttributes.addFlashAttribute("messageType", "error");
+            }
+
+        } catch (Exception e) {
+            log.error("입고 취소 중 오류 발생 - inboundId: {}", inboundId, e);
+            redirectAttributes.addFlashAttribute("message", "입고 취소 중 오류가 발생했습니다.");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+        }
+
+        return "redirect:/inbound/member/list";
+    }
 
 }
