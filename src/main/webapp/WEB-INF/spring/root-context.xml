@@ -26,7 +26,6 @@
         <property name="jdbcUrl"
                   value="jdbc:mysql://localhost:3306/wmstestdb?serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8"/>
         <property name="username" value="root"/>
-<!--        <property name="password" value="mysql1234"/>-->
         <property name="password" value="mysql1234"/>
         <property name="connectionTimeout" value="30000"/>
         <property name="minimumIdle" value="2"/>

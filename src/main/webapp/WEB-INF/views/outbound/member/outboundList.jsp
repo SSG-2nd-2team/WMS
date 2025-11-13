@@ -1,5 +1,5 @@
 <%-- /WEB-INF/views/outbound/member/outboundList.jsp --%>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -22,10 +22,11 @@
                     <div class="col-md-3">
                         <label for="statusFilter" class="form-label">배송상태</label>
                         <select id="statusFilter" name="status" class="form-select">
-                            <option value="">-- 전체 --</option>
-                            <option value="승인대기" ${param.status eq '승인대기' ? 'selected' : ''}>승인대기</option>
-                            <option value="승인" ${param.status eq '승인' ? 'selected' : ''}>승인</option>
-                            <option value="반려" ${param.status eq '반려' ? 'selected' : ''}>반려</option>
+                            <option value="">-- 전체 --</option>₩
+                            <option value="PENDING">승인대기</option>
+                            <option value="APPROVED">승인</option>
+                            <option value="COMPANION">반려</option>
+
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
@@ -97,7 +98,7 @@
 
             <!-- 하단 버튼 -->
             <div class="card-footer d-flex justify-content-between align-items-center">
-                <a href="${pageContext.request.contextPath}/member/outbound/request/form?memberId=${param.memberId}"
+                <a href="${pageContext.request.contextPath}/member/outbound/request/form?${param.memberId}"
                    class="btn btn-primary">출고요청 등록</a>
                 <div><nav><ul class="pagination"></ul></nav></div>
             </div>
@@ -130,7 +131,7 @@
                         let queryString = `?memberId=\${memberId}`;
                         if (status) queryString += `&status=\${status}`;
 
-                        const baseUrl = window.location.origin + contextPath + "/member/outbound";
+                        const baseUrl = window.location.origin + contextPath + "/member/outbound/list";
                         window.location.href = baseUrl + queryString;
                     });
                 }
@@ -227,8 +228,13 @@
                     });
             }
 
+            let currentOutboundRequestId = null; // 현재 선택된 요청 ID 저장
+
             function displayDetailModal(data) {
                 console.log("📝 모달 데이터 표시 함수 실행");
+
+                // 현재 요청 ID 저장 (삭제 시 사용)
+                currentOutboundRequestId = data.outboundRequestId;
 
                 const tbody = document.getElementById('detailTableBody');
                 if (!tbody) {
@@ -281,6 +287,67 @@
                 });
 
                 console.log("✅ 테이블 렌더링 완료! 행 개수:", tbody.children.length);
+            }
+
+            // 삭제 버튼 이벤트 리스너 추가
+            document.addEventListener('DOMContentLoaded', function() {
+                const deleteBtn = document.querySelector('.modal-footer .btn-danger');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', handleDelete);
+                }
+            });
+
+            function handleDelete() {
+                if (!currentOutboundRequestId) {
+                    alert('삭제할 요청을 찾을 수 없습니다.');
+                    return;
+                }
+
+                if (!confirm(`출고 요청 번호 \${currentOutboundRequestId}을(를) 정말 삭제하시겠습니까?`)) {
+                    return;
+                }
+
+                const memberId = document.querySelector("#memberIdInput")?.value || currentMemberId;
+                const url = `\${contextPath}/member/outbound/request/\${currentOutboundRequestId}?memberId=\${memberId}`;
+
+                console.log("🗑️ 삭제 요청 URL:", url);
+
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(async response => {
+                        console.log("📥 삭제 응답 상태:", response.status);
+
+                        // ⚠️ 상태코드별 분기처리
+                        if (response.status === 403) {
+                            const msg = await response.text(); // 승인된 출고요청일 때
+                            throw new Error(msg || "승인된 출고요청은 삭제할 수 없습니다.");
+                        }
+
+                        if (!response.ok) {
+                            const msg = await response.text();
+                            throw new Error(msg || `삭제 실패: ${response.status} ${response.statusText}`);
+                        }
+
+                        return response.text();
+                    })
+                    .then(() => {
+                        console.log("✅ 삭제 성공");
+                        alert("출고 요청이 삭제되었습니다.");
+
+                        // 모달 닫기
+                        const modalElement = document.getElementById("shipmentDetailModal");
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+                        if (modal) modal.hide();
+
+                        // 새로고침
+                        location.reload();
+                    })
+                    .catch(err => {
+                        console.error("❌ 삭제 에러:", err);
+                        alert("삭제 중 오류가 발생했습니다: " + err.message);
+                    });
             }
         </script>
 
