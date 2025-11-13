@@ -1,9 +1,8 @@
 package com.ssg.wms.inquiry.mappers;
 
-import com.ssg.wms.announcement.dto.AnnouncementDTO;
-import com.ssg.wms.announcement.dto.AnnouncementSearch;
 import com.ssg.wms.inquiry.dto.InquiryDTO;
 import com.ssg.wms.inquiry.dto.InquirySearch;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -12,11 +11,12 @@ public interface InquiryMapper {
 
     int countInquiries(InquirySearch search);
 
-    InquiryDTO selectInquiryById(Long id);
+    InquiryDTO selectInquiryById(Long inquiryId);
 
     void insertInquiry(InquiryDTO dto);
 
     void updateInquiry(InquiryDTO dto);
 
-    void deleteInquiry(Long id);
+    void deleteInquiry(@Param(value = "inquiryId") Long inquiryId,
+                       @Param(value = "password") String password);
 }

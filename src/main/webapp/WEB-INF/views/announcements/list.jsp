@@ -27,18 +27,20 @@
         </div>
         <div class="card-body">
             <!-- 검색 영역 -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-10">
-                    <label class="form-label">검색어</label>
-                    <input type="text" name="keyword" class="form-control"
-                           placeholder="제목, 작성자 등" value="${keyword}"/>
+            <form action="/announcements" method="get" class="mb-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-10">
+                        <label class="form-label">검색어</label>
+                        <input type="text" name="keyword" class="form-control"
+                               placeholder="제목, 작성자 등" value="${keyword}"/>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bx bx-search me-1"></i> 검색
+                        </button>
+                    </div>
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bx bx-search me-1"></i> 검색
-                    </button>
-                </div>
-            </div>
+            </form>
 
             <!-- 테이블 -->
             <div class="table-responsive text-nowrap">

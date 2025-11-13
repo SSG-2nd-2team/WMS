@@ -80,8 +80,13 @@ public class MemberController {
             log.info("Member Registration Error");
             return "member/register";
         }
-        memberDTO.setPartnerId(memberService.getPartnerIdByBusinessNumber(memberDTO.getBusinessNumber()));
-        log.info("PartnerId-inserted memberDTO: " + memberDTO);
+        try {
+            memberDTO.setPartnerId(memberService.getPartnerIdByBusinessNumber(memberDTO.getBusinessNumber()));
+            log.info("PartnerId-inserted memberDTO: " + memberDTO);
+        } catch (Exception e) {
+            log.info("PartnerId-insertion error: " + e);
+            return "member/register";
+        }
         memberService.insertMember(memberDTO);
         log.info("Member Registration Success");
 
