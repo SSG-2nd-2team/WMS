@@ -1,5 +1,6 @@
 package com.ssg.wms.admin.service;
 
+import com.ssg.wms.admin.domain.Staff;
 import com.ssg.wms.member.domain.Member;
 import com.ssg.wms.admin.dto.MemberCriteria;
 import com.ssg.wms.manager.dto.StaffDTO;
@@ -53,5 +54,11 @@ public class AdminServiceImpl implements AdminService {
         log.info("Member " + memberId + " has been changed to " + status);
     }
 
+    @Override
+    public Staff loginCheck(String loginId, String password) {
+        Staff staff = adminMapper.findByLoginIdAndPw(loginId, password);
+
+        return staff;
+    }
 
 }

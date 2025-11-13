@@ -1,5 +1,6 @@
 package com.ssg.wms.admin.controller;
 
+import com.ssg.wms.admin.domain.Staff;
 import com.ssg.wms.member.domain.Member;
 import com.ssg.wms.admin.dto.MemberCriteria;
 import com.ssg.wms.admin.dto.MemberPageDTO;
@@ -39,18 +40,23 @@ public class AdminController {
         return "admin/login";
     }
 
-    @PostMapping("")
-    public String postAdminLogin(@RequestParam("loginId") String id,
+    @PostMapping("/login")
+    public String postAdminLogin(@RequestParam("loginId") String loginId,
+                                 @RequestParam String password,
                                  HttpSession session,
                                  Model model) {
+        Staff staff = adminService.loginCheck(loginId, password);
+        if (staff == null) {
+            model.addAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
+            return "login";
+        }
+
         // 세션에 저장
-        session.setAttribute("loginId", id);
+        session.setAttribute("loginStaff", staff);
+        session.setAttribute("loginId", loginId);
         session.setAttribute("role", Role.ADMIN);
 
-        // 모델에 담아서 뷰로 전달
-        model.addAttribute("loginId", id);
-
-        return "admin/connect";
+        return "redirect:/admin";
     }
 
     @Transactional

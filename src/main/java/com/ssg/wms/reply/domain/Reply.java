@@ -17,8 +17,5 @@ public class Reply {
     private String content;
     private String writer;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private BoardStatus status;
-    private String password;
 }
 

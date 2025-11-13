@@ -55,7 +55,7 @@
         partner_id,
         contract_start,
         contract_area,
-        contract_status,
+        contract_status
         FROM partner_contract
         WHERE 1=1
         <if test="contractId != null">
@@ -64,8 +64,14 @@
         <if test="partnerId != null">
             AND partner_id = #{partnerId}
         </if>
+        <if test="contractStart != null">
+            AND contract_start &gt;= #{contractStart}
+        </if>
+        <if test="contractStart != null">
+            AND contract_start &lt;= DATE_ADD(#{contractStart}, INTERVAL 1 DAY)
+        </if>
         <if test="status != null and status != ''">
-            AND status = #{status}
+            AND status LIKE #{status}
         </if>
         ORDER BY contract_start DESC
     </select>

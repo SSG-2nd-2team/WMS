@@ -18,6 +18,4 @@ public class ReplyDTO {
     private String content;
     private String writer;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private BoardStatus status;
 }
