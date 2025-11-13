@@ -1,5 +1,6 @@
 package com.ssg.wms.outbound.controller;
 
+import com.ssg.wms.member.dto.MemberDTO;
 import com.ssg.wms.outbound.domain.Criteria;
 import com.ssg.wms.outbound.domain.dto.OutboundDTO;
 import com.ssg.wms.outbound.service.OutboundService;
@@ -7,6 +8,7 @@ import com.ssg.wms.product_ehs.dto.ProductDTO;
 import com.ssg.wms.product_ehs.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,73 +24,62 @@ import java.util.List;
 public class OutboundController {
 
     private final OutboundService outboundService;
-    private final ProductService productService; // 상품 정보 로드용
+    private final ProductService productService;
 
 
-//     * 출고요청 전체 조회 (사용자)
-//     * 예: GET /member/outbound?userId=1&status=승인대기
-// ✅ 출고요청 전체 조회 (화면용)
-@GetMapping
-public String getAllOutboundRequests(
-        @RequestParam(value = "memberId", required = false) Long memberId,
-        @RequestParam(value = "status", required = false) String status,
-        Model model) {
-
-    log.info("========== 출고요청 목록 조회 시작 ==========");
-    log.info("📥 파라미터 - memberId: {}, status: {}", memberId, status);
-
-    List<OutboundDTO> outboundList = outboundService.allOutboundRequests(memberId, status);
-
-    log.info("📦 조회된 데이터 개수: {}", outboundList.size());
-
-    // 🔍 각 항목의 ID 확인
-    for (int i = 0; i < outboundList.size(); i++) {
-        OutboundDTO dto = outboundList.get(i);
-        log.info("  [{}] outboundRequestId: {}, brandName: {}, requestUserName: {}",
-                i + 1, dto.getOutboundRequestId(), dto.getBrandName(), dto.getRequestUserName());
-    }
-
-    log.info("========== 출고요청 목록 조회 끝 ==========");
-
-    model.addAttribute("outboundList", outboundList);
-    return "outbound/member/outboundList";
-}
+    //  기본 경로 → 리스트 페이지로 리다이렉트
+    @GetMapping
+    public String redirectToList(HttpSession session) {
 
 
-    // ======================================================
-    // 1️⃣ 출고 요청 목록 조회 (View 반환)
-    // ======================================================
-    @GetMapping("/list")
-    public String getOutboundList(@RequestParam Long memberId,
-                                  @RequestParam(required = false) String status,
-                                  Criteria criteria,
-                                  Model model) {
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
+
         if (memberId == null) {
             return "redirect:/login";
         }
+
+        return "redirect:/member/outbound/list"; // jsp경로
+    }
+
+
+    // ======================================================
+    // 🔵 1. 출고 요청 목록 조회
+    // ======================================================
+    @GetMapping("/list")  // url경로 /member/outbound/list
+    public String getOutboundList(HttpSession session,
+                                  @RequestParam(required = false) String status,
+                                  Model model) {
+
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
+        if (memberId == null) {
+            return "redirect:/login";
+        }
+
         log.info("출고 요청 목록 조회 - memberId: {}, status: {}", memberId, status);
+
         List<OutboundDTO> outboundList = outboundService.getRequestsByUserId(memberId, status);
 
         model.addAttribute("outboundList", outboundList);
         model.addAttribute("memberId", memberId);
-        return "outbound/member/outboundList"; // 📄 /WEB-INF/views/outbound/member/outboundList.jsp
+
+        return "outbound/member/outboundList";  // jsp경로
     }
 
 
-
     // ======================================================
-    // 2️⃣ 출고 요청 생성 페이지 (JSP View)
+    // 🔵 2. 출고 요청 작성 페이지
     // ======================================================
-    @GetMapping("/request/form")
-    public String getOutboundRequestForm(@RequestParam Long memberId, Model model) {
+    @GetMapping("/request/form") // /member/outbound/request/form
+    public String getOutboundRequestForm(HttpSession session, Model model) {
 
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
         if (memberId == null) {
             return "redirect:/login";
         }
 
-        log.info("출고 요청 생성 페이지 접근 - memberId: {}", memberId);
-
-        // ✅ 카테고리 목록 로드
         model.addAttribute("categories", productService.getCategory());
         model.addAttribute("memberId", memberId);
 
@@ -96,92 +87,122 @@ public String getAllOutboundRequests(
     }
 
 
+    // ======================================================
+    // 🔵 3. 출고 요청 등록
+    // ======================================================
+    @PostMapping("/request")
+    public String createOutboundRequest(HttpSession session,
+                                        @ModelAttribute OutboundDTO outboundDTO) {
 
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
+        if (memberId == null) return "redirect:/login";
+
+        outboundDTO.setMemberId(memberId);
+
+        log.info("출고 요청 등록 - memberId={}, 품목수={}",
+                memberId,
+                (outboundDTO.getOutboundRequestItems() != null
+                        ? outboundDTO.getOutboundRequestItems().size() : 0)
+        );
+
+        outboundService.createOutboundRequest(outboundDTO, memberId);
+
+        return "redirect:/member/outbound/list";
+    }
 
 
     // ======================================================
-    // 5️⃣ 출고 요청 수정 (PUT)
+    // 🔵 4. 출고 요청 상세 조회 (JSON)
+    // ======================================================
+    @GetMapping("/request/{outboundRequestId}")
+    @ResponseBody
+    public ResponseEntity<OutboundDTO> getOutboundRequestDetail(
+            @PathVariable Long outboundRequestId,
+            HttpSession session) {
+
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
+        if (memberId == null) return ResponseEntity.status(401).build();
+
+        log.info("출고 요청 상세 조회 - outboundRequestId: {}", outboundRequestId);
+
+        OutboundDTO dto = outboundService.getRequestDetailById(outboundRequestId, memberId);
+        return ResponseEntity.ok(dto);
+    }
+
+
+    // ======================================================
+    // 🔵 5. 출고 요청 수정
     // ======================================================
     @PutMapping("/request/{outboundRequestId}")
     @ResponseBody
     public ResponseEntity<Void> updateOutboundRequest(
             @PathVariable Long outboundRequestId,
-            @RequestParam Long memberId,
+            HttpSession session,
             @RequestBody OutboundDTO dto) {
 
-        log.info("출고 요청 수정 - outboundRequestId: {}, memberId: {}", outboundRequestId, memberId);
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
+        if (memberId == null) return ResponseEntity.status(401).build();
+
+        log.info("출고 요청 수정 - outboundRequestId={}, memberId={}",
+                outboundRequestId, memberId);
+
         outboundService.updateRequest(outboundRequestId, memberId, dto);
 
         return ResponseEntity.ok().build();
     }
 
 
-
     // ======================================================
-    // 4️⃣ 출고 요청 등록 (POST)
-    // ======================================================
-    @PostMapping("/request")
-    public String createOutboundRequest(@ModelAttribute OutboundDTO outboundDTO) {
-
-        if (outboundDTO.getMemberId() == null) {
-            return "redirect:/login";
-        }
-
-        log.info("출고 요청 등록 - memberId: {}, 품목 수: {}",
-                outboundDTO.getMemberId(),
-                (outboundDTO.getOutboundRequestItems() != null ? outboundDTO.getOutboundRequestItems().size() : 0));
-
-        outboundService.createOutboundRequest(outboundDTO, outboundDTO.getMemberId());
-
-        return "redirect:/member/outbound/list?memberId=" + outboundDTO.getMemberId();
-    }
-
-
-
-    //http://localhost:8080/member/outbound/list?memberId=1
-    // ======================================================
-    // 5️⃣ 출고 요청 상세 조회 (JSON)
-    // ======================================================
-    @GetMapping("/request/{outboundRequestId}")
-    @ResponseBody
-    public ResponseEntity<OutboundDTO> getOutboundRequestDetail(
-            @PathVariable Long outboundRequestId,
-            @RequestParam Long memberId) {
-
-        log.info("출고 요청 상세 조회 - outboundRequestId: {}, memberId: {}", outboundRequestId, memberId);
-        OutboundDTO outboundDTO = outboundService.getRequestDetailById(outboundRequestId, memberId);
-        return ResponseEntity.ok(outboundDTO);
-    }
-
-
-
-    // ======================================================
-    // 6️⃣ 출고 요청 삭제 (DELETE)
+    // 🔵 6. 출고 요청 삭제
     // ======================================================
     @DeleteMapping("/request/{outboundRequestId}")
     @ResponseBody
-    public ResponseEntity<Void> deleteOutboundRequest(
+    public ResponseEntity<String> deleteOutboundRequest(
             @PathVariable Long outboundRequestId,
-            @RequestParam Long memberId) {
+            HttpSession session) {
 
-        log.info("출고 요청 삭제 - outboundRequestId: {}, memberId: {}", outboundRequestId, memberId);
-        outboundService.deleteRequest(outboundRequestId, memberId);
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
+        if (memberId == null) return ResponseEntity.status(401).build();
 
-        return ResponseEntity.ok().build();
+        log.info("출고 요청 삭제 - outboundRequestId={}, memberId={}",
+                outboundRequestId, memberId);
+
+        try {
+            outboundService.deleteRequest(outboundRequestId, memberId);
+            return ResponseEntity.ok("삭제 완료");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("❌ 삭제 오류", e);
+            return ResponseEntity.status(500).body("삭제 중 오류 발생");
+        }
     }
 
 
+    // ======================================================
+    // 🔵 7. 카테고리별 상품 조회
+    // ======================================================
     @GetMapping("/products/byCategory")
     @ResponseBody
-    public List<ProductDTO> getProductsByPartner(
+    public ResponseEntity<?> getProductsByPartner(
             @RequestParam Integer categoryCd,
             HttpSession session) {
 
-        // 세션에서 partnerId 가져오기
-        Integer partnerId = 1; // 예제
-        // 실제 구현: session.getAttribute("loginMemberBrandId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        if (memberDTO == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
 
-        return productService.getProductsByPartnerAndCategory(partnerId, categoryCd);
+        Integer partnerId = memberDTO.getPartnerId(); // 로그인한 회원의 파트너 ID
+
+        List<ProductDTO> products =
+                productService.getProductsByPartnerAndCategory(partnerId, categoryCd);
+
+        return ResponseEntity.ok(products);
     }
 
 }
