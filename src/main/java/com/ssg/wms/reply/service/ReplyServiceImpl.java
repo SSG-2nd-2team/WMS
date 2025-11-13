@@ -35,15 +35,6 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     @Override
-    public ReplyDTO updateReply(Long inquiryId, Long replyId, ReplyDTO replyDTO) {
-        replyDTO.setInquiryId(inquiryId);
-        replyDTO.setReplyId(replyId);
-        replyMapper.updateReply(replyDTO);
-        log.info("updateReply inquiryId:" + inquiryId);
-        return replyDTO;
-    }
-
-    @Override
     public void deleteReply(Long inquiryId, Long replyId) {
         replyMapper.deleteReply(replyId, inquiryId);
     }

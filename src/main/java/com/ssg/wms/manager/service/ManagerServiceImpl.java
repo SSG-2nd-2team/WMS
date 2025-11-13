@@ -7,6 +7,7 @@ import com.ssg.wms.common.AccountStatus;
 import com.ssg.wms.manager.dto.StaffDTO;
 import com.ssg.wms.manager.mappers.ManagerMapper;
 import com.ssg.wms.member.domain.Member;
+import com.ssg.wms.member.dto.MemberDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +33,12 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public void updateManager(StaffDTO staffDTO) {
         managerMapper.updateManager(staffDTO);
+    }
+
+    @Override
+    public StaffDTO loginCheck(String loginId, String password) {
+        StaffDTO manager = managerMapper.findByLoginIdAndPw(loginId, password);
+
+        return manager;
     }
 }

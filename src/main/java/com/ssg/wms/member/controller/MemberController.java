@@ -39,18 +39,29 @@ public class MemberController {
         return "member/login";
     }
 
-    @PostMapping("")
-    public String postMemberLogin(@RequestParam("loginId") String id,
+    @PostMapping("/login")
+    public String postMemberLogin(@RequestParam("loginId") String loginId,
+                                  @RequestParam String password,
                                   HttpSession session,
                                   Model model) {
-        // 세션에 저장
-        session.setAttribute("loginId", id);
+        MemberDTO member = memberService.loginCheck(loginId, password);
+        if (member == null) {
+            model.addAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
+            return "member/login"; // 로그인 페이지로 다시 이동
+        }
+
+        String partnerName = memberService.getPartnerName(member.getPartnerId());
+
+        // 세션에 추가
+        session.setAttribute("loginMember", member);
+        // partnerName : ex) 나이키 코리아
+        session.setAttribute("partnerName", partnerName);
+        session.setAttribute("loginId", loginId);
         session.setAttribute("role", Role.MEMBER);
 
-        // 모델에 담아서 뷰로 전달
-        model.addAttribute("loginId", id);
+        log.info("Login Member: " + member);
+        return "redirect:/member"; // 로그인 성공 시 홈으로 이동
 
-        return "member/connect";
     }
 
     @GetMapping("/register")
@@ -69,7 +80,8 @@ public class MemberController {
             log.info("Member Registration Error");
             return "member/register";
         }
-
+        memberDTO.setPartnerId(memberService.getPartnerIdByBusinessNumber(memberDTO.getBusinessNumber()));
+        log.info("PartnerId-inserted memberDTO: " + memberDTO);
         memberService.insertMember(memberDTO);
         log.info("Member Registration Success");
 

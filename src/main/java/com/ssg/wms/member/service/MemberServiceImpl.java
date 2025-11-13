@@ -39,4 +39,27 @@ public class MemberServiceImpl implements MemberService {
         memberMapper.updateMember(memberUpdateDTO);
         log.info("Member Updated: " + memberUpdateDTO);
     }
+
+    @Override
+    public MemberDTO loginCheck(String loginId, String password) {
+        MemberDTO member = memberMapper.findByLoginIdAndPw(loginId, password);
+
+        return member; // 로그인 성공
+    }
+
+    @Override
+    public String getPartnerName(int partnerId) {
+        String partnerName = memberMapper.getPartnerName(partnerId);
+        log.info("Partner Name: " + partnerName);
+        return partnerName;
+    }
+
+    @Override
+    public int getPartnerIdByBusinessNumber(String businessNumber) {
+        int partnerId = memberMapper.getPartnerIdByBusinessNumber(businessNumber);
+        log.info("Partner Id: " + partnerId);
+        return partnerId;
+    }
+
+
 }

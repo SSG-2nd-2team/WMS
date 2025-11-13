@@ -40,24 +40,34 @@ public class PartnerController {
     @GetMapping("/detail/{partnerId}")
     @ResponseBody
     public PartnerDetailResponse getPartnerDetail(@PathVariable int partnerId) {
-        PartnerDTO partnerDTO = new PartnerDTO();
-        partnerDTO.setPartnerId(partnerId);
+        log.info("getPartnerDetail inquiryId:" + partnerId);
 
-        PartnerFeeDTO partnerFeeDTO = new PartnerFeeDTO();
-        partnerFeeDTO.setPartnerId(partnerId);
+        try {
+            PartnerDTO partnerDTO = new PartnerDTO();
+            partnerDTO.setPartnerId(partnerId);
 
-        PartnerContractDTO partnerContractDTO = new PartnerContractDTO();
-        partnerContractDTO.setPartnerId(partnerId);
+            PartnerFeeDTO partnerFeeDTO = new PartnerFeeDTO();
+            partnerFeeDTO.setPartnerId(partnerId);
 
-        List<PartnerDTO> partners = partnerService.selectPartners(partnerDTO);
-        List<PartnerFeeDTO> fees = partnerService.selectPartnerFees(partnerFeeDTO);
-        List<PartnerContractDTO> contracts = partnerService.selectPartnerContracts(partnerContractDTO);
+            PartnerContractDTO partnerContractDTO = new PartnerContractDTO();
+            partnerContractDTO.setPartnerId(partnerId);
 
-        return PartnerDetailResponse.builder()
-                .partner(partners.isEmpty() ? null : partners.get(0))
-                .fees(fees)
-                .contracts(contracts)
-                .build();
+            List<PartnerDTO> partners = partnerService.selectPartners(partnerDTO);
+            log.info("Partners found: {}", partners.size());
+            List<PartnerFeeDTO> fees = partnerService.selectPartnerFees(partnerFeeDTO);
+            log.info("Fees found: {}", fees.size());
+            List<PartnerContractDTO> contracts = partnerService.selectPartnerContracts(partnerContractDTO);
+            log.info("Contracts found: {}", contracts.size());
+
+            return PartnerDetailResponse.builder()
+                    .partner(partners.isEmpty() ? null : partners.get(0))
+                    .fees(fees)
+                    .contracts(contracts)
+                    .build();
+        } catch (Exception e) {
+            log.error("Error occurred: ", e);
+            throw e;
+        }
     }
 
     @GetMapping("/api/partners")

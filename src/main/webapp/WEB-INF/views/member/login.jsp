@@ -113,8 +113,9 @@
                     </div>
                     <h4 class="mb-2">환영해요! 👋</h4>
                     <p class="mb-4">신속하고 정확한 창고 관리 서비스 RACL WMS와 함께 편리한 비즈니스를 시작해보세요.</p>
+                    <p class="mb-4">🚹 일반회원 로그인 페이지입니다.</p>
 
-                    <form id="formAuthentication" class="mb-3" action="/member" method="POST">
+                    <form id="formAuthentication" class="mb-3" action="/member/login" method="POST">
                         <div class="mb-3">
                             <label for="loginId" class="form-label">ID</label>
                             <input

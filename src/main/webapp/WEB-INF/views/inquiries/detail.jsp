@@ -5,7 +5,7 @@
         <jsp:include page="/WEB-INF/views/admin/admin-header.jsp" />
     </c:when>
     <c:when test="${sessionScope.role eq 'MANAGER'}">
-        <jsp:include page="/WEB-INF/views/manager/manager-header.jsp" />
+        <jsp:include page="/WEB-INF/views/warehousemanager/manager-header.jsp" />
     </c:when>
     <c:otherwise>
         <jsp:include page="/WEB-INF/views/member/member-header.jsp" />
@@ -29,7 +29,7 @@
                     ${inquiry.createdAt}
                 </span>
             <span>
-                    <strong>정보수정일:</strong>
+                    <strong>수정일:</strong>
                     ${inquiry.updatedAt}
                 </span>
         </div>
@@ -83,7 +83,6 @@
             <div class="reply-detail-meta">
                 <div><strong>작성자:</strong> <span id="detailWriter"></span></div>
                 <div><strong>작성일:</strong> <span id="detailCreatedAt"></span></div>
-                <div><strong>수정일:</strong> <span id="detailUpdatedAt"></span></div>
             </div>
             <div class="reply-detail-content" id="detailContent"></div>
         </div>
@@ -119,7 +118,7 @@
 </div>
 
 <script>
-    const inquiryId = ${inquiry.inquiryId};
+    const inquiryId = '${inquiry.inquiryId}';
     const loginId = '${sessionScope.loginId}';
     let currentReply = null;
 
@@ -131,32 +130,43 @@
     // 답글 목록 조회
     async function loadReplies() {
         try {
-            const response = await axios.get('/api/inquiries/' + inquiryId + '/replies');
-            const replies = Array.isArray(response.data) ? response.data : [];
+            // ✅ 기존 경로 유지 (/api/inquiries/{inquiryId})
+            const response = await axios.get('/api/inquiries/' + inquiryId);
+            console.log('API 응답:', response.data);
 
+            // ✅ 서버 응답에 replies가 포함되어 있을 경우
+            const replies = Array.isArray(response.data.replies)
+                ? response.data.replies
+                : (Array.isArray(response.data) ? response.data : []);
+
+            console.log('변환된 replies:', replies);
             document.getElementById('replyCount').textContent = replies.length;
 
             const replyList = document.getElementById('replyList');
-
             if (replies.length === 0) {
                 replyList.innerHTML = '<div class="empty-message">등록된 답글이 없습니다.</div>';
                 return;
             }
 
+            // ✅ reply.replyId 사용 (전역 replyId 제거)
             replyList.innerHTML = replies.map(reply => {
+                const id = reply.replyId;
+                if (!id) return '';
+
                 const safeContent = escapeHtml(reply.content || '');
                 const safeWriter = escapeHtml(reply.writer || '');
                 const safeDate = reply.createdAt || '';
 
-                return `
-                <div class="reply-item" onclick="showReplyDetail(${reply.replyId})">
-                    <div class="reply-item-header">
-                        <span class="reply-writer">${safeWriter}</span>
-                        <span class="reply-date">${safeDate}</span>
-                    </div>
-                    <div class="reply-content-preview">${safeContent}</div>
-                </div>
-            `;
+                return (
+                    '<div class="reply-item" style="border: 2px solid red; padding: 10px; margin: 10px 0; cursor:pointer;" ' +
+                    'onclick="showReplyDetail(' + id + ')">' +
+                    '<div class="reply-item-header">' +
+                    '<span class="reply-writer">' + safeWriter + '</span>' +
+                    '<span class="reply-date">' + safeDate + '</span>' +
+                    '</div>' +
+                    '<div class="reply-content-preview">' + safeContent + '</div>' +
+                    '</div>'
+                );
             }).join('');
         } catch (error) {
             console.error('답글 목록 조회 실패:', error);
@@ -166,36 +176,38 @@
 
     // 답글 상세보기
     async function showReplyDetail(replyId) {
-        console.log("replyId: ", replyId);
+        console.log("replyId 클릭됨:", replyId);
         try {
             const response = await axios.get('/api/inquiries/' + inquiryId + '/reply/' + replyId);
             currentReply = response.data;
+            console.log('상세 조회 응답:', currentReply);
 
             const writerEl = document.getElementById('detailWriter');
             const createdEl = document.getElementById('detailCreatedAt');
-            const updatedEl = document.getElementById('detailUpdatedAt');
             const contentEl = document.getElementById('detailContent');
 
             if (writerEl) writerEl.textContent = currentReply.writer || '';
             if (createdEl) createdEl.textContent = currentReply.createdAt || '';
-            if (updatedEl) updatedEl.textContent = currentReply.updatedAt || '';
             if (contentEl) contentEl.textContent = currentReply.content || '';
 
             const footer = document.getElementById('detailModalFooter');
             if (footer) {
-                if (loginId === currentReply.writer) {
-                    footer.innerHTML = `
-                    <button class="btn btn-secondary" onclick="closeDetailModal()">닫기</button>
-                    <button class="btn btn-primary" onclick="openEditModal()">수정</button>
-                    <button class="btn btn-danger" onclick="deleteReply()">삭제</button>
-                `;
+                // ✅ 공백 제거 + 대소문자 무시 비교
+                if (
+                    loginId &&
+                    currentReply.writer &&
+                    loginId.trim().toLowerCase() === currentReply.writer.trim().toLowerCase()
+                ) {
+                    footer.innerHTML =
+                        '<button class="btn btn-secondary" onclick="closeDetailModal()">닫기</button>' +
+                        '<button class="btn btn-danger" onclick="deleteReply()">삭제</button>';
                 } else {
-                    footer.innerHTML = `
-                    <button class="btn btn-secondary" onclick="closeDetailModal()">닫기</button>
-                `;
+                    footer.innerHTML =
+                        '<button class="btn btn-secondary" onclick="closeDetailModal()">닫기</button>';
                 }
             }
 
+            document.getElementById('detailModal').style.display = 'block';
             document.getElementById('detailModal').classList.add('show');
         } catch (error) {
             console.error('답글 상세 조회 실패:', error);
@@ -209,18 +221,10 @@
         document.getElementById('replyForm').reset();
         document.getElementById('replyId').value = '';
         document.getElementById('formModal').classList.add('show');
+        document.getElementById('formModal').style.display = 'block';
     }
 
-    // 답글 수정 모달 열기
-    function openEditModal() {
-        closeDetailModal();
-        document.getElementById('formModalTitle').textContent = '답글 수정';
-        document.getElementById('replyId').value = currentReply.replyId;
-        document.getElementById('content').value = currentReply.content;
-        document.getElementById('formModal').classList.add('show');
-    }
-
-    // 답글 저장 (작성/수정)
+    // 답글 저장
     async function submitReply() {
         const replyId = document.getElementById('replyId').value;
         const content = document.getElementById('content').value.trim();
@@ -230,21 +234,12 @@
             return;
         }
 
-        const replyDTO = {
-            content: content,
-            writer: loginId
-        };
+        const replyDTO = { content: content, writer: loginId };
 
         try {
-            if (replyId) {
-                // 수정
-                await axios.put('/api/inquiries/' + inquiryId + '/reply/' + replyId, replyDTO);
-                alert('답글이 수정되었습니다.');
-            } else {
-                // 작성
-                await axios.post('/api/inquiries/' + inquiryId + '/reply', replyDTO);
-                alert('답글이 등록되었습니다.');
-            }
+            // ✅ 신규 등록
+            await axios.post('/api/inquiries/' + inquiryId + '/reply', replyDTO);
+            alert('답글이 등록되었습니다.');
 
             closeFormModal();
             loadReplies();
@@ -256,12 +251,10 @@
 
     // 답글 삭제
     async function deleteReply() {
-        if (!confirm('정말 삭제하시겠습니까?')) {
-            return;
-        }
+        if (!confirm('정말 삭제하시겠습니까?')) return;
 
         try {
-            await axios.delete('/api/inquiries/' + inquiryId + '/reply/' + currentReply.replyId);
+            await axios.put('/api/inquiries/' + inquiryId + '/reply/' + currentReply.replyId);
             alert('답글이 삭제되었습니다.');
             closeDetailModal();
             loadReplies();
@@ -273,51 +266,32 @@
 
     // 모달 닫기
     function closeDetailModal() {
-        document.getElementById('detailModal').classList.remove('show');
+        const modal = document.getElementById('detailModal');
+        modal.style.display = 'none';
+        modal.classList.remove('show');
         currentReply = null;
     }
 
     function closeFormModal() {
-        document.getElementById('formModal').classList.remove('show');
-    }
-
-    // 모달 외부 클릭 시 닫기
-    window.onclick = function(event) {
-        const detailModal = document.getElementById('detailModal');
-        const formModal = document.getElementById('formModal');
-
-        if (event.target === detailModal) {
-            closeDetailModal();
-        }
-        if (event.target === formModal) {
-            closeFormModal();
-        }
+        const modal = document.getElementById('formModal');
+        modal.style.display = 'none';
+        modal.classList.remove('show');
     }
 
     // HTML 이스케이프 함수
     function escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
-    }
-
-    // 문의글 삭제 확인
-    function confirmDelete() {
-        return confirm('정말 삭제하시겠습니까?');
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return text ? text.toString().replace(/[&<>"']/g, m => map[m]) : '';
     }
 </script>
+
 
 <c:choose>
     <c:when test="${sessionScope.role eq 'ADMIN'}">
         <jsp:include page="/WEB-INF/views/admin/admin-footer.jsp" />
     </c:when>
     <c:when test="${sessionScope.role eq 'MANAGER'}">
-        <jsp:include page="/WEB-INF/views/manager/manager-footer.jsp" />
+        <jsp:include page="/WEB-INF/views/warehousemanager/manager-footer.jsp" />
     </c:when>
     <c:otherwise>
         <jsp:include page="/WEB-INF/views/member/member-footer.jsp" />

@@ -25,4 +25,5 @@ public class MemberDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String businessNumber;
+    private int partnerId;
 }

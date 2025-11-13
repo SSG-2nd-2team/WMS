@@ -1,6 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ include file="../admin/admin-header.jsp" %>
+<c:choose>
+    <c:when test="${sessionScope.role eq 'ADMIN'}">
+        <jsp:include page="/WEB-INF/views/admin/admin-header.jsp" />
+    </c:when>
+    <c:when test="${sessionScope.role eq 'MANAGER'}">
+        <jsp:include page="/WEB-INF/views/warehousemanager/manager-header.jsp" />
+    </c:when>
+    <c:otherwise>
+        <jsp:include page="/WEB-INF/views/member/member-header.jsp" />
+    </c:otherwise>
+</c:choose>
 <div class="container">
     <h1>공지사항 상세보기</h1>
 
@@ -46,4 +56,14 @@
         </c:if>
     </div>
 </div>
-<%@ include file="../admin/admin-footer.jsp" %>
+<c:choose>
+    <c:when test="${sessionScope.role eq 'ADMIN'}">
+        <jsp:include page="/WEB-INF/views/admin/admin-footer.jsp" />
+    </c:when>
+    <c:when test="${sessionScope.role eq 'MANAGER'}">
+        <jsp:include page="/WEB-INF/views/warehousemanager/manager-footer.jsp" />
+    </c:when>
+    <c:otherwise>
+        <jsp:include page="/WEB-INF/views/member/member-footer.jsp" />
+    </c:otherwise>
+</c:choose>

@@ -8,6 +8,5 @@ public interface ReplyService {
     List<ReplyDTO> getReplies(Long inquiryId);
     ReplyDTO saveReply(Long inquiryId, ReplyDTO replyDTO);
     ReplyDTO getReplyDetail(Long inquiryId, Long replyId);
-    ReplyDTO updateReply(Long inquiryId, Long replyId, ReplyDTO replyDTO);
     void deleteReply(Long inquiryId, Long replyId);
 }
