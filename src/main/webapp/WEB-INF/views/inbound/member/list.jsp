@@ -60,7 +60,8 @@
 
 <script>
     const contextPath = '<%=request.getContextPath()%>';
-    const currentPartnerId = '<%= session.getAttribute("partnerId") != null ? session.getAttribute("partnerId") : "" %>';
+    const currentPartnerId = '${partnerId}';
+
 
     $(document).ready(function() {
 
@@ -101,17 +102,17 @@
         $("#statusFilter").change(function() {
             const status = $(this).val();
             $.ajax({
-                url: "<%=contextPath%>/inbound/admin/list",
+                url: "<%=contextPath%>/inbound/member/list",
                 type: "get",
                 data: {
                     status: status,
-                    partnerId: currentPartnerId
                 },
                 success: function(data) {
                     const newBody = $(data).find("#inboundTableBody").html();
                     $("#inboundTableBody").html(newBody);
                 },
                 error: function() {
+                    console.error("AJAX Error:", error);
                     alert("리스트 조회 중 오류가 발생했습니다.");
                 }
             });

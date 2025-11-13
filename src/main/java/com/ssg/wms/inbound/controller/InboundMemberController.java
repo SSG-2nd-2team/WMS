@@ -108,13 +108,20 @@ public class InboundMemberController {
 
     // 입고 요청 목록 조회 (관리자용 - 브랜드, 상태 파라미터로 받아서 검색)
     @GetMapping("/list")
-    public String inboundList(HttpSession session, Model model,
-                              @RequestParam(value = "status", required = false) String status) {
+    public String inboundList(
+            HttpSession session,
+            Model model,
+            @RequestParam(value = "status", required = false) String status) {
 
         MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
         Long memberId = memberDTO.getMemberId();
+        int partnerId = memberDTO.getPartnerId();
+
+        // 입고 요청 목록 조회
         List<InboundListDTO> list = inboundMemberService.getInboundListByPartner(memberId, status);
+
         model.addAttribute("list", list);
+        model.addAttribute("partnerId", partnerId);
 
         return "inbound/member/list";
     }
