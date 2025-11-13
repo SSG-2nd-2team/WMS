@@ -52,7 +52,7 @@
 <body>
 <div class="login-container">
     <a href="${pageContext.request.contextPath}/admin/login" class="login-button admin">총관리자 로그인</a>
-    <a href="${pageContext.request.contextPath}/manager/login" class="login-button manager">창고관리자 로그인</a>
+    <a href="${pageContext.request.contextPath}/warehousemanager/login" class="login-button manager">창고관리자 로그인</a>
     <a href="${pageContext.request.contextPath}/member/login" class="login-button member">일반회원 로그인</a>
 </div>
 </body>

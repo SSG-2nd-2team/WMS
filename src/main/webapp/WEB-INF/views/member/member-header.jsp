@@ -137,7 +137,7 @@
 
                 <!-- Documentation -->
                 <li class="menu-item">
-                    <a href="https://github.com/SSG-2nd-2team/WMS" class="menu-link">
+                    <a href="https://github.com/SSG-2nd-2team/WMS" target="_blank" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-layout"></i>
                         <div data-i18n="Layouts">Documentation</div>
                     </a>

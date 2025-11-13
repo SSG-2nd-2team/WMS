@@ -61,7 +61,6 @@ dependencies {
     // MyBatis
     implementation 'org.mybatis:mybatis:3.5.6'
     implementation 'org.mybatis:mybatis-spring:2.0.6'
-
     // Validation/Mapping
     implementation 'org.modelmapper:modelmapper:3.0.0'
     implementation 'org.hibernate.validator:hibernate-validator:6.2.5.Final'

@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
+<%-- [수정 1] JSTL을 사용하기 위해 이 코드를 파일 맨 위에 추가합니다. --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!-- Footer -->
 <footer class="content-footer footer bg-footer-theme">
     <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
@@ -43,9 +46,13 @@
 <script src="${pageContext.request.contextPath}/resources/assets/js/main.js"></script>
 
 <!-- Page JS -->
-<script src="${pageContext.request.contextPath}/resources/assets/js/dashboards-analytics.js"></script>
+<%-- [수정 2] 이 스크립트 태그를 c:if로 감싸줍니다. --%>
+<c:if test="${empty disablePageSpecificScript}">
+    <script src="${pageContext.request.contextPath}/resources/assets/js/dashboards-analytics.js"></script>
+</c:if>
 
 <!-- Place this tag in your head or just before your close body tag. -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
+
 </body>
 </html>

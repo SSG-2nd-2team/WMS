@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-@RequiredArgsConstructor // final로 선언된 Mapper를 자동 주입 (Autowired)
-@Transactional // (선택 사항: CUD 작업 시 트랜잭션 보장)
+@RequiredArgsConstructor
+@Transactional
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final ExpenseMapper expenseMapper;
-    private final ModelMapper modelMapper; // DTO <-> VO 변환용
+    private final ModelMapper modelMapper;
 
     @Override
     public ExpenseResponseDTO getExpenses(ExpenseRequestDTO dto) {
@@ -37,7 +37,6 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public ExpenseVO getExpense(Long id) {
-        // Java 8/9 호환 방식: () -> new ... 를 인자로 전달합니다.
         return expenseMapper.findById(id).orElseThrow(() ->
                 new NoSuchElementException("ID " + id + "에 해당하는 Expense 를 찾을 수 없습니다.")
         );
@@ -45,18 +44,34 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Long saveExpense(ExpenseSaveDTO dto) {
-        // DTO 를 VO(Entity)로 변환
+        // 1. DTO를 VO로 변환
         ExpenseVO expenseVO = modelMapper.map(dto, ExpenseVO.class);
+
+        // 2. 먼저 DB에 저장 (ID를 받아오기 위해)
         expenseMapper.save(expenseVO);
-        return expenseVO.getId(); // 저장 후 생성된 PK 반환
+
+        // 3. MyBatis가 <insert>의 useGeneratedKeys 덕분에 VO에 채워준 ID를 가져옴
+        Long newId = expenseVO.getId();
+
+        // 4. 고유 식별 번호 생성 (예: EXP-251111-00027)
+        // 날짜 포맷 (2025-11-11 -> 251111)
+        String datePart = dto.getExpenseDate().toString().replace("-", "").substring(2);
+        // ID 포맷 (27 -> 00027)
+        String idPart = String.format("%05d", newId); // ID를 5자리로 패딩
+
+        String expenseCode = "EXP-" + datePart + "-" + idPart;
+
+        // 5. 생성된 관리번호(expenseCode)를 DB에 다시 UPDATE
+        expenseMapper.updateCode(newId, expenseCode);
+
+        return newId; // 컨트롤러에는 기존처럼 ID만 반환
     }
 
     @Override
     public void updateExpense(Long id, ExpenseSaveDTO dto) {
-        // DTO를 VO로 변환
         ExpenseVO expenseVO = modelMapper.map(dto, ExpenseVO.class);
         ExpenseVO finalVO = expenseVO.toBuilder()
-                .id(id) // URL 에서 받은 id로 설정
+                .id(id)
                 .build();
         expenseMapper.update(finalVO);
     }
@@ -64,10 +79,5 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public void deleteExpense(Long id) {
         expenseMapper.delete(id);
-    }
-
-    @Override
-    public List<CategorySummaryDTO> getAnnualExpenseSummary(int year) {
-        return expenseMapper.findSummaryByCategory(year);
     }
 }

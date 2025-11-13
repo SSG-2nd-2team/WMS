@@ -1,6 +1,7 @@
 package com.ssg.wms.finance.service;
 
 import com.ssg.wms.finance.domain.SalesVO;
+import com.ssg.wms.finance.dto.SalesPartnerDTO;
 import com.ssg.wms.finance.dto.SalesRequestDTO;
 import com.ssg.wms.finance.dto.SalesResponseDTO;
 import com.ssg.wms.finance.dto.SalesSaveDTO;
@@ -42,10 +43,21 @@ public class SalesServiceImpl implements SalesService {
     }
 
     @Override
+    @Transactional
     public Long saveSales(SalesSaveDTO dto) {
         SalesVO salesVO = modelMapper.map(dto, SalesVO.class);
+
         salesMapper.save(salesVO);
-        return salesVO.getId();
+
+        Long newId = salesVO.getId();
+
+        String datePart = dto.getSalesDate().toString().replace("-", "").substring(2);
+        String idPart = String.format("%05d", newId); // 5자리 ID
+        String salesCode = "SAL-" + datePart + "-" + idPart;
+
+        salesMapper.updateCode(newId, salesCode);
+
+        return newId;
     }
 
     @Override
@@ -60,5 +72,10 @@ public class SalesServiceImpl implements SalesService {
     @Override
     public void deleteSales(Long id) {
         salesMapper.delete(id);
+    }
+
+    @Override
+    public List<SalesPartnerDTO> getPartnerList() {
+        return salesMapper.selectPartnerList();
     }
 }

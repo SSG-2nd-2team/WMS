@@ -10,14 +10,9 @@ import java.util.List;
 
 public interface ExpenseService {
     ExpenseResponseDTO getExpenses(ExpenseRequestDTO dto);
-
     ExpenseVO getExpense(Long id);
-
     Long saveExpense(ExpenseSaveDTO dto);
-
     void updateExpense(Long id, ExpenseSaveDTO dto);
-
     void deleteExpense(Long id);
 
-    List<CategorySummaryDTO> getAnnualExpenseSummary(int year);
 }

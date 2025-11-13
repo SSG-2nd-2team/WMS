@@ -55,4 +55,21 @@ public class DashboardServiceImpl implements DashboardService {
     public int getMonthlyOutboundCount(int year, int month) {
         return dashboardMapper.countMonthlyOutbound(year, month);
     }
+
+    @Override
+    public long getMonthlySales(int year, int month) {
+        return salesMapper.findTotalSalesByMonth(year, month);
+    }
+
+    @Override
+    public long getMonthlyExpense(int year, int month) {
+        return expenseMapper.findTotalExpenseByMonth(year, month);
+    }
+
+    @Override
+    public long getMonthlyNetProfit(int year, int month) {
+        long monthlySales = salesMapper.findTotalSalesByMonth(year, month);
+        long monthlyExpense = expenseMapper.findTotalExpenseByMonth(year, month);
+        return monthlySales - monthlyExpense;
+    }
 }

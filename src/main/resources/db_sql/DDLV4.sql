@@ -22,6 +22,7 @@ CREATE TABLE `category` (
 
 -- ===========================
 -- 3. WAREHOUSE
+
 -- ===========================
 CREATE TABLE `WAREHOUSE` (
     `warehouse_id` int NOT NULL AUTO_INCREMENT COMMENT '창고 고유 식별',

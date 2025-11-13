@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- [핵심] 이 페이지가 'sales'임을 알림 --%>
@@ -41,12 +41,12 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>관리번호</th>
                         <th>매출일자</th>
                         <th>고객사명</th>
                         <th>창고명</th>
                         <th>카테고리</th>
-                        <th class="text-end">금액</th>
+                        <th class="text-end">금액 (만원)</th>
                         <th>설명</th>
                     </tr>
                     </thead>
@@ -84,11 +84,33 @@
                 <div class="row g-2">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">고객사명 <span class="text-danger">*</span></label>
-                        <input type="text" id="modalClientName" class="form-control" placeholder="예: (주)SSG"/>
+                        <%-- ▼ [수정] input을 select로 변경 --%>
+                        <select id="modalClientName" class="form-select">
+                            <option value="">고객사를 선택하세요</option>
+
+                            <%-- 1단계에서 Controller가 넘겨준 ${partnerList}를 사용 --%>
+                            <c:forEach var="partner" items="${partnerList}">
+                                <%--
+                                  Sales 테이블은 이름을 저장하므로 value에 이름을 넣습니다.
+                                  (partnerName은 PartnerDTO의 필드명으로 가정)
+                                --%>
+                                <option value="${partner.partnerName}">${partner.partnerName}</option>
+                            </c:forEach>
+                        </select>
+                        <%-- ▲ [수정] ---%>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">창고명 <span class="text-danger">*</span></label>
-                        <input type="text" id="modalWarehouseName" class="form-control" placeholder="예: 김포 물류센터"/>
+                        <%-- ▼ [수정] input을 select로 변경 --%>
+                        <select id="modalWarehouseName" class="form-select">
+                            <option value="">창고를 선택하세요</option>
+
+                            <%-- 1단계에서 Controller가 넘겨준 ${warehouseList}를 사용 --%>
+                            <c:forEach var="warehouse" items="${warehouseList}">
+                                <option value="${warehouse.warehouseName}">${warehouse.warehouseName}</option>
+                            </c:forEach>
+                        </select>
+                        <%-- ▲ [수정] ---%>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -142,6 +164,7 @@
             },
             dataType: 'json',
             success: function (res) {
+                // [수정] DTO에 salesCode가 포함된 sales 리스트를 사용
                 renderTable(res.sales);
                 renderPagination(res);
             },
@@ -151,26 +174,43 @@
         });
     }
 
+    // --- ▼ [수정] 날짜 포맷팅과 salesCode를 사용하도록 수정한 최종본 ---
     function renderTable(list) {
         let tbody = $('#tableBody').empty();
+
         if (!list || list.length === 0) {
             tbody.append('<tr><td colspan="7" class="text-center py-3">데이터가 없습니다.</td></tr>');
             return;
         }
+
         list.forEach(item => {
-            let amt = new Intl.NumberFormat('ko-KR').format(item.amount);
+            // 금액 포맷
+            let amtInManWon = Math.floor(item.amount / 10000).toLocaleString('ko-KR');
+
+            // 날짜 포맷: "2025,11,10" -> "2025-11-10"
+            let formattedDate = item.salesDate ? String(item.salesDate).replace(/,/g, '-') : '-';
+
+            // DTO의 salesCode 필드를 사용 (Service에서 생성한 값)
             tbody.append(`<tr style="cursor:pointer" onclick="openDetailModal(\${item.id})">
-                <td>\${item.id}</td><td>\${item.salesDate}</td><td><strong>\${item.clientName}</strong></td><td>\${item.warehouseName}</td>
-                <td><span class="badge bg-label-success">\${item.category}</span></td>
-                <td class="text-end fw-bold text-success">\${amt}원</td><td>\${item.description || '-'}</td></tr>`);
+                <td>\${item.salesCode}</td>
+                <td>\${formattedDate}</td>
+                <td><strong>\${item.clientName}</strong></td>
+                <td>\${item.warehouseName}</td>
+                <td><span class="text-success fw-bold">\${item.category}</span></td>
+                <td class="text-end fw-bold text-success">\${amtInManWon}</td>
+                <td>\${item.description || '-'}</td>
+            </tr>`);
         });
     }
+
+    // --- ▲ [수정] ---
 
     const salesModal = new bootstrap.Modal(document.getElementById('salesModal'));
 
     function openRegisterModal() {
         $('#salesId').val('');
         $('#modalSalesDate').val(new Date().toISOString().split('T')[0]);
+        // [수정] Select2 로직 제거, input 값 비우기로 원복
         $('#modalClientName, #modalWarehouseName, #modalCategory, #modalAmount, #modalDescription').val('');
         $('#modalCategory').val('');
         $('#modalTitle').text('신규 매출 등록');
@@ -182,9 +222,14 @@
     function openDetailModal(id) {
         $.get(API_BASE_URL + '/' + id, function (data) {
             $('#salesId').val(data.id);
-            $('#modalSalesDate').val(data.salesDate);
+
+            // [수정] 날짜 포맷팅 적용 (쉼표를 하이픈으로)
+            $('#modalSalesDate').val(data.salesDate ? String(data.salesDate).replace(/,/g, '-') : '');
+
+            // [수정] Select2 로직 제거, input 값 채우기로 원복
             $('#modalClientName').val(data.clientName);
             $('#modalWarehouseName').val(data.warehouseName);
+
             $('#modalCategory').val(data.category);
             $('#modalAmount').val(data.amount);
             $('#modalDescription').val(data.description);
@@ -209,13 +254,17 @@
         if (confirm('삭제하시겠습니까?')) sendRequest('DELETE', API_BASE_URL + '/' + $('#salesId').val(), '삭제되었습니다.');
     }
 
+    // [수정] Select2가 아닌 input의 val()을 사용 (기존 코드와 동일)
     function sendRequest(method, url, msg) {
         $.ajax({
             url: url, type: method, contentType: 'application/json',
             data: method === 'DELETE' ? null : JSON.stringify({
-                salesDate: $('#modalSalesDate').val(), clientName: $('#modalClientName').val(),
-                warehouseName: $('#modalWarehouseName').val(), category: $('#modalCategory').val(),
-                amount: $('#modalAmount').val(), description: $('#modalDescription').val()
+                salesDate: $('#modalSalesDate').val(),
+                clientName: $('#modalClientName').val(),
+                warehouseName: $('#modalWarehouseName').val(),
+                category: $('#modalCategory').val(),
+                amount: $('#modalAmount').val(),
+                description: $('#modalDescription').val()
             }),
             success: function () {
                 alert(msg);
