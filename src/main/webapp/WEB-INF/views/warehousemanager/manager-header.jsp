@@ -155,12 +155,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/stock/list" class="menu-link">
                                 <div data-i18n="Account">재고 조회</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/physical-inventory" class="menu-link">
                                 <div data-i18n="Account">재고 실사</div>
                             </a>
                         </li>

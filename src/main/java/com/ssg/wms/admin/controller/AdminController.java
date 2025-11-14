@@ -76,6 +76,8 @@ public class AdminController {
         // 세션에 저장하고 모델로 넘김
         session.setAttribute("loginAdmin", staffDTO);
         model.addAttribute("loginAdmin", staffDTO);
+        log.info("(중요) 세션 로그: " + session.getAttribute("role"));
+
         return "admin/mypage";
     }
 

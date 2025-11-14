@@ -45,6 +45,8 @@ public class MemberController {
                                   HttpSession session,
                                   Model model) {
         MemberDTO member = memberService.loginCheck(loginId, password);
+        log.info("(중요) 세션 로그: " + session.getAttribute("role"));
+
         if (member == null) {
             model.addAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
             return "member/login"; // 로그인 페이지로 다시 이동
@@ -54,10 +56,14 @@ public class MemberController {
 
         // 세션에 추가
         session.setAttribute("loginMember", member);
+        log.info("세션 로그: " + member);
         // partnerName : ex) 나이키 코리아
         session.setAttribute("partnerName", partnerName);
+        log.info("세션 로그: " + partnerName);
         session.setAttribute("loginId", loginId);
+        log.info("세션 로그: " + loginId);
         session.setAttribute("role", Role.MEMBER);
+        log.info("(중요) 세션 로그: " + session.getAttribute("role"));
 
         log.info("Login Member: " + member);
         return "redirect:/member"; // 로그인 성공 시 홈으로 이동
@@ -72,12 +78,13 @@ public class MemberController {
 
     @PostMapping("/register")
     public String registerMember(@Valid @ModelAttribute MemberDTO memberDTO,
-                                 BindingResult bindingResult
-                                 ) {
+                                 BindingResult bindingResult,
+                                 Model model) {
         log.info("memberDTO: " + memberDTO);
 
         if (bindingResult.hasErrors()) {
             log.info("Member Registration Error");
+            model.addAttribute("errorMessage", "입력값을 다시 확인해주세요.");
             return "member/register";
         }
         try {
@@ -85,6 +92,7 @@ public class MemberController {
             log.info("PartnerId-inserted memberDTO: " + memberDTO);
         } catch (Exception e) {
             log.info("PartnerId-insertion error: " + e);
+            model.addAttribute("errorMessage", "등록되지 않은 사업자등록번호입니다.");
             return "member/register";
         }
         memberService.insertMember(memberDTO);

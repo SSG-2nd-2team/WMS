@@ -1,5 +1,7 @@
 package com.ssg.wms.config;
 
+import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -8,16 +10,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 // @RequiredArgsConstructor로 주입받는 것이 더 좋습니다.
 // (지금은 new()로 생성되어 있으니 그대로 둡니다.)
 
+@Log4j2
 @Configuration
+@ComponentScan(basePackages = "com.ssg.wms.config")
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-
-        // 관리자와 창고관리자 둘 다 허용 (ADMIN, MANAGER)
-        registry.addInterceptor(new RoleCheckInterceptor("ADMIN", "MANAGER"))
-                .addPathPatterns(
-                        // (여기에 향후 공통 페이지 추가, 예: "/stock/**")
-                );
+        log.info("addInterceptors 작동");
 
         // 관리자만 허용 (ADMIN)
         registry.addInterceptor(new RoleCheckInterceptor("ADMIN"))
@@ -36,6 +35,11 @@ public class WebConfig implements WebMvcConfigurer {
                 )
                 .excludePathPatterns(
                         "/admin/login"
+                );
+        // 관리자와 창고관리자 둘 다 허용 (ADMIN, MANAGER)
+        registry.addInterceptor(new RoleCheckInterceptor("ADMIN", "MANAGER"))
+                .addPathPatterns(
+                        // (여기에 향후 공통 페이지 추가, 예: "/stock/**")
                 );
 
         registry.addInterceptor(new StatusCheckInterceptor("INACTIVE"))

@@ -130,20 +130,6 @@
 
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                        <div data-i18n="Estimate">견적 관리</div>
-                    </a>
-                    <ul class="menu-sub">
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div data-i18n="EstimateList">견적 조회</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="menu-item">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="menu-icon tf-icons bx bx-down-arrow-circle"></i>
                         <div data-i18n="Inbound">입고 관리</div>
                     </a>
@@ -163,7 +149,7 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/outbound/admin/outboundOrderList" class="menu-link">
                                 <div data-i18n="Outbound List">출고지시서 조회/승인</div>
                             </a>
                         </li>

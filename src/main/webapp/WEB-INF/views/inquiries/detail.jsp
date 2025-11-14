@@ -277,7 +277,7 @@
 
                 return (
                     '<div class="reply-item" style="border: 2px solid lightslategray; padding: 10px; margin: 10px 0; cursor:pointer;" ' +
-                    'onclick="showReplyDetail(' + id + ')">' + '    ' +
+                    'onclick="showReplyDetail(' + id + ')">' + '<span>   </span>' +
                     '<div class="reply-item-header">' +
                     '<span class="reply-writer">' + safeWriter + '</span>' +
                     '<span class="reply-date">' + safeDate + '</span>' +

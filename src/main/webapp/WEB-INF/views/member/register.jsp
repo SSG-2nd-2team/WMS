@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %> <%-- 💡 이 한 줄만 남겨둡니다. --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html
         lang="en"
         class="light-style customizer-hide"
@@ -43,6 +44,47 @@
     <script src="${pageContext.request.contextPath}/resources/assets/vendor/js/helpers.js"></script>
 
     <script src="${pageContext.request.contextPath}/resources/assets/js/config.js"></script>
+
+    <style>
+        .error-message {
+            color: #ff3e1d;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: block;
+            min-height: 1.2rem;
+        }
+
+        .success-message {
+            color: #71dd37;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: block;
+            min-height: 1.2rem;
+        }
+
+        .form-control.is-invalid {
+            border-color: #ff3e1d;
+        }
+
+        .form-control.is-valid {
+            border-color: #71dd37;
+        }
+
+        /* 제출 버튼 비활성화 상태 스타일 */
+        #submitBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 비밀번호 토글 버튼 */
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .input-group-text {
+            background-color: transparent;
+        }
+    </style>
 </head>
 
 <body>
@@ -180,6 +222,12 @@
                             <div id="businessError" class="error-message"></div>
                         </div>
 
+                        <c:if test="${not empty errorMessage}">
+                            <div class="alert alert-danger">
+                                    ${errorMessage}
+                            </div>
+                        </c:if>
+
                         <div class="mb-3">
                             <button class="btn btn-primary d-grid w-100" type="submit" id="submitBtn" disabled>회원가입</button>
                         </div>
@@ -191,6 +239,7 @@
                                 <span>로그인하기</span>
                             </a>
                         </p>
+
                 </div>
             </div>
         </div>
@@ -202,31 +251,238 @@
         const form = document.getElementById('formRegistration');
         const submitBtn = document.getElementById('submitBtn');
 
-        const requiredFields = [
-            'memberLoginId',
-            'memberPw',
-            'memberPwConfirm',
-            'memberName',
-            'memberPhone',
-            'memberEmail',
-            'businessNumber'
-        ];
+        // 검증 상태를 추적하는 객체
+        const validationState = {
+            memberLoginId: false,
+            memberPw: false,
+            memberPwConfirm: false,
+            memberName: false,
+            memberPhone: false,
+            memberEmail: false,
+            businessNumber: false
+        };
 
-        function checkFormFilled() {
-            const allFilled = requiredFields.every(id => {
-                const input = document.getElementById(id);
-                return input && input.value.trim() !== '';
-            });
+        // 아이디 검증 (영문, 숫자 조합 4-20자)
+        const memberLoginId = document.getElementById('memberLoginId');
+        const idError = document.getElementById('idError');
+        const idSuccess = document.getElementById('idSuccess');
 
-            submitBtn.disabled = !allFilled;
+        memberLoginId.addEventListener('input', function() {
+            const value = this.value.trim();
+            const idRegex = /^[a-zA-Z0-9]{4,20}$/;
+
+            if (value === '') {
+                idError.textContent = '';
+                idSuccess.textContent = '';
+                validationState.memberLoginId = false;
+            } else if (!idRegex.test(value)) {
+                idError.textContent = '영문, 숫자 조합 4-20자로 입력해주세요.';
+                idSuccess.textContent = '';
+                validationState.memberLoginId = false;
+            } else {
+                idError.textContent = '';
+                idSuccess.textContent = '사용 가능한 아이디입니다.';
+                validationState.memberLoginId = true;
+            }
+            checkFormValid();
+        });
+
+        // 비밀번호 검증 (영문, 숫자, 특수문자 조합 8-20자)
+        const memberPw = document.getElementById('memberPw');
+        const pwError = document.getElementById('pwError');
+
+        memberPw.addEventListener('input', function() {
+            const value = this.value;
+            // 영문, 숫자, 특수문자를 각각 포함하는지 체크
+            const hasLetter = /[a-zA-Z]/.test(value);
+            const hasNumber = /[0-9]/.test(value);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+            const validLength = value.length >= 8 && value.length <= 20;
+
+            if (value === '') {
+                pwError.textContent = '';
+                validationState.memberPw = false;
+            } else if (!validLength) {
+                pwError.textContent = '비밀번호는 8-20자로 입력해주세요.';
+                validationState.memberPw = false;
+            } else if (!hasLetter || !hasNumber || !hasSpecial) {
+                pwError.textContent = '영문, 숫자, 특수문자를 모두 포함해야 합니다.';
+                validationState.memberPw = false;
+            } else {
+                pwError.textContent = '';
+                validationState.memberPw = true;
+            }
+
+            // 비밀번호 확인 필드가 채워져 있다면 재검증
+            if (memberPwConfirm.value !== '') {
+                memberPwConfirm.dispatchEvent(new Event('input'));
+            }
+            checkFormValid();
+        });
+
+        // 비밀번호 확인 검증
+        const memberPwConfirm = document.getElementById('memberPwConfirm');
+        const pwConfirmError = document.getElementById('pwConfirmError');
+
+        memberPwConfirm.addEventListener('input', function() {
+            const value = this.value;
+
+            if (value === '') {
+                pwConfirmError.textContent = '';
+                validationState.memberPwConfirm = false;
+            } else if (value !== memberPw.value) {
+                pwConfirmError.textContent = '비밀번호가 일치하지 않습니다.';
+                validationState.memberPwConfirm = false;
+            } else {
+                pwConfirmError.textContent = '';
+                validationState.memberPwConfirm = true;
+            }
+            checkFormValid();
+        });
+
+        // 이름 검증 (한글, 영문 2-20자)
+        const memberName = document.getElementById('memberName');
+        const nameError = document.getElementById('nameError');
+
+        memberName.addEventListener('input', function() {
+            const value = this.value.trim();
+            const nameRegex = /^[가-힣a-zA-Z]{2,20}$/;
+
+            if (value === '') {
+                nameError.textContent = '';
+                validationState.memberName = false;
+            } else if (!nameRegex.test(value)) {
+                nameError.textContent = '한글 또는 영문 2-20자로 입력해주세요.';
+                validationState.memberName = false;
+            } else {
+                nameError.textContent = '';
+                validationState.memberName = true;
+            }
+            checkFormValid();
+        });
+
+        // 전화번호 검증 (010-XXXX-XXXX 형식)
+        const memberPhone = document.getElementById('memberPhone');
+        const phoneError = document.getElementById('phoneError');
+
+        memberPhone.addEventListener('input', function() {
+            let value = this.value.replace(/[^0-9]/g, ''); // 숫자만 추출
+
+            // 자동으로 하이픈 추가
+            if (value.length > 3 && value.length <= 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+            }
+
+            this.value = value;
+
+            const phoneRegex = /^010-\d{4}-\d{4}$/;
+
+            if (value === '') {
+                phoneError.textContent = '';
+                validationState.memberPhone = false;
+            } else if (!phoneRegex.test(value)) {
+                phoneError.textContent = '올바른 전화번호 형식이 아닙니다. (010-XXXX-XXXX)';
+                validationState.memberPhone = false;
+            } else {
+                phoneError.textContent = '';
+                validationState.memberPhone = true;
+            }
+            checkFormValid();
+        });
+
+        // 이메일 검증
+        const memberEmail = document.getElementById('memberEmail');
+        const emailError = document.getElementById('emailError');
+
+        memberEmail.addEventListener('input', function() {
+            const value = this.value.trim();
+            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            if (value === '') {
+                emailError.textContent = '';
+                validationState.memberEmail = false;
+            } else if (!emailRegex.test(value)) {
+                emailError.textContent = '올바른 이메일 형식이 아닙니다.';
+                validationState.memberEmail = false;
+            } else {
+                emailError.textContent = '';
+                validationState.memberEmail = true;
+            }
+            checkFormValid();
+        });
+
+        // 사업자등록번호 검증 (10자리 숫자, 자동으로 하이픈 추가)
+        const businessNumber = document.getElementById('businessNumber');
+        const businessError = document.getElementById('businessError');
+
+        businessNumber.addEventListener('input', function() {
+            let value = this.value.replace(/[^0-9]/g, ''); // 숫자만 추출
+
+            // 자동으로 하이픈 추가 (XXX-XX-XXXXX 형식)
+            if (value.length > 3 && value.length <= 5) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 5) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 5) + '-' + value.slice(5, 10);
+            }
+
+            this.value = value;
+
+            const businessRegex = /^\d{3}-\d{2}-\d{5}$/;
+
+            if (value === '') {
+                businessError.textContent = '';
+                validationState.businessNumber = false;
+            } else if (!businessRegex.test(value)) {
+                businessError.textContent = '사업자등록번호는 10자리 숫자입니다. (XXX-XX-XXXXX)';
+                validationState.businessNumber = false;
+            } else {
+                businessError.textContent = '';
+                validationState.businessNumber = true;
+            }
+            checkFormValid();
+        });
+
+        // 비밀번호 표시/숨김 토글
+        const togglePw = document.getElementById('togglePw');
+        togglePw.addEventListener('click', function() {
+            const type = memberPw.type === 'password' ? 'text' : 'password';
+            memberPw.type = type;
+            this.querySelector('i').classList.toggle('bx-hide');
+            this.querySelector('i').classList.toggle('bx-show');
+        });
+
+        const togglePwConfirm = document.getElementById('togglePwConfirm');
+        togglePwConfirm.addEventListener('click', function() {
+            const type = memberPwConfirm.type === 'password' ? 'text' : 'password';
+            memberPwConfirm.type = type;
+            this.querySelector('i').classList.toggle('bx-hide');
+            this.querySelector('i').classList.toggle('bx-show');
+        });
+
+        // 전체 폼 유효성 검사
+        function checkFormValid() {
+            const allValid = Object.values(validationState).every(valid => valid === true);
+            submitBtn.disabled = !allValid;
         }
 
-        // 각 필드에 이벤트 리스너 등록
-        requiredFields.forEach(id => {
-            const input = document.getElementById(id);
-            if (input) {
-                input.addEventListener('input', checkFormFilled);
+        // 폼 제출 시 최종 검증
+        form.addEventListener('submit', function(e) {
+            const allValid = Object.values(validationState).every(valid => valid === true);
+
+            if (!allValid) {
+                e.preventDefault();
+                alert('모든 항목을 올바르게 입력해주세요.');
+                return false;
             }
+
+            // 사업자등록번호에서 하이픈 제거 후 다시 형식에 맞게 추가 (서버 전송용)
+            const businessValue = businessNumber.value.replace(/[^0-9]/g, '');
+            const formattedBusiness = businessValue.slice(0, 3) + '-' +
+                businessValue.slice(3, 5) + '-' +
+                businessValue.slice(5, 10);
+            businessNumber.value = formattedBusiness;
         });
     });
 </script>
