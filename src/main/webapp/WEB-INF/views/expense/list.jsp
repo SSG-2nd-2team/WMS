@@ -134,7 +134,7 @@
 <script>
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
     // [수정] 지출 API 기본 URL
-    const API_BASE_URL = CONTEXT_PATH + '/expense/api';
+    const API_BASE_URL = CONTEXT_PATH + '/admin/expense/api';
 
     $(document).ready(function () {
         loadData(1);

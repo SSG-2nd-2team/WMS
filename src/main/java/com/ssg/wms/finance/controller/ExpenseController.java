@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List; // java.util.List import
 
 @Log4j2
-@RequestMapping("/expense")
+@RequestMapping("/admin/expense")
 @Controller
 @RequiredArgsConstructor
 public class ExpenseController {

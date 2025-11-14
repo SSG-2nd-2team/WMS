@@ -187,12 +187,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item ${pageActive == 'sales' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/sales/list" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/sales/list" class="menu-link">
                                 <div data-i18n="Sales">매출 관리</div>
                             </a>
                         </li>
                         <li class="menu-item ${pageActive == 'expense' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/expense/list" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/expense/list" class="menu-link">
                                 <div data-i18n="Expense">지출 관리</div>
                             </a>
                         </li>
