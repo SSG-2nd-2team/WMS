@@ -54,7 +54,7 @@ public class GlobalRoleChecker {
         String uri = request.getRequestURI();
         HttpSession session = request.getSession(false);
 
-        if (uri.equals("/member/login")) return;
+        if ((uri.equals("/member/login")) || (uri.equals("/member/register"))) return;
 
         if (uri.startsWith("/member")) {
             Role role = (Role) session.getAttribute("role");
