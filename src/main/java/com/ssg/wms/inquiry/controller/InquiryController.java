@@ -1,8 +1,5 @@
 package com.ssg.wms.inquiry.controller;
 
-import com.ssg.wms.announcement.dto.AnnouncementDTO;
-import com.ssg.wms.announcement.dto.AnnouncementSearch;
-import com.ssg.wms.announcement.service.AnnouncementService;
 import com.ssg.wms.inquiry.dto.InquiryDTO;
 import com.ssg.wms.inquiry.dto.InquirySearch;
 import com.ssg.wms.inquiry.service.InquiryService;
@@ -91,8 +88,9 @@ public class InquiryController {
 
     // 문의 삭제
     @PostMapping("/{id}/delete")
-    public String postDelete(@PathVariable("id") Long id) {
-        inquiryService.deleteInquiry(id);
+    public String postDelete(@PathVariable("id") Long id,
+                             @RequestParam String password) {
+        inquiryService.deleteInquiry(id, password);
         return "redirect:/inquiries";
     }
 }

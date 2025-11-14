@@ -21,4 +21,5 @@ public class InquiryDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private BoardStatus status;
+    private String password;
 }

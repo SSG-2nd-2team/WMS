@@ -1,8 +1,5 @@
 package com.ssg.wms.inquiry.service;
 
-import com.ssg.wms.announcement.dto.AnnouncementDTO;
-import com.ssg.wms.announcement.dto.AnnouncementPageDTO;
-import com.ssg.wms.announcement.dto.AnnouncementSearch;
 import com.ssg.wms.inquiry.dto.InquiryDTO;
 import com.ssg.wms.inquiry.dto.InquiryPageDTO;
 import com.ssg.wms.inquiry.dto.InquirySearch;
@@ -58,7 +55,7 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
-    public void deleteInquiry(Long id) {
-        inquiryMapper.deleteInquiry(id);
+    public void deleteInquiry(Long inquiryId, String password) {
+        inquiryMapper.deleteInquiry(inquiryId, password);
     }
 }

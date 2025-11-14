@@ -146,7 +146,7 @@
 
 <script>
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
-    const API_BASE_URL = CONTEXT_PATH + '/sales/api';
+    const API_BASE_URL = CONTEXT_PATH + '/admin/sales/api';
 
     $(document).ready(function () {
         loadData(1);

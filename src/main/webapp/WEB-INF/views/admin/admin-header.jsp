@@ -49,7 +49,7 @@
     <div class="layout-container">
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
             <div class="app-brand demo">
-                <a href="${pageContext.request.contextPath}/dashboard" class="app-brand-link">
+                <a href="${pageContext.request.contextPath}/admin/dashboard" class="app-brand-link">
                     <span class="app-brand-logo demo">
                         <svg width="25" viewBox="0 0 25 42" version="1.1" xmlns="http://www.w3.org/2000/svg"
                              xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -104,7 +104,7 @@
             <ul class="menu-inner py-1">
 
                 <li class="menu-item ${pageActive == 'dashboard' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/dashboard" class="menu-link">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-home-circle"></i>
                         <div data-i18n="Analytics">Dashboard</div>
                     </a>
@@ -126,20 +126,6 @@
                         <i class="menu-icon tf-icons bx bx-user-check"></i>
                         <div data-i18n="MemberApproval">고객 관리</div>
                     </a>
-                </li>
-
-                <li class="menu-item">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                        <div data-i18n="Estimate">견적 관리</div>
-                    </a>
-                    <ul class="menu-sub">
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div data-i18n="EstimateList">견적 조회</div>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
 
                 <li class="menu-item">
@@ -167,23 +153,17 @@
                                 <div data-i18n="Outbound List">출고지시서 조회/승인</div>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div data-i18n="Waybill">운송장 등록/조회</div>
-                            </a>
-                        </li>
                     </ul>
                 </li>
 
-                <li class="menu-item ${(pageActive == 'stock_list' || pageActive == 'physical_inventory' || pageActive == 'product_list') ? 'active open' : ''}">
-
+                <li class="menu-item ${(pageActive == 'stock_list' || pageActive == 'physical_inventory' || pageActive == 'stock_product_list') ? 'active open' : ''}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="menu-icon tf-icons bx bx-package"></i>
                         <div data-i18n="Stock">재고 관리</div>
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item ${pageActive == 'stock_list' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/stock/list" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/stock/search" class="menu-link">
                                 <div data-i18n="Stock List">재고 조회</div>
                             </a>
                         </li>
@@ -192,7 +172,7 @@
                                 <div data-i18n="Stock Inspection">재고 실사</div>
                             </a>
                         </li>
-                        <li class="menu-item ${pageActive == 'product_list' ? 'active' : ''}">
+                        <li class="menu-item ${pageActive == 'stock_product_list' ? 'active' : ''}">
                             <a href="${pageContext.request.contextPath}/productList/plist" class="menu-link">
                                 <div data-i18n="Product Status">품목 현황</div>
                             </a>
@@ -207,12 +187,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item ${pageActive == 'sales' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/sales/list" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/sales/list" class="menu-link">
                                 <div data-i18n="Sales">매출 관리</div>
                             </a>
                         </li>
                         <li class="menu-item ${pageActive == 'expense' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/expense/list" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/expense/list" class="menu-link">
                                 <div data-i18n="Expense">지출 관리</div>
                             </a>
                         </li>
@@ -226,12 +206,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/warehouses/register" class="menu-link">
                                 <div data-i18n="WarehouseRegister">창고 등록</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/warehouses" class="menu-link">
                                 <div data-i18n="WarehouseList">창고 목록 조회/수정</div>
                             </a>
                         </li>
@@ -293,11 +273,8 @@
 
                 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
                     <div class="navbar-nav align-items-center">
-                        <div class="nav-item d-flex align-items-center">
-                            <i class="bx bx-search fs-4 lh-0"></i>
-                            <input type="text" class="form-control border-0 shadow-none" placeholder="Search..."
-                                   aria-label="Search..."/>
-                        </div>
+                        <a class="navbar-brand" href="${pageContext.request.contextPath}/admin/dashboard">RACL WMS</a>
+
                     </div>
                     <ul class="navbar-nav flex-row align-items-center ms-auto">
                         <li class="nav-item navbar-dropdown dropdown-user dropdown">

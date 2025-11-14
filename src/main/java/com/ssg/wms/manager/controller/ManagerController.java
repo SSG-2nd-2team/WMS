@@ -50,7 +50,7 @@ public class ManagerController {
         // 세션에 저장
         session.setAttribute("loginManager", manager);
         session.setAttribute("loginId", loginId);
-        session.setAttribute("role", Role.MANAGER);
+        session.setAttribute("role", manager.getRole());
         return "redirect:/warehousemanager";
     }
 

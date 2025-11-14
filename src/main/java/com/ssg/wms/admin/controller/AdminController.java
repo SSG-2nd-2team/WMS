@@ -31,7 +31,7 @@ public class AdminController {
     @GetMapping("")
     public String getAdminMain() {
         // 메인 화면
-        return "admin/connect";
+        return "admin/dashboard";
     }
 
     @GetMapping("/login")
@@ -54,9 +54,9 @@ public class AdminController {
         // 세션에 저장
         session.setAttribute("loginStaff", staff);
         session.setAttribute("loginId", loginId);
-        session.setAttribute("role", Role.ADMIN);
+        session.setAttribute("role", staff.getRole());
 
-        return "redirect:/admin";
+        return "redirect:/admin/dashboard";
     }
 
     @Transactional
@@ -76,6 +76,8 @@ public class AdminController {
         // 세션에 저장하고 모델로 넘김
         session.setAttribute("loginAdmin", staffDTO);
         model.addAttribute("loginAdmin", staffDTO);
+        log.info("(중요) 세션 로그: " + session.getAttribute("role"));
+
         return "admin/mypage";
     }
 
@@ -125,7 +127,7 @@ public class AdminController {
     public ResponseEntity<?> rejectMember(@PathVariable long memberId) {
         // 거절 로직 처리
         log.info("Rejecting member " + memberId);
-        adminService.changeMemberStatus(memberId, AccountStatus.INACTIVE);
+        adminService.changeMemberStatus(memberId, AccountStatus.REJECTED);
         return ResponseEntity.ok().build();
     }
 

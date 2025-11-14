@@ -129,7 +129,7 @@
             <ul class="menu-inner py-1">
                 <!-- Dashboard -->
                 <li class="menu-item">
-                    <a href="/manager" class="menu-link">
+                    <a href="/warehousemanager" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-home-circle"></i>
                         <div data-i18n="Analytics">Dashboard</div>
                     </a>
@@ -155,17 +155,17 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/stock/list" class="menu-link">
                                 <div data-i18n="Account">재고 조회</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/physical-inventory" class="menu-link">
                                 <div data-i18n="Account">재고 실사</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/productList/plist" class="menu-link">
                                 <div data-i18n="Account">품목 현황</div>
                             </a>
                         </li>
@@ -238,7 +238,7 @@
                 </div>
 
                 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-                    <a class="navbar-brand" href="javascript:void(0)">Navbar</a>
+                    <a class="navbar-brand" href="${pageContext.request.contextPath}/warehousemanager">RACL WMS</a>
 
                     <ul class="navbar-nav flex-row align-items-center ms-auto">
                         <!-- Place this tag where you want the button to render. -->

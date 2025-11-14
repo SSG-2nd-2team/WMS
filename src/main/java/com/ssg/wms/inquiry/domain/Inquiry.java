@@ -15,7 +15,6 @@ public class Inquiry {
     private String title;
     private String content;
     private String writer;
-    private boolean isImportant;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private BoardStatus status;

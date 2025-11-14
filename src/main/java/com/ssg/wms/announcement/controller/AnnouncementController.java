@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -43,8 +44,9 @@ public class AnnouncementController {
 
     // 공지 작성 폼
     @GetMapping("/save")
-    public String getSaveForm(Model model) {
+    public String getSaveForm(Model model, HttpSession session) {
         model.addAttribute("announcement", new AnnouncementDTO());
+        log.info("세션 로그: {}", session.getAttribute("role"));
         return "announcements/save";
     }
 

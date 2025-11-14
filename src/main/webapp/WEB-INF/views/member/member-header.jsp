@@ -174,13 +174,8 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="${pageContext.request.contextPath}/member/outbound" class="menu-link">
-                                <div data-i18n="Account">요청 작성</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">요청 조회/수정/취소</div>
+                            <a href="${pageContext.request.contextPath}/member/outbound/list" class="menu-link">
+                                <div data-i18n="Account">요청 관리</div>
                             </a>
                         </li>
                     </ul>
@@ -193,12 +188,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/member/warehouses" class="menu-link">
                                 <div data-i18n="Account">창고 목록 조회</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/member/warehouses/location" class="menu-link">
                                 <div data-i18n="Account">창고 위치 조회</div>
                             </a>
                         </li>
@@ -247,7 +242,7 @@
                 </div>
 
                 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-                    <a class="navbar-brand" href="javascript:void(0)">Navbar</a>
+                    <a class="navbar-brand" href="${pageContext.request.contextPath}/member">RACL WMS</a>
 
                     <ul class="navbar-nav flex-row align-items-center ms-auto">
                         <!-- Place this tag where you want the button to render. -->

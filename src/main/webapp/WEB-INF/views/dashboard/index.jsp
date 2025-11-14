@@ -220,7 +220,7 @@
 <%-- ========================================================== --%>
 <script>
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
-    const API_URL = CONTEXT_PATH + '/dashboard/api';
+    const API_URL = CONTEXT_PATH + '/admin/dashboard/api';
 
     let mainChart, growthChart;
 
