@@ -62,7 +62,7 @@ public class MemberController {
         log.info("세션 로그: " + partnerName);
         session.setAttribute("loginId", loginId);
         log.info("세션 로그: " + loginId);
-        session.setAttribute("role", Role.MEMBER);
+        session.setAttribute("role", member.getRole());
         log.info("(중요) 세션 로그: " + session.getAttribute("role"));
 
         log.info("Login Member: " + member);

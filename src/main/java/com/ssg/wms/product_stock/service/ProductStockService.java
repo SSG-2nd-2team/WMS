@@ -4,6 +4,7 @@ import com.ssg.wms.product_stock.dto.*;
 
 import java.util.List;
 
+//재고 조회 서비스
 public interface ProductStockService {
 
     List<DropdownDTO> categoryDropDown();
@@ -13,7 +14,6 @@ public interface ProductStockService {
 
     PageResponseDTO<StockInfoDTO> getStockList(PageRequestDTO pageRequestDTO);
 
-    // --- 💡 새로 추가할 메서드 ---
     /** 상품 ID를 기반으로 상세 요약 정보를 가져옵니다. (화면 상단 정보) */
     StockSummaryDTO getProductSummary(String productId);
 

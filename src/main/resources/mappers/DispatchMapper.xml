@@ -70,6 +70,7 @@
         Cartype = #{carType},
         driverName = #{driverName},
         dispatchStatus = #{dispatchStatus}
+        warehouse_id = #{warehouseId}
         WHERE
         approvedOrder_ID = #{approvedOrderID}
     </update>

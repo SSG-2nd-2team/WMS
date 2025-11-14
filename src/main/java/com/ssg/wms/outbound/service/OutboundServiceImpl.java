@@ -33,6 +33,7 @@ public class OutboundServiceImpl implements OutboundService {
         dto.setMemberId(memberId);
         dto.setOutboundDate(LocalDate.now());
         dto.setApprovedStatus("승인대기");
+        dto.setWarehouseId(dto.getWarehouseId());
 
         // ✅ 2. 출고요청 등록 (outboundRequest)
         outboundMapper.insertOutboundRequest(dto);

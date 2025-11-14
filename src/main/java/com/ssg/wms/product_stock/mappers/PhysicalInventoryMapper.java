@@ -27,5 +27,18 @@ public interface PhysicalInventoryMapper {
             @Param("sectionId") Long sectionId
     );
 
+    Long getPsIdByPiId(int piId);
+
+    Integer getCalculatedQuantityByPiId(int piId);
+
+    void updateStockQuantity(@Param("psId") Long psId, @Param("quantityChange") int quantityChange);
+
+    void insertStockLog(
+            @Param("psId") Long psId,
+            @Param("moveQuantity") int moveQuantity,
+            @Param("eventType") String eventType,
+            @Param("productStatus") String productStatus,
+            @Param("destination") String destination
+    );
 
 }

@@ -50,6 +50,8 @@ public class PageRequestDTO {
     private LocalDate to;
 
     @Nullable
+    private String productId;
+    @Nullable
     private Long categoryCd;
     @Nullable
     private Long partnerId;

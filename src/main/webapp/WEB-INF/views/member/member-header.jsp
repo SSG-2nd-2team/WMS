@@ -175,12 +175,7 @@
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="${pageContext.request.contextPath}/member/outbound/list" class="menu-link">
-                                <div data-i18n="Account">요청 작성</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div data-i18n="Account">요청 조회/수정/취소</div>
+                                <div data-i18n="Account">요청 관리</div>
                             </a>
                         </li>
                     </ul>
@@ -193,12 +188,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/member/warehouses" class="menu-link">
                                 <div data-i18n="Account">창고 목록 조회</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/member/warehouses/location" class="menu-link">
                                 <div data-i18n="Account">창고 위치 조회</div>
                             </a>
                         </li>

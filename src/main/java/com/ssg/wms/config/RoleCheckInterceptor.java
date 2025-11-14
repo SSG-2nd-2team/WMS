@@ -1,5 +1,6 @@
 package com.ssg.wms.config;
 
+import com.ssg.wms.common.Role;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -11,12 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 
 @Log4j2
-@Component
 public class RoleCheckInterceptor implements HandlerInterceptor {
     private final List<String> allowedRoles;
 
     // 생성자로 허용할 역할 목록을 주입
     public RoleCheckInterceptor(String... roles) {
+        log.info("RoleCheckInterceptor: " + Arrays.toString(roles));
         this.allowedRoles = Arrays.asList(roles);
     }
 
@@ -26,19 +27,21 @@ public class RoleCheckInterceptor implements HandlerInterceptor {
                              Object handler) throws Exception {
 
         HttpSession session = request.getSession(false);
-        if (session == null) {
+        log.info("preHandle: " + session);
+
+        if (session == null || session.getAttribute("role") == null) {
             log.info("session == null, /login redirected");
             response.sendRedirect("/login");
             return false;
         }
 
-        String role = (String) session.getAttribute("role");
-        log.info("role: {}", role);
+        Role role = (Role) session.getAttribute("role");
+        String uri = request.getRequestURI();
+        log.info("요청 URI: {}, 사용자 권한: {}", uri, role);
 
-        // 허용된 권한에 포함되는지 검사
-        if (!allowedRoles.contains(role)) {
-            log.info("role not allowed: {}", role);
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "권한이 없습니다.");
+        if (!allowedRoles.contains(role.name())) {
+            log.info("권한 없음: {}", role);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "접근 권한이 없습니다.");
             return false;
         }
 

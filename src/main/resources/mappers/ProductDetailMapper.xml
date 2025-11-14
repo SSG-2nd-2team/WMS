@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ssg.wms.product_stock.mappers.ProductListMapper">
-
+<mapper namespace="com.ssg.wms.product_stock.mappers.ProductStockMapper">
+<!--재고 상세-->
     <select id="getStockMovementLogs" resultType="com.ssg.wms.product_stock.dto.StockLogDTO">
         SELECT
             T1.event_time AS eventTime,

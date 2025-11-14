@@ -27,6 +27,7 @@
         <root level="INFO" additivity="false">
             <AppenderRef ref="CONSOLE"/>
         </root>
+
     </Loggers>
 
 </Configuration>

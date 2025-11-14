@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DropdownDTO {
-    Long id;
-    String name;
+    //드롭 다운 메뉴
+    private Long id;
+    private String name;
 }

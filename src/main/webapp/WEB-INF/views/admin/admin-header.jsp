@@ -149,13 +149,8 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="${pageContext.request.contextPath}/outbound/admin/outboundOrderList" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/outbound" class="menu-link">
                                 <div data-i18n="Outbound List">출고지시서 조회/승인</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div data-i18n="Waybill">운송장 등록/조회</div>
                             </a>
                         </li>
                     </ul>
@@ -168,7 +163,7 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item ${pageActive == 'stock_list' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/stock/list" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/stock/search" class="menu-link">
                                 <div data-i18n="Stock List">재고 조회</div>
                             </a>
                         </li>
@@ -178,7 +173,7 @@
                             </a>
                         </li>
                         <li class="menu-item ${pageActive == 'stock_product_list' ? 'active' : ''}">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/productList/plist" class="menu-link">
                                 <div data-i18n="Product Status">품목 현황</div>
                             </a>
                         </li>
@@ -192,12 +187,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item ${pageActive == 'sales' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/sales/list" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/sales/list" class="menu-link">
                                 <div data-i18n="Sales">매출 관리</div>
                             </a>
                         </li>
                         <li class="menu-item ${pageActive == 'expense' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/expense/list" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/expense/list" class="menu-link">
                                 <div data-i18n="Expense">지출 관리</div>
                             </a>
                         </li>
@@ -211,12 +206,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/warehouses/register" class="menu-link">
                                 <div data-i18n="WarehouseRegister">창고 등록</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/warehouses" class="menu-link">
                                 <div data-i18n="WarehouseList">창고 목록 조회/수정</div>
                             </a>
                         </li>

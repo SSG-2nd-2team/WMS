@@ -54,7 +54,7 @@ public class AdminController {
         // 세션에 저장
         session.setAttribute("loginStaff", staff);
         session.setAttribute("loginId", loginId);
-        session.setAttribute("role", Role.ADMIN);
+        session.setAttribute("role", staff.getRole());
 
         return "redirect:/dashboard";
     }

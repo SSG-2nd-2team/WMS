@@ -2,7 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <c:set var="pageActive" value="stock_detail" scope="request"/>
-
 <%@ include file="../admin/admin-header.jsp" %>
 
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -10,7 +9,6 @@
         <span class="text-muted fw-light">재고 관리 /</span> 상품 상세 정보
     </h4>
 
-    <!-- 1. 상품 요약 정보 -->
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">상품 기본 정보</h5>
@@ -52,7 +50,6 @@
         </div>
     </div>
 
-    <!-- 2. 재고 이동 기록 테이블 -->
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0">재고 이동 기록</h5>
@@ -102,7 +99,6 @@
             </div>
         </div>
 
-        <!-- 목록으로 돌아가기 버튼 -->
         <div class="card-footer d-flex justify-content-end">
             <a href="javascript:void(0)" class="btn btn-secondary" onclick="history.back()">
                 <i class="bx bx-list-ul me-1"></i> 목록으로 돌아가기
@@ -111,7 +107,4 @@
 
     </div>
 </div>
-
-
-
 <%@ include file="../admin/admin-footer.jsp" %>

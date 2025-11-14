@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.ssg.wms.product_stock.mappers.PhysicalInventoryMapper">
 
+<!--재고 실사-->
     <select id="selectPhysicalInventoryList" resultType="com.ssg.wms.product_stock.dto.PhysicalInventoryDTO">
         SELECT
             PI.piID AS piId,
@@ -44,14 +46,13 @@
 
     <insert id="insertPhysicalInventory" useGeneratedKeys="true" keyProperty="piId">
         INSERT INTO Physical_Inventory
-            (PS_ID, pi_date, pi_state, pid_quantity, update_state)
+            (PS_ID, pi_date, pi_state, pid_quantity)
         VALUES
             (
                 #{psId},
                 #{piDate},
                 #{piState},
-                #{calculatedQuantity},
-                NULL
+                #{calculatedQuantity}
             )
     </insert>
 

@@ -2,6 +2,7 @@ package com.ssg.wms.product_stock.service;
 
 import com.ssg.wms.product_stock.dto.*;
 import com.ssg.wms.product_stock.mappers.ProductListMapper;
+import com.ssg.wms.product_stock.mappers.ProductStockMapper;
 import com.ssg.wms.product_stock.mappers.dropDownMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import java.util.List;
 public class ProductStockServiceImpl implements ProductStockService{
 
     private final dropDownMapper dropDownMapper;
-    private final ProductListMapper productListMapper;
+    private final ProductStockMapper productStockMapper;
 
     @Override
     public List<DropdownDTO> categoryDropDown() {
@@ -38,8 +39,8 @@ public class ProductStockServiceImpl implements ProductStockService{
     public PageResponseDTO<StockInfoDTO> getStockList(PageRequestDTO pageRequestDTO) {
 
         pageRequestDTO.normalize();
-        int totalCount = productListMapper.countStockList(pageRequestDTO);
-        List<StockInfoDTO> dtoList = productListMapper.findStockList(pageRequestDTO);
+        int totalCount = productStockMapper.countStockList(pageRequestDTO);
+        List<StockInfoDTO> dtoList = productStockMapper.findStockList(pageRequestDTO);
 
         return PageResponseDTO.<StockInfoDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
@@ -50,13 +51,12 @@ public class ProductStockServiceImpl implements ProductStockService{
 
     @Override
     public StockSummaryDTO getProductSummary(String productId) {
-        return  productListMapper.getProductSummaryById(productId);
+        return  productStockMapper.getProductSummaryById(productId);
     }
-
 
     @Override
     public List<StockLogDTO> getStockMovementLogs(String productId) {
-        List<StockLogDTO> logs = productListMapper.getStockMovementLogs(productId);
+        List<StockLogDTO> logs = productStockMapper.getStockMovementLogs(productId);
         // LocalDateTime → String 변환
         logs.forEach(log -> {
             if (log.getEventTime() != null) {

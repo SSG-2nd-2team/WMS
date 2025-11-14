@@ -18,6 +18,7 @@
         <th>차량번호</th>
         <th>차량종류</th>
         <th>출고박스</th>
+        <th>창고</th>
         <th>최대적재</th>
         <th>배차상태</th>
         <th>요청상태</th>
@@ -28,24 +29,25 @@
       <tr>
         <td>${dispatch.approvedOrderID}</td>
 
-        <!-- 기사 선택 -->
         <td>
           <select id="driverSelect" name="driverName" class="form-select" required>
             <option value="">-- 기사 선택 --</option>
           </select>
         </td>
 
-        <!-- 차량정보 (자동입력) -->
         <td><input type="text" name="vehicleNumber" class="form-control" readonly></td>
         <td><input type="text" name="vehicleType" class="form-control" readonly></td>
 
-        <!-- 박스 -->
         <td><input type="number" name="boxCount" class="form-control" required></td>
 
-        <!-- 용량 -->
-        <td><input type="number" name="vehicleCapacity" class="form-control" required></td>
+        <td>
+          <select id="warehouseSelect" name="warehouseId" class="form-select" required>
+            <option value="">-- 창고 선택 --</option>
+          </select>
+        </td>
 
-        <!-- 배차상태 -->
+        <td><input type="number" name="vehicleCapacity" class="form-control" value="100" readonly></td>
+
         <td>
           <select name="dispatchStatus" class="form-select" required>
             <option value="대기">대기</option>
@@ -53,10 +55,9 @@
           </select>
         </td>
 
-        <!-- 승인상태 -->
         <td>
           <select name="approvalStatus" class="form-select" required>
-            <option value="승인">승인</option>
+            <option value="approved">승인</option>
             <option value="반려">반려</option>
           </select>
         </td>
@@ -64,7 +65,6 @@
       </tbody>
     </table>
 
-    <!-- 버튼 -->
     <div class="text-end mt-3">
       <button type="button" class="btn btn-primary" id="submitDispatchBtn">등록</button>
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
@@ -73,169 +73,201 @@
 
   <script>
     $(document).ready(function () {
-      console.log("🚀 dispatchForm 시작");
 
       var isExistingDispatch = ${dispatch.carId != null ? 'true' : 'false'};
-      console.log("기존 배차 여부:", isExistingDispatch);
 
-      // ==========================================
-      // 1) 기사 목록 불러오기
-      // ==========================================
+      var approvedStatusValue = "${dispatch.approvedStatus}";
+      var isApproved = (approvedStatusValue === "APPROVED" || approvedStatusValue === "승인");
+
+      console.log("🔍 배차 정보:", {
+        approvedOrderID: "${dispatch.approvedOrderID}",
+        carId: "${dispatch.carId}",
+        warehouseId: "${dispatch.warehouseId}",
+        warehouseName: "${dispatch.warehouseName}",
+        approvedStatus: approvedStatusValue,
+        isApproved: isApproved,
+        isExistingDispatch: isExistingDispatch
+      });
+
+      if (isApproved) {
+        console.log("⚠️ 승인된 건이므로 수정 불가");
+        $("#dispatchForm input, #dispatchForm select").prop("disabled", true);
+        $("#submitDispatchBtn")
+                .prop("disabled", true)
+                .removeClass("btn-primary")
+                .addClass("btn-secondary")
+                .text("승인된 건은 수정할 수 없습니다");
+      }
+      var loadStatus = {
+        drivers: false,
+        warehouses: false
+      };
+
+      function checkAndSetValues() {
+        if (loadStatus.drivers && loadStatus.warehouses && isExistingDispatch) {
+          console.log("✅ 모든 데이터 로드 완료 - 기존 값 세팅 시작");
+          setExistingValues();
+        }
+      }
+
+      // ------------------------
+      // 1) 기사 목록 불러오기 ⭐ 수정
+      // ------------------------
       $.ajax({
         url: contextPath + "/admin/dispatches/drivers",
         type: "GET",
         dataType: "json",
         success: function (response) {
-          console.log("📦 API 응답:", response);
-          console.log("📦 응답 타입:", typeof response);
-          console.log("📦 배열 여부:", Array.isArray(response));
-
-          var drivers = Array.isArray(response) ? response : [response];
-          console.log("📦 기사 개수:", drivers.length);
-
-          if (!drivers || drivers.length === 0) {
-            console.warn("⚠️ 기사 목록이 비어있습니다");
-            alert("등록된 기사가 없습니다.");
-            return;
-          }
+          console.log("✅ 기사 목록 조회 성공:", response);
 
           var select = $("#driverSelect");
           select.empty();
           select.append('<option value="">-- 기사 선택 --</option>');
 
-          // 중복 제거 (carId 기준)
-          var uniqueDrivers = [];
+          if (!response || response.length === 0) {
+            console.warn("⚠️ 기사 데이터가 없습니다.");
+            loadStatus.drivers = true;
+            checkAndSetValues();
+            return;
+          }
+
           var seenCarIds = new Set();
 
-          for (var i = 0; i < drivers.length; i++) {
-            var d = drivers[i];
-            if (d && d.carId && !seenCarIds.has(d.carId)) {
-              seenCarIds.add(d.carId);
-              uniqueDrivers.push(d);
-            }
-          }
+          response.forEach(function (d) {
+            if (!d.carId || seenCarIds.has(d.carId)) return;
+            seenCarIds.add(d.carId);
 
-          console.log("📦 중복 제거 후:", uniqueDrivers.length);
+            select.append(
+                    $('<option></option>')
+                            .val(d.driverName)
+                            .attr('data-car', d.carId)
+                            .attr('data-type', d.carType)
+                            .text(d.driverName + ' (' + d.carId + ')')
+            );
+          });
 
-          // 기사 옵션 추가
-          for (var j = 0; j < uniqueDrivers.length; j++) {
-            var driver = uniqueDrivers[j];
-
-            console.log("기사 " + j + ":", driver);
-
-            var driverName = driver.driverName;
-            var carId = driver.carId;
-            var carType = driver.carType || '';
-
-            console.log("→ 이름=" + driverName + ", 차량=" + carId + ", 타입=" + carType);
-
-            if (!driverName || !carId) {
-              console.warn("⚠️ 필수 정보 누락:", driver);
-              continue;
-            }
-
-            var newOption = $('<option></option>');
-            newOption.val(driverName);
-            newOption.attr('data-car', carId);
-            newOption.attr('data-type', carType);
-            newOption.text(driverName + ' (' + carId + ')');
-
-            console.log("→ 생성 HTML:", newOption.get(0).outerHTML);
-            select.append(newOption);
-          }
-
-          console.log("✅ 총 옵션:", $("#driverSelect option").length - 1);
-
-          // 초기값 설정
-          if (isExistingDispatch) {
-            setExistingValues();
-          } else {
-            setNewValues();
-          }
+          console.log("📋 기사 옵션 추가 완료:", select.find('option').length - 1 + "명");
+          loadStatus.drivers = true;
+          checkAndSetValues();
         },
-        error: function (xhr, status, error) {
-          console.error("🚨 기사 목록 로드 실패");
-          console.error("Status:", status);
-          console.error("Error:", error);
-          console.error("Response:", xhr.responseText);
+        error: function(xhr, status, error) {
+          console.error("❌ 기사 목록 조회 실패:", error);
           alert("기사 목록을 불러오는데 실패했습니다.");
         }
       });
 
-      // ==========================================
-      // 2) 기존 배차 값 세팅
-      // ==========================================
+      // ------------------------
+      // 2) 창고 목록 불러오기
+      // ------------------------
+      $.ajax({
+        url: contextPath + "/admin/outbound/dispatches/warehouses",
+        type: "GET",
+        dataType: "json",
+        success: function(list) {
+          console.log("✅ 창고 목록 조회 성공:", list);
+
+          var select = $("#warehouseSelect");
+          select.empty();
+          select.append('<option value="">-- 창고 선택 --</option>');
+
+          if (!list || list.length === 0) {
+            console.warn("⚠️ 창고 데이터가 없습니다.");
+            loadStatus.warehouses = true;
+            checkAndSetValues();
+            return;
+          }
+
+          list.forEach(function(w) {
+            select.append(
+                    $('<option></option>')
+                            .val(w.id) // ✅ 수정: JSON의 'id' 필드 사용 (w.warehouseId -> w.id)
+                            .text(w.name) // ✅ 수정: JSON에 없는 'warehouseType' 제거
+            );
+          });
+
+          console.log("📋 창고 옵션 추가 완료:", select.find('option').length - 1 + "개");
+        },
+        error: function(xhr, status, error) {
+          console.error("❌ 창고 목록 조회 실패:", error);
+          console.error("응답:", xhr.responseText);
+        }
+      });
+
+      // ------------------------
+      // 기존 배차 값 세팅
+      // ------------------------
       function setExistingValues() {
+        console.log("📝 기존 배차 데이터 세팅 중...");
+        console.log("warehouseId:", "${dispatch.warehouseId}");
+
         $("input[name='vehicleNumber']").val("${dispatch.carId}");
         $("input[name='vehicleType']").val("${dispatch.carType}");
         $("input[name='boxCount']").val("${dispatch.loadedBox}");
-        $("input[name='vehicleCapacity']").val("${dispatch.maximumBOX}");
         $("select[name='dispatchStatus']").val("${dispatch.dispatchStatus}");
         $("select[name='approvalStatus']").val("${dispatch.approvedStatus}");
         $("#driverSelect").val("${dispatch.driverName}");
 
-        console.log("✅ 기존값 세팅 완료");
+        // ✅ 창고 선택 - warehouseId가 있으면 설정
+        var warehouseId = "${dispatch.warehouseId}";
+        if (warehouseId && warehouseId !== "null" && warehouseId !== "") {
+          $("#warehouseSelect").val(warehouseId);
+          console.log("✅ 창고 설정됨:", warehouseId);
+        } else {
+          console.warn("⚠️ warehouseId가 없습니다:", warehouseId);
+        }
       }
-
-      // ==========================================
-      // 3) 신규 배차 초기값
-      // ==========================================
-      function setNewValues() {
-        $("input[name='vehicleNumber']").val("");
-        $("input[name='vehicleType']").val("");
-        $("input[name='boxCount']").val(0);
-        $("input[name='vehicleCapacity']").val(100);
-        $("select[name='dispatchStatus']").val("대기");
-        $("select[name='approvalStatus']").val("승인");
-
-        console.log("✅ 신규값 초기화 완료");
-      }
-
-      // ==========================================
-      // 4) 기사 선택 시 차량 자동입력
-      // ==========================================
+      // ------------------------
+      // 기사 변경 → 차량 자동 입력 ⭐ 수정
+      // ------------------------
       $("#driverSelect").on("change", function () {
-        var selectedOption = $(this).find("option:selected");
-        var carId = selectedOption.attr('data-car') || "";
-        var carType = selectedOption.attr('data-type') || "";
+        var option = $(this).find("option:selected");
+        var carId = option.attr("data-car");
+        var carType = option.attr("data-type");
 
-        console.log("👤 선택된 기사:", selectedOption.val());
-        console.log("🚗 차량번호:", carId);
-        console.log("🚙 차량종류:", carType);
+        console.log("🚗 기사 선택:", $(this).val());
+        console.log("차량번호:", carId);
+        console.log("차량종류:", carType);
 
-        $("input[name='vehicleNumber']").val(carId);
-        $("input[name='vehicleType']").val(carType);
+        $("input[name='vehicleNumber']").val(carId || '');
+        $("input[name='vehicleType']").val(carType || '');
       });
 
-      // ==========================================
-      // 5) 등록 버튼 클릭
-      // ==========================================
+      // ------------------------
+      // 등록 버튼
+      // ------------------------
       $("#submitDispatchBtn").on("click", function () {
-        var driverName = $("#driverSelect").val();
-        var vehicleNumber = $("input[name='vehicleNumber']").val();
-
-        if (!driverName) {
-          alert("기사를 선택해주세요.");
-          return;
-        }
-
-        if (!vehicleNumber) {
-          alert("차량번호가 없습니다.");
+        if (isApproved) {
+          alert("승인된 건은 수정할 수 없습니다.");
           return;
         }
 
         var data = {
           approvedOrderID: Number("${dispatch.approvedOrderID}"),
-          carId: vehicleNumber,
+          carId: $("input[name='vehicleNumber']").val(),
           carType: $("input[name='vehicleType']").val(),
-          driverName: driverName,
+          driverName: $("#driverSelect").val(),
           loadedBox: Number($("input[name='boxCount']").val()),
+          warehouseId: Number($("#warehouseSelect").val()),
           maximumBOX: Number($("input[name='vehicleCapacity']").val()),
           dispatchStatus: $("select[name='dispatchStatus']").val(),
           approvedStatus: $("select[name='approvalStatus']").val()
         };
 
-        console.log("📤 전송 데이터:", data);
+        console.log("📤 등록 데이터:", data);
+
+        // 유효성 검사
+        if (!data.driverName) {
+          alert("기사를 선택해주세요.");
+          return;
+        }
+        if (!data.warehouseId) {
+          alert("창고를 선택해주세요.");
+          return;
+        }
+        if (!data.loadedBox || data.loadedBox <= 0) {
+          alert("출고박스 수를 입력해주세요.");
+          return;
+        }
 
         $.ajax({
           url: contextPath + "/admin/outbound/" + data.approvedOrderID + "/register",
@@ -249,10 +281,8 @@
             location.reload();
           },
           error: function (xhr, status, error) {
-            console.error("🚨 등록 실패");
-            console.error("Status:", status);
-            console.error("Error:", error);
-            console.error("Response:", xhr.responseText);
+            console.error("❌ 등록 실패:", error);
+            console.error("응답:", xhr.responseText);
             alert("등록 실패: " + (xhr.responseText || error));
           }
         });
