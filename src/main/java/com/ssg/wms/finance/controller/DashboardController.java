@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/dashboard")
+@RequestMapping("/admin/dashboard")
 @RequiredArgsConstructor
 @Log4j2
 public class DashboardController {
@@ -99,11 +99,10 @@ public class DashboardController {
         response.put("profitGrowthMoM", profitGrowthMoM);
         response.put("profitGrowthYoY", profitGrowthYoY);
 
-        // --- ▼ [신규 추가] 7. 월간 카드용 데이터 추가 ---
+        // --- 월간 카드용 데이터 추가 ---
         response.put("monthlySales", monthlySales);
         response.put("monthlyExpense", monthlyExpense);
         response.put("monthlyNetProfit", monthlyNetProfit);
-        // --- ▲ [신규 추가] ---
 
         return ResponseEntity.ok(response);
     }
