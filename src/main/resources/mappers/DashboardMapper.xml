@@ -6,17 +6,17 @@
     <select id="countMonthlyInbound" resultType="int">
         SELECT COUNT(*)
         FROM inbound
-        WHERE inbound_status = 'approved'
-          AND YEAR(inbound_at) = #{year}
+        WHERE YEAR(inbound_at) = #{year}
           AND MONTH(inbound_at) = #{month}
+          AND inbound_status = 'approved'
     </select>
 
     <select id="countMonthlyOutbound" resultType="int">
         SELECT COUNT(*)
         FROM outboundRequest
-        WHERE approvedStatus = 'APPROVED'
-          AND YEAR(outboundDate) = #{year}
+        WHERE YEAR(outboundDate) = #{year}
           AND MONTH(outboundDate) = #{month}
+          AND UPPER(approvedStatus) = 'Approved'
     </select>
 
 </mapper>

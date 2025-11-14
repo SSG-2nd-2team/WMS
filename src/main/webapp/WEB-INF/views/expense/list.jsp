@@ -101,6 +101,7 @@
                         <label class="form-label">카테고리 <span class="text-danger">*</span></label>
                         <select id="modalCategory" class="form-select">
                             <option value="">선택하세요</option>
+                            <option value="전체">전체</option>
                             <option value="임대료">임대료</option>
                             <option value="인건비">인건비</option>
                             <option value="전기세">전기세</option>

@@ -283,6 +283,8 @@
                     labels: {
                         formatter: (val) => formatKoreanNumber(val),
                         hideOverlappingLabels: true, // 겹치는 라벨 자동 숨김
+                        offsetX: 5, // 레이블을 왼쪽으로 -5px 이동 (오른쪽으로 5px 이동하려면 양수)
+                        offsetY: 0,  // 레이블 수직 위치 조정 (필요 시)
                         style: {
                             fontSize: '11px' // 폰트 크기 살짝 줄임
                         }
