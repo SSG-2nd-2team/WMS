@@ -31,7 +31,7 @@ public class AdminController {
     @GetMapping("")
     public String getAdminMain() {
         // 메인 화면
-        return "admin/dashboard";
+        return "/dashboard";
     }
 
     @GetMapping("/login")
@@ -56,7 +56,7 @@ public class AdminController {
         session.setAttribute("loginId", loginId);
         session.setAttribute("role", Role.ADMIN);
 
-        return "redirect:/admin/dashboard";
+        return "redirect:/dashboard";
     }
 
     @Transactional

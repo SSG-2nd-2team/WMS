@@ -112,8 +112,19 @@
 <div class="page-wrapper">
   <h1>창고 목록 및 위치 조회</h1>
 
-  <c:if test="${userRole == 'ADMIN'}">
-    <button onclick="location.href='${pageContext.request.contextPath}/admin/warehouses/register'" class="register-btn">
+  <%-- 1. [등록 버튼 수정] ADMIN 또는 MANAGER일 때만 등록 버튼 표시 --%>
+  <c:if test="${userRole == 'ADMIN' || userRole == 'MANAGER'}">
+    <c:set var="registerPath" value="" />
+    <c:choose>
+      <c:when test="${userRole == 'ADMIN'}">
+        <c:set var="registerPath" value="${pageContext.request.contextPath}/admin/warehouses/register" />
+      </c:when>
+      <c:when test="${userRole == 'MANAGER'}">
+        <%-- Manager의 컨트롤러 매핑 경로를 '/warehousemanager/warehouses'로 설정했으므로 그에 맞게 경로를 조정해야 합니다. --%>
+        <c:set var="registerPath" value="${pageContext.request.contextPath}/warehousemanager/warehouses/register" />
+      </c:when>
+    </c:choose>
+    <button onclick="location.href='${registerPath}'" class="register-btn">
       새로운 창고 등록
     </button>
   </c:if>
@@ -133,21 +144,27 @@
       </thead>
       <tbody>
 
-      <%-- 1. [목록 통합] 두 가지 변수명 중 존재하는 데이터를 displayList에 설정 --%>
+      <%-- 2. [목록 통합] 두 가지 변수명 중 존재하는 데이터를 displayList에 설정 --%>
       <c:set var="displayList" value="${tableWarehouseList != null ? tableWarehouseList : warehouseList}" />
 
       <c:forEach var="warehouse" items="${displayList}">
         <tr>
           <td>${warehouse.warehouseId}</td>
           <td>
-              <%-- 2. [권한 분기] 역할에 따라 상세 조회 URL 분기 --%>
+              <%-- 3. [상세 조회 링크 수정] 역할에 따라 상세 조회 URL 분기 --%>
             <c:choose>
               <c:when test="${userRole == 'ADMIN'}">
                 <a href="${pageContext.request.contextPath}/admin/warehouses/${warehouse.warehouseId}">
                     ${warehouse.name}
                 </a>
               </c:when>
+              <c:when test="${userRole == 'MANAGER'}">
+                <a href="${pageContext.request.contextPath}/warehousemanager/warehouses/${warehouse.warehouseId}">
+                    ${warehouse.name}
+                </a>
+              </c:when>
               <c:otherwise>
+                <%-- MEMBER는 member 경로 사용 --%>
                 <a href="${pageContext.request.contextPath}/member/warehouses/${warehouse.warehouseId}">
                     ${warehouse.name}
                 </a>
@@ -175,17 +192,15 @@
 </div>
 
 <script type="text/javascript">
-  // 3. [지도 데이터 통합] jsWarehouseData가 없으면 displayList를 대체 소스로 사용
+  // 4. [지도 데이터 통합] jsWarehouseData가 없으면 displayList를 대체 소스로 사용
   var warehouseListForJs = '${jsWarehouseData}';
-  if (warehouseListForJs.trim().length === 0 || warehouseListForJs === '[]') {
-    // jsWarehouseData가 비어있는 경우, 테이블에 사용된 목록을 사용
-    warehouseListForJs = '${displayList}';
-  }
-
   var jsonString = warehouseListForJs;
   var warehouseData = [];
 
   try {
+    // jsWarehouseData가 비어있는 경우(혹은 문자열화된 리스트 객체인 경우), 이 부분은 컨트롤러에서 JSON 문자열을 정확히 넣어주는 것이 좋습니다.
+    // 하지만 현재 HTML 소스 코드에 `${displayList}`가 포함되어 있지 않으므로,
+    // JSON 파싱 부분만 유효한 JSON 문자열에 대해 동작하도록 유지합니다.
     if (jsonString && jsonString.trim().length > 0 && jsonString !== '[]') {
       // JSON 파싱 시 'jsWarehouseData' 변수에 유효한 JSON 문자열이 담겨야 합니다.
       warehouseData = JSON.parse(jsonString.replace(/&quot;/g, '"'));
@@ -199,7 +214,6 @@
     }
   } catch(e) {
     console.error("창고 데이터 JSON 파싱 오류:", e);
-    // 오류가 발생해도 지도 로딩은 계속 진행 (데이터는 비어있음)
     warehouseData = [];
   }
 

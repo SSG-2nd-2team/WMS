@@ -26,7 +26,7 @@ public class ManagerController {
     @GetMapping("")
     public String getManagerMain() {
         // 메인 화면
-        return "warehousemanager/connect";
+        return "/dashboard";
     }
 
     @GetMapping("/login")
@@ -51,7 +51,7 @@ public class ManagerController {
         session.setAttribute("loginManager", manager);
         session.setAttribute("loginId", loginId);
         session.setAttribute("role", Role.MANAGER);
-        return "redirect:/warehousemanager";
+        return "redirect:/dashboard";
     }
 
     @Transactional

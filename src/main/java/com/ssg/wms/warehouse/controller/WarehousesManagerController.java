@@ -25,7 +25,9 @@ import javax.servlet.http.HttpSession; // HttpSession import
 @Log4j2 // 로그 사용을 위해 추가
 @Controller
 // Tomcat Manager 충돌 방지를 위해 경로를 /mgr/warehouses로 변경
-@RequestMapping("/mgr/warehouses")
+
+/// 한번더 최종 경로변경
+@RequestMapping("/warehousemanager/warehouses")
 public class WarehousesManagerController {
 
     private final WarehouseManagerService warehouseManagerService;
