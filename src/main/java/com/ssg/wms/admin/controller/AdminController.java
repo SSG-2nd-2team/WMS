@@ -56,7 +56,7 @@ public class AdminController {
         session.setAttribute("loginId", loginId);
         session.setAttribute("role", staff.getRole());
 
-        return "redirect:/dashboard";
+        return "redirect:/admin/dashboard";
     }
 
     @Transactional

@@ -168,7 +168,7 @@
       // 2) 창고 목록 불러오기
       // ------------------------
       $.ajax({
-        url: contextPath + "/admin/outbound/dispatches/warehouses",
+        url: contextPath + "/admin/dispatches/warehouses",
         type: "GET",
         dataType: "json",
         success: function(list) {
