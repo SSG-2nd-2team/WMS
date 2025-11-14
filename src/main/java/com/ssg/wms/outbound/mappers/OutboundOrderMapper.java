@@ -29,7 +29,8 @@ public interface OutboundOrderMapper {
 
     // ✅ 출고요청 상태 업데이트 (새로 추가)
     int updateOutboundRequestStatus(@Param("approvedOrderId") Long approvedOrderId,
-                                    @Param("approvedStatus") String approvedStatus);
+                                    @Param("approvedStatus") String approvedStatus,
+                                    @Param("warehouseId") Long warehouseId);
 
 
 }

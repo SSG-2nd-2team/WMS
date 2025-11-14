@@ -26,6 +26,8 @@
         <result property="maximumBOX" column="maximumBox"/>
         <result property="waybillNumber" column="waybillNumber"/>
         <result property="waybillStatus" column="waybillStatus"/>
+        <result property="warehouseId" column="warehouseId"/>
+        <result property="warehouseName" column="warehouseName"/>
     </resultMap>
 
     <!-- 출고지시서 목록 매핑 -->
@@ -37,6 +39,8 @@
         <result property="approvedStatus" column="approvedStatus"/>
         <result property="partnerName" column="partnerName"/>
         <result property="driverName" column="driverName"/>
+        <result property="warehouseId" column="warehouseId"/>
+        <result property="warehouseName" column="warehouseName"/>
     </resultMap>
 
     <!-- 출고지시서 전체 목록 -->
@@ -48,11 +52,18 @@
         r.outboundDate,
         r.approvedStatus,
         p.partner_name AS partnerName,
-        m.member_name AS driverName
+        m.member_name AS driverName,
+        w.warehouse_id AS warehouseId,
+        w.name AS warehouseName
         FROM outboundRequest r
-        LEFT JOIN outboundOrder o ON r.outboundRequest_ID = o.outboundRequest_ID
-        LEFT JOIN member m ON r.member_id = m.member_id
-        LEFT JOIN partner p ON m.partner_id = p.partner_id
+        LEFT JOIN outboundOrder o
+        ON r.outboundRequest_ID = o.outboundRequest_ID
+        LEFT JOIN member m
+        ON r.member_id = m.member_id
+        LEFT JOIN partner p
+        ON m.partner_id = p.partner_id
+        LEFT JOIN WAREHOUSE w
+        ON r.warehouse_id = w.warehouse_id
         ORDER BY r.outboundDate DESC
     </select>
 
@@ -93,18 +104,29 @@
     </select>
 
     <!-- 출고지시서 상세 조회 -->
-    <select id="getOrderDetailById" resultType="com.ssg.wms.outbound.domain.dto.OutboundOrderDTO">
+    <select id="getOrderDetailById" resultMap="ShipmentOrderDetailMap">
         SELECT
-        o.approvedOrder_ID AS approvedOrderID,
-        o.outboundRequest_ID AS outboundRequestID,
+        o.approvedOrder_ID AS approvedOrder_ID,
+        o.outboundRequest_ID,
         o.orderStatus,
         r.outboundDate,
         r.approvedStatus,
-        p.partner_name AS partnerName
+        p.partner_name AS partnerName,
+        d.dispatch_ID AS dispatch_ID,
+        d.carID AS carId,
+        d.Cartype AS carType,
+        d.driverName AS driverName,
+        d.dispatchStatus AS dispatchStatus,
+        d.loadedBOX AS loadedBox,
+        d.maximumBOX AS maximumBox,
+        d.warehouseId AS warehouseId,
+        w.name AS warehouseName
         FROM outboundOrder o
         LEFT JOIN outboundRequest r ON o.outboundRequest_ID = r.outboundRequest_ID
+        LEFT JOIN dispatch d ON d.approvedOrder_ID = o.approvedOrder_ID
         LEFT JOIN member m ON r.member_id = m.member_id
         LEFT JOIN partner p ON m.partner_id = p.partner_id
+        LEFT JOIN WAREHOUSE w ON d.warehouseId = w.warehouse_id
         WHERE o.approvedOrder_ID = #{approvedOrderId}
     </select>
 
@@ -122,7 +144,8 @@
     <update id="updateOutboundRequestStatus">
         UPDATE outboundRequest
         SET
-        approvedStatus = #{approvedStatus}
+        approvedStatus = #{approvedStatus},
+        warehouse_id = #{warehouseId}
         WHERE outboundRequest_ID = (
         SELECT outboundRequest_ID
         FROM outboundOrder
@@ -130,5 +153,44 @@
         )
     </update>
 
+    <insert id="upsertDispatch" parameterType="com.ssg.wms.outbound.domain.dto.OutboundOrderDTO">
+        INSERT INTO dispatch (
+        approvedOrder_ID,
+        carID,
+        Cartype,
+        driverName,
+        assignedDate,
+        dispatchStatus,
+        loadedBOX,
+        maximumBOX,
+        warehouseId
+        ) VALUES (
+        #{approvedOrderID},
+        #{carId},
+        #{carType},
+        #{driverName},
+        NOW(),
+        #{dispatchStatus},
+        #{loadedBox},
+        #{maximumBOX},
+        #{warehouseId}
+        )
+        ON DUPLICATE KEY UPDATE
+        carID = #{carId},
+        Cartype = #{carType},
+        driverName = #{driverName},
+        assignedDate = NOW(),
+        dispatchStatus = #{dispatchStatus},
+        loadedBOX = #{loadedBox},
+        maximumBOX = #{maximumBOX},
+        warehouseId = #{warehouseId}
+    </insert>
+
+    <!-- ⭐ 4. 기존 배차가 있는지 확인 -->
+    <select id="checkDispatchExists" resultType="int">
+        SELECT COUNT(*)
+        FROM dispatch
+        WHERE approvedOrder_ID = #{approvedOrderId}
+    </select>
 
 </mapper>

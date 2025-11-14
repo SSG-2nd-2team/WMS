@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssg.wms.product_stock.mappers.ProductListMapper">
+<!--품목현황 -->
+
+    <sql id="wmsSearchCondition">
+        <where>
+            <if test="categoryCd != null">
+                AND P.category_cd = #{categoryCd}
+            </if>
+            <if test="partnerId != null">
+                AND P.partner_id = #{partnerId}
+            </if>
+            <if test="warehouseId != null">
+                AND PS.warehouse_id = #{warehouseId}
+            </if>
+            <if test="sectionId != null">
+                AND PS.section_id = #{sectionId}
+            </if>
+            <if test="productId != null">
+                AND P.product_id = #{productId}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="findProductList" resultType="com.ssg.wms.product_stock.dto.ProductListDTO">
+        SELECT
+        P.product_id AS productId,                      -- DTO 필드: productId
+        P.product_name AS productName,                  -- DTO 필드: productName
+        PR.partner_name AS brandName,                 -- DTO 필드: partnerName (브랜드)
+        W.name AS warehouseName,                        -- DTO 필드: warehouseName
+        S.section_name AS sectionName,                  -- DTO 필드: sectionName
+        PS.quantity AS quantity,                        -- DTO 필드: quantity
+        PS.product_status AS productState,             -- DTO 필드: productStatus
+        CASE
+        WHEN PS.quantity > 0 THEN '가능'
+        ELSE '불가능'
+        END AS availableOutbound,                  -- DTO 필드: AvailableOutbound
+        I.inbound_at AS inboundDate
+        FROM
+        Product_Stock PS
+        INNER JOIN
+        WAREHOUSE W ON PS.warehouse_id = W.warehouse_id
+        INNER JOIN
+        Section S ON PS.section_id = S.section_id AND PS.warehouse_id = S.warehouse_id
+        INNER JOIN
+        inbound_item II ON PS.inbound_item_id = II.inbound_item_id
+        INNER JOIN
+        Product P ON II.product_id = P.product_id
+        INNER JOIN
+        Partner PR ON P.partner_id = PR.partner_id
+        INNER JOIN
+        inbound I ON II.inbound_id = I.inbound_id
+
+        <include refid="wmsSearchCondition"/>
+
+        ORDER BY
+        PS.ps_id DESC
+        LIMIT #{size} OFFSET #{skip}
+    </select>
+
+    <select id="countProductList" resultType="int">
+        SELECT
+        COUNT(PS.ps_id)
+        FROM
+        Product_Stock PS
+        INNER JOIN WAREHOUSE W ON PS.warehouse_id = W.warehouse_id
+        INNER JOIN Section S ON PS.section_id = S.section_id AND PS.warehouse_id = S.warehouse_id
+        INNER JOIN inbound_item II ON PS.inbound_item_id = II.inbound_item_id
+        INNER JOIN Product P ON II.product_id = P.product_id
+        INNER JOIN Partner PR ON P.partner_id = PR.partner_id
+        INNER JOIN inbound I ON II.inbound_id = I.inbound_id
+
+        <include refid="wmsSearchCondition"/>
+    </select>
+
+</mapper>

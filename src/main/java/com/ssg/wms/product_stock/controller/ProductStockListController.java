@@ -16,11 +16,11 @@ import java.util.*;
 @RequestMapping("/stock")
 @RequiredArgsConstructor
 @Log4j2
-public class Product_search_list_Controller {
+public class ProductStockListController {
 
     private final ProductStockService productStockService;
 
-    @GetMapping("/search")
+    @GetMapping("/list")
     public String drop_down_list(PageRequestDTO pageRequestDTO, Model model){
         List<DropdownDTO> categoryList = productStockService.categoryDropDown();
         List<DropdownDTO> brandList = productStockService.brandDropDown();
@@ -35,10 +35,10 @@ public class Product_search_list_Controller {
         PageResponseDTO<StockInfoDTO> responseDTO = productStockService.getStockList(pageRequestDTO);
         model.addAttribute("responseDTO", responseDTO);
 
-        return "stock/list";
+        return "stock/stock-list";
     }
 
-    @GetMapping("/list") // 💡 새로운 엔드포인트
+    @GetMapping("/search") // 💡 새로운 엔드포인트
     @ResponseBody // 💡 응답 데이터를 JSON으로 변환하여 본문에 직접 작성하도록 지시
     public PageResponseDTO<StockInfoDTO> searchStockList(
             @RequestParam(required = false) String categoryCd,
@@ -74,7 +74,7 @@ public class Product_search_list_Controller {
         model.addAttribute("summary", summary);
         model.addAttribute("logList", logList);
 
-        return "stock/detail";
+        return "stock/stock-detail";
     }
 
     @GetMapping("/stock/detail/{productId}")

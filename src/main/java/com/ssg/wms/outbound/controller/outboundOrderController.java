@@ -4,6 +4,8 @@ import com.ssg.wms.common.Role;
 import com.ssg.wms.outbound.domain.Criteria;
 import com.ssg.wms.outbound.domain.dto.OutboundOrderDTO;
 import com.ssg.wms.outbound.service.OutboundOrderService;
+import com.ssg.wms.product_stock.dto.DropdownDTO;
+import com.ssg.wms.product_stock.mappers.dropDownMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import java.util.Map;
 public class outboundOrderController {
 
     private final OutboundOrderService outboundOrderService;
+    private final dropDownMapper dropdownMapper;
 
     /** ADMIN 권한 체크 */
     private boolean isAdmin(HttpSession session) {
@@ -86,6 +89,28 @@ public class outboundOrderController {
         model.addAttribute("dispatch", detail);
 
         return "outbound/admin/dispatchForm";
+    }
+
+    @GetMapping("/dispatches/warehouses")
+    @ResponseBody
+    public ResponseEntity<List<DropdownDTO>> getWarehouseListForDispatch(HttpSession session) {
+
+        if (!isLoggedIn(session))
+            return ResponseEntity.status(401).build();
+        if (!isAdmin(session))
+            return ResponseEntity.status(403).build();
+
+        log.info("창고 목록 조회 요청 (AJAX)");
+
+        try {
+            // DropDownMapper를 사용하여 재고가 있는 창고 목록을 조회
+            List<DropdownDTO> warehouseList = dropdownMapper.warehouseDropDown();
+            return ResponseEntity.ok(warehouseList);
+
+        } catch (Exception e) {
+            log.error("창고 목록 조회 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+        }
     }
 
 

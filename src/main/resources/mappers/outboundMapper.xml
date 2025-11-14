@@ -86,7 +86,7 @@
         M.member_name AS requestUserName,
         sr.outboundDate,
         CASE
-        WHEN sr.approvedStatus = 'APPROVED' THEN '승인'
+        WHEN sr.approvedStatus = 'APPROVED' THEN 'approved'
         WHEN sr.approvedStatus = 'PENDING' THEN '승인대기'
         WHEN sr.approvedStatus = 'COMPANION' THEN '반려'
         ELSE sr.approvedStatus
@@ -98,7 +98,7 @@
 
         <if test="status != null and status != ''">
             AND (
-            (sr.approvedStatus = 'APPROVED' AND #{status} = '승인')
+            (sr.approvedStatus = 'APPROVED' AND #{status} = 'approved')
             OR (sr.approvedStatus = 'PENDING' AND #{status} = '승인대기')
             OR (sr.approvedStatus = 'COMPANION' AND #{status} = '반려')
             )
@@ -116,7 +116,7 @@
         m.member_name AS requestUserName,
         sr.outboundDate,
         CASE
-        WHEN sr.approvedStatus = 'APPROVED' THEN '승인'
+        WHEN sr.approvedStatus = 'APPROVED' THEN 'approved'
         WHEN sr.approvedStatus = 'PENDING' THEN '승인대기'
         WHEN sr.approvedStatus = 'COMPANION' THEN '반려'
         ELSE sr.approvedStatus
@@ -168,7 +168,7 @@
         c.category_name
         FROM outboundRequest sr
         INNER JOIN Member M ON sr.member_id = M.member_id
-        LEFT JOIN Staff st ON sr.staff_Id = st.staff_id
+        LEFT JOIN Staff st ON sr.staff_id = st.staff_id
         LEFT JOIN Partner Pt ON M.partner_id = Pt.partner_id
         LEFT JOIN outboundOrder o ON sr.outboundRequest_ID = o.outboundRequest_ID
         LEFT JOIN dispatch d ON o.approvedOrder_ID = d.approvedOrder_ID
@@ -178,7 +178,7 @@
         LEFT JOIN Category c ON p.category_cd = c.category_cd
         WHERE sr.outboundRequest_ID = #{outboundRequestId}
         <if test="memberId != null">
-            AND sr.member_Id = #{memberId}
+            AND sr.member_id = #{memberId}
         </if>
     </select>
 

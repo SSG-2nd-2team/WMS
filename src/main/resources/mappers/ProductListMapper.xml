@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ssg.wms.product_stock.mappers.ProductListMapper">
 
+<mapper namespace="com.ssg.wms.product_stock.mappers.ProductStockMapper">
 
+<!--재고 조회-->
+
+<!--검색 메뉴 선택 하지 않았을때 null 값으로 받음 -->
     <sql id="wmsSearchCondition">
         <where>
             <if test="categoryCd != null">
@@ -57,7 +60,4 @@
 
         <include refid="wmsSearchCondition"/>
     </select>
-
-
-
 </mapper>

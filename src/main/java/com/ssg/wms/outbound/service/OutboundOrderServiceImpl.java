@@ -61,7 +61,8 @@ public class OutboundOrderServiceImpl implements OutboundOrderService {
             // ✅ 2. 출고요청 상태 업데이트
             int updatedRequest = outboundOrderMapper.updateOutboundRequestStatus(
                     outboundOrderDTO.getApprovedOrderID(),
-                    outboundOrderDTO.getApprovedStatus()
+                    outboundOrderDTO.getApprovedStatus(),
+                    outboundOrderDTO.getWarehouseId()
             );
             log.info("✅ 출고요청 상태 업데이트 완료: {} rows", updatedRequest);
 
@@ -97,6 +98,7 @@ public class OutboundOrderServiceImpl implements OutboundOrderService {
                             .dispatchStatus(outboundOrderDTO.getDispatchStatus())
                             .loadedBox(outboundOrderDTO.getLoadedBox())
                             .maximumBox(outboundOrderDTO.getMaximumBOX())
+                            .warehouseId(outboundOrderDTO.getWarehouseId())
                             .build();
 
                     dispatchMapper.updateDispatchInformation(dispatchDTO);
