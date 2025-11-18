@@ -32,11 +32,12 @@
 
 
 
-<!--    배차 정보 등록-->
+    <!-- 배차 정보 신규 생성 (warehouseId 추가) -->
     <insert id="insertDispatchInformation"
             parameterType="com.ssg.wms.outbound.domain.dto.OutboundOrderDTO"
             useGeneratedKeys="true"
-            keyProperty="dispatchId">
+            keyProperty="dispatchId"
+            keyColumn="dispatch_ID">
         INSERT INTO dispatch (
         approvedOrder_ID,
         carID,
@@ -45,9 +46,9 @@
         assignedDate,
         dispatchStatus,
         loadedBOX,
-        maximumBOX
-        )
-        VALUES (
+        maximumBOX,
+        warehouseId
+        ) VALUES (
         #{approvedOrderID},
         #{carId},
         #{carType},
@@ -55,25 +56,29 @@
         NOW(),
         #{dispatchStatus},
         #{loadedBox},
-        100
+        #{maximumBOX},
+        #{warehouseId}
         )
     </insert>
 
 
 
 
-    
-    <update id="updateDispatchInformation" parameterType="com.ssg.wms.outbound.domain.dto.DispatchDTO">
+    <update id="updateDispatchInformation"
+            parameterType="com.ssg.wms.outbound.domain.dto.DispatchDTO">
         UPDATE dispatch
         SET
         carID = #{carId},
         Cartype = #{carType},
         driverName = #{driverName},
-        dispatchStatus = #{dispatchStatus}
-        warehouse_id = #{warehouseId}
-        WHERE
-        approvedOrder_ID = #{approvedOrderID}
+        assignedDate = NOW(),
+        dispatchStatus = #{dispatchStatus},
+        loadedBOX = #{loadedBox},
+        maximumBOX = #{maximumBox},
+        warehouseId = #{warehouseId}
+        WHERE dispatch_ID = #{dispatchId}
     </update>
+
 
 
 

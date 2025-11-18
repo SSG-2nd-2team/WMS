@@ -23,7 +23,6 @@ public interface OutboundMapper {
 
 
     // 출고 요청 목록 조회 (서비스 getRequestByUserId와 연결)
-
     List<OutboundDTO> selectOutboundRequestByUserId(@Param("memberId") Long memberId,
                                                     @Param("status") String status);
 
@@ -60,6 +59,8 @@ public interface OutboundMapper {
                       @Param("memberId") Long memberId);
 
     int deleteWaybillByRequestId(@Param("outboundRequestId")Long outboundRequestId);
+
+
     int deleteDispatchByRequestId(@Param("outboundRequestId") Long outboundRequestId);
 
 

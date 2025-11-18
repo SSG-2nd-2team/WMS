@@ -29,6 +29,7 @@
       <tr>
         <td>${dispatch.approvedOrderID}</td>
 
+        <!-- 기사 선택 -->
         <td>
           <select id="driverSelect" name="driverName" class="form-select" required>
             <option value="">-- 기사 선택 --</option>
@@ -40,6 +41,7 @@
 
         <td><input type="number" name="boxCount" class="form-control" required></td>
 
+        <!-- 창고 선택 -->
         <td>
           <select id="warehouseSelect" name="warehouseId" class="form-select" required>
             <option value="">-- 창고 선택 --</option>
@@ -57,7 +59,7 @@
 
         <td>
           <select name="approvalStatus" class="form-select" required>
-            <option value="approved">승인</option>
+            <option value="승인">승인</option>
             <option value="반려">반려</option>
           </select>
         </td>
@@ -76,6 +78,7 @@
 
       var isExistingDispatch = ${dispatch.carId != null ? 'true' : 'false'};
 
+      // ⭐ approvedStatus 값 확인 (APPROVED, 승인 둘 다 체크)
       var approvedStatusValue = "${dispatch.approvedStatus}";
       var isApproved = (approvedStatusValue === "APPROVED" || approvedStatusValue === "승인");
 
@@ -89,6 +92,7 @@
         isExistingDispatch: isExistingDispatch
       });
 
+      // ✅ 승인된 건이면 폼 비활성화
       if (isApproved) {
         console.log("⚠️ 승인된 건이므로 수정 불가");
         $("#dispatchForm input, #dispatchForm select").prop("disabled", true);
@@ -98,6 +102,10 @@
                 .addClass("btn-secondary")
                 .text("승인된 건은 수정할 수 없습니다");
       }
+
+      // ------------------------
+      // 데이터 로드 완료 추적
+      // ------------------------
       var loadStatus = {
         drivers: false,
         warehouses: false
@@ -111,7 +119,7 @@
       }
 
       // ------------------------
-      // 1) 기사 목록 불러오기 ⭐ 수정
+      // 1) 기사 목록 불러오기
       // ------------------------
       $.ajax({
         url: contextPath + "/admin/dispatches/drivers",
@@ -160,7 +168,7 @@
       // 2) 창고 목록 불러오기
       // ------------------------
       $.ajax({
-        url: contextPath + "/admin/outbound/dispatches/warehouses",
+        url: contextPath + "/admin/dispatches/warehouses",
         type: "GET",
         dataType: "json",
         success: function(list) {
@@ -180,16 +188,17 @@
           list.forEach(function(w) {
             select.append(
                     $('<option></option>')
-                            .val(w.id) // ✅ 수정: JSON의 'id' 필드 사용 (w.warehouseId -> w.id)
-                            .text(w.name) // ✅ 수정: JSON에 없는 'warehouseType' 제거
+                            .val(String(w.warehouseId))
+                            .text(w.name + ' (' + w.warehouseType + ')')
             );
           });
 
           console.log("📋 창고 옵션 추가 완료:", select.find('option').length - 1 + "개");
+          loadStatus.warehouses = true;
+          checkAndSetValues();
         },
         error: function(xhr, status, error) {
           console.error("❌ 창고 목록 조회 실패:", error);
-          console.error("응답:", xhr.responseText);
         }
       });
 
@@ -216,10 +225,13 @@
           console.warn("⚠️ warehouseId가 없습니다:", warehouseId);
         }
       }
+
       // ------------------------
-      // 기사 변경 → 차량 자동 입력 ⭐ 수정
+      // 기사 변경 → 차량 자동 입력
       // ------------------------
       $("#driverSelect").on("change", function () {
+        if (isApproved) return; // 승인된 건은 변경 불가
+
         var option = $(this).find("option:selected");
         var carId = option.attr("data-car");
         var carType = option.attr("data-type");
@@ -260,7 +272,7 @@
           alert("기사를 선택해주세요.");
           return;
         }
-        if (!data.warehouseId) {
+        if (!data.warehouseId || isNaN(data.warehouseId)) {
           alert("창고를 선택해주세요.");
           return;
         }

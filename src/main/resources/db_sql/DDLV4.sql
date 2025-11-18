@@ -65,6 +65,7 @@ CREATE TABLE `Member` (
     `member_name` varchar(255) NOT NULL,
     `member_phone` varchar(255) NOT NULL,
     `member_email` varchar(255) NOT NULL,
+    `business_number` varchar(20) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
     `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
     `status` varchar(20) NOT NULL DEFAULT 'PENDING',

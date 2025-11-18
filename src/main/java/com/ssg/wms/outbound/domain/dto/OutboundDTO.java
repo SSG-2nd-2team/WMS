@@ -29,11 +29,12 @@ public class OutboundDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate requestedDeliveryDate;
-
+    private String warehouseAddress;
     private Long memberId;
     private String staffName;
     private String staffId;
     private Long warehouseId;
+    private String warehouseName;
     private String dispatchStatus;
     private String waybillNumber;
     private String waybillStatus;

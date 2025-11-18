@@ -121,11 +121,14 @@ public class OutboundController {
             @PathVariable Long outboundRequestId,
             HttpSession session) {
 
-        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
-        Long memberId = memberDTO.getMemberId();
-        if (memberId == null) return ResponseEntity.status(401).build();
+        // 로그인 회원 정보 꺼내기
+        MemberDTO loginMember = (MemberDTO) session.getAttribute("loginMember");
+        if (loginMember == null) {
+            return ResponseEntity.status(401).build();
+        }
 
-        log.info("출고 요청 상세 조회 - outboundRequestId: {}", outboundRequestId);
+        Long memberId = loginMember.getMemberId();
+        log.info("출고 요청 상세 조회 - outboundRequestId: {}, memberId: {}", outboundRequestId, memberId);
 
         OutboundDTO dto = outboundService.getRequestDetailById(outboundRequestId, memberId);
         return ResponseEntity.ok(dto);
