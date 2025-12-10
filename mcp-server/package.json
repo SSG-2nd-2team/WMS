@@ -1,0 +1,19 @@
+{
+  "name": "github-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for GitHub integration with Claude",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@octokit/rest": "^21.0.0",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": ["mcp", "github", "claude"],
+  "author": "",
+  "license": "MIT"
+}

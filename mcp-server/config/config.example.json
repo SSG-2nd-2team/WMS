@@ -1,0 +1,11 @@
+{
+  "github": {
+    "token": "YOUR_GITHUB_TOKEN_HERE",
+    "defaultOwner": "",
+    "defaultRepo": ""
+  },
+  "server": {
+    "name": "github-mcp-server",
+    "version": "1.0.0"
+  }
+}
